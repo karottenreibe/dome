@@ -19,10 +19,15 @@ module Dome
     # Keeps a single Document.
     #
     class Document
-        attr_accessor roots
+        attr_accessor :roots
 
         def initialize
             @roots = []
+        end
+
+        def inspect
+            "#<Dome::Document @roots=[" +
+            "#{ @roots.inject(nil) { |memo,n| memo ? "#{memo}, #{n.inspect}" : n.inspect } }]>"
         end
     end
 
@@ -35,6 +40,13 @@ module Dome
         def initialize
             @name, @attributes, @children = '', [], []
         end
+
+        def inspect
+            "<#{@name} " +
+            "#{ @attributes.inject('') { |memo,a| "#{memo} #{a.inspect}" } }> " +
+            "#{ @children.inject('') { |memo,c| memo + c.inspect } } " +
+            "</#{@name}>"
+        end
     end
 
     ##
@@ -46,6 +58,10 @@ module Dome
         def initialize
             @data = ''
         end
+
+        def inspect
+            @data
+        end
     end
 
     ##
@@ -56,6 +72,10 @@ module Dome
 
         def initialize
             @name, @value = '', ''
+        end
+
+        def inspect
+            "#{@name}=#{@value.inspect}"
         end
     end
 
@@ -92,6 +112,7 @@ module Dome
             node = Node.new
 
             pos = :before_start
+            trunc = true
 
             # parse start tag
             while str.length > 0
@@ -112,10 +133,12 @@ module Dome
                     unless char =~ /\s/
                         attr, str = AttrParser.new.parse str
                         node.attributes << attr
+                        trunc = false # otherwise it would erase the closing '>'
                     end
                 end
 
-                str = str[1..-1]
+                str = str[1..-1] if trunc
+                trunc = true
             end
 
             # remove trailing '>'
@@ -128,7 +151,7 @@ module Dome
             end_tag = "</#{node.name}>"
             str = str[end_tag.length..-1] if str.start_with? "</#{node.name}>"
 
-            data, str
+            [node, str]
         end
     end
 
@@ -151,23 +174,36 @@ module Dome
                     end
                 when :before_value
                     case char
-                    when '"' pos = :in_quote
-                    else pos = :in_value
+                    when '"'
+                        pos = :in_quote
+                    else
+                        pos = :in_value
+                        attr.value << char
                     end
                 when :in_quote
                     case char
                     when '\\'
-                        escaped = true
-                    when '"'
-                        if escaped then attr.value << char
-                        else break
+                        if escaped
+                            attr.value << '\\'
+                            escaped = false
+                        else
+                            escaped = true
                         end
-                    else attr.value << char
+                    when '"'
+                        if escaped
+                            attr.value << char
+                            escaped = false
+                        else
+                            str = str[1..-1]
+                            break
+                        end
+                    else
+                        attr.value << '\\' if escaped
+                        attr.value << char
+                        escaped = false
                     end
-
-                    escaped = false
                 when :in_value
-                    if char =~ /\s/ then break
+                    if char =~ /\s|>/ then break
                     else attr.value << char
                     end
                 end
@@ -175,7 +211,7 @@ module Dome
                 str = str[1..-1]
             end
 
-            attr, str
+            [attr, str]
         end
     end
 
@@ -199,11 +235,9 @@ module Dome
                     data, str = DataParser.new.parse str
                     nodes << data
                 end
-                
-                str = str[1..-1]
             end
 
-            nodes, str
+            [nodes, str]
         end
     end
 
@@ -224,7 +258,7 @@ module Dome
                 str = str[1..-1]
             end
 
-            data, str
+            [data, str]
         end
     end
 
