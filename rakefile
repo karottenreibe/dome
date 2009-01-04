@@ -22,12 +22,12 @@ spec = Gem::Specification.new do |s|
     end
 
     s.platform  =   Gem::Platform::RUBY
-    s.name      =   "Pablo"
+    s.name      =   "Dome"
     s.version   =   ver
     s.author    =   "Fabian Streitel"
     s.email     =   "karottenreibe @nospam@ gmail.com"
-    s.homepage  =   "http://pablo.rubyforge.org/"
-    s.rubyforge_project = "pablo"
+    s.homepage  =   "http://dome.rubyforge.org/"
+    s.rubyforge_project = "dome"
     s.summary   =   "A commandline parser for Ruby that is entirely based on blocks."
     s.files     =   FileList['lib/*.rb', 'test/*'].to_a
     s.require_path  =   "lib"
@@ -66,7 +66,7 @@ task :test do
 end
 
 task :upload do
-    sh "rsync -azv --no-perms --no-times rdoc/* karottenreibe@rubyforge.org:/var/www/gforge-projects/pablo/rdoc/"
+    sh "rsync -azv --no-perms --no-times rdoc/* karottenreibe@rubyforge.org:/var/www/gforge-projects/dome/rdoc/"
 end
 
 task :default => [:gem, :doc]
