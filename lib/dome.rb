@@ -17,6 +17,7 @@ module Dome
 
     ##
     # Keeps a single Document.
+    # All the root elements are stored in the +roots+ Array.
     #
     class Document
         attr_accessor :roots
@@ -32,25 +33,30 @@ module Dome
     end
 
     ##
-    # Keeps a single Node of a Document.
+    # Keeps a single Node of a Document with its +name+ (String), +attributes+ (Array),
+    # +children+ (Array) and +empty+ flag.
     #
     class Node
-        attr_accessor :name, :attributes, :children
+        attr_accessor :name, :attributes, :children, :empty
         
         def initialize
-            @name, @attributes, @children = '', [], []
+            @name, @attributes, @children, @empty = '', [], [], false
+        end
+
+        def empty?
+            @empty
         end
 
         def inspect
             "<#{@name} " +
             "#{ @attributes.inject('') { |memo,a| "#{memo} #{a.inspect}" } }> " +
             "#{ @children.inject('') { |memo,c| memo + c.inspect } } " +
-            "</#{@name}>"
+            ( @empty ? " />" : "</#{@name}>" )
         end
     end
 
     ##
-    # Keeps text data.
+    # Keeps text +data+.
     #
     class Data
         attr_accessor :data
@@ -65,7 +71,7 @@ module Dome
     end
 
     ##
-    # Keeps a single Attribute of a Node.
+    # Keeps a single Attribute of a Node with its +name+ and +value+.
     #
     class Attribute
         attr_reader :name, :value
@@ -80,7 +86,9 @@ module Dome
     end
 
     ##
-    # Parses a string into a Document of Nodes and Attributes
+    # Parses a string into a Document of Nodes and Attributes.
+    # Parsing is started by calling +parse+.
+    # The same parser can be used to parse different documents.
     #
     class Parser
 
@@ -93,6 +101,8 @@ module Dome
 
             #TODO remove doctype
             while str.length > 0
+                ##TODO: user ChildrenParser here? so text will be processed as well
+                ##TODO: Doctype working?
                 node, str = NodeParser.new.parse str
                 doc.roots << node
             end
@@ -128,6 +138,12 @@ module Dome
                     else node.name << char
                     end
                 when :attributes
+                    if char == '/' and str[1..1] == '>'
+                        node.empty = true
+                        str = str[1..-1]
+                        break
+                    end
+
                     break if char == '>'
 
                     unless char =~ /\s/

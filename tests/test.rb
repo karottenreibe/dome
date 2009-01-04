@@ -26,18 +26,22 @@ class Tests < Test::Unit::TestCase
     end
 
     def testAttributes
-        doc = '<root foo=bar><subnode chunky="bacon"></subnode></root>'
+        doc = '<root foo=bar loo="lar"><subnode chunky="bacon" bacon="chunky"></subnode></root>'
         tree = Dome::parse doc
         assert_equal 1, tree.roots.length
             assert_equal 'root', tree.roots[0].name
-            assert_equal 1, tree.roots[0].attributes.length
+            assert_equal 2, tree.roots[0].attributes.length
             assert_equal 'foo', tree.roots[0].attributes[0].name
             assert_equal 'bar', tree.roots[0].attributes[0].value
+            assert_equal 'loo', tree.roots[0].attributes[1].name
+            assert_equal 'lar', tree.roots[0].attributes[1].value
                 assert_equal 1, tree.roots[0].children.length
                 assert_equal 'subnode', tree.roots[0].children[0].name
-                assert_equal 1, tree.roots[0].children[0].attributes.length
+                assert_equal 2, tree.roots[0].children[0].attributes.length
                 assert_equal 'chunky', tree.roots[0].children[0].attributes[0].name
                 assert_equal 'bacon', tree.roots[0].children[0].attributes[0].value
+                assert_equal 'bacon', tree.roots[0].children[0].attributes[1].name
+                assert_equal 'chunky', tree.roots[0].children[0].attributes[1].value
                     assert_equal 0, tree.roots[0].children[0].children.length
     end
 
@@ -114,6 +118,17 @@ class Tests < Test::Unit::TestCase
                     assert_equal 'som/\edata', tree.roots[0].children[1].children[0].data
 
                 assert_equal 'dududu', tree.roots[0].children[2].data
+    end
+
+    def testEmptyTag
+        doc = '<root><closeme /></root>'
+        tree = Dome::parse doc
+        assert_equal 1, tree.roots.length
+            assert_equal 'root', tree.roots[0].name
+                assert_equal 1, tree.roots[0].children.length
+                assert_equal 'closeme', tree.roots[0].children[0].name
+                assert_equal true, tree.roots[0].children[0].empty?
+                    assert_equal 0, tree.roots[0].children[0].children.length
     end
 
 end
