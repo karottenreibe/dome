@@ -1,0 +1,74 @@
+require 'rubygems'
+Gem::manage_gems
+require 'rake/gempackagetask'
+require 'rake/rdoctask'
+
+spec = Gem::Specification.new do |s|
+    puts
+    puts
+    puts "Versioning policy:"
+    puts "1 = implementation details changed"
+    puts "2 = compatible new feature"
+    puts "3 = incompatible changes"
+    puts
+    puts "Last build: " + (Dir['pkg/*'].sort)[-1]
+    print "Enter version number > "
+    ver = STDIN.gets.strip
+    print "Enter changelog > "
+    chl = STDIN.gets
+
+    File.open('CHANGELOG', 'a') do |f|
+        f.write "#{ver.ljust 8} :: #{chl}"
+    end
+
+    s.platform  =   Gem::Platform::RUBY
+    s.name      =   "Pablo"
+    s.version   =   ver
+    s.author    =   "Fabian Streitel"
+    s.email     =   "karottenreibe @nospam@ gmail.com"
+    s.homepage  =   "http://pablo.rubyforge.org/"
+    s.rubyforge_project = "pablo"
+    s.summary   =   "A commandline parser for Ruby that is entirely based on blocks."
+    s.files     =   FileList['lib/*.rb', 'test/*'].to_a
+    s.require_path  =   "lib"
+    s.test_files = Dir.glob('tests/*.rb')
+    s.has_rdoc  =   true
+    s.extra_rdoc_files  =   ["README", "CHANGELOG"]
+end
+
+Rake::GemPackageTask.new(spec) do |pkg|
+    pkg.need_tar = true
+end
+
+task :gem => "pkg/#{spec.name}-#{spec.version}.gem" do
+    puts "generated gem"
+end
+
+Rake::RDocTask.new :real_doc do |rdoc|
+    rdoc.rdoc_files.include "lib/**/*.rb"
+end
+
+task :doc => [:real_doc] do
+    sh 'rm -r rdoc' if File::exists? 'rdoc'
+    sh 'mv html rdoc'
+end
+
+task :clean do
+    sh 'rm -r rdoc'
+    sh 'rm -r pkg'
+end
+
+task :test do
+    #TODO: add param support for testrb -n someTest tests/someTestfile
+    Dir.glob('tests/**/*.rb').each do |f|
+        ruby f + ' -c test'
+    end
+end
+
+task :upload do
+    sh "rsync -azv --no-perms --no-times rdoc/* karottenreibe@rubyforge.org:/var/www/gforge-projects/pablo/rdoc/"
+end
+
+task :default => [:gem, :doc]
+task :all => [:clean, :gem, :doc, :test]
+
