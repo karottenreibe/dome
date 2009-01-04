@@ -11,7 +11,7 @@ spec = Gem::Specification.new do |s|
     puts "2 = compatible new feature"
     puts "3 = incompatible changes"
     puts
-    puts "Last build: " + (Dir['pkg/*'].sort)[-1]
+    puts "Last build: " + (Dir['pkg/*'].sort)[-1].to_s
     print "Enter version number > "
     ver = STDIN.gets.strip
     print "Enter changelog > "
@@ -71,4 +71,5 @@ end
 
 task :default => [:gem, :doc]
 task :all => [:clean, :gem, :doc, :test]
+task :rdoc => [:doc]
 
