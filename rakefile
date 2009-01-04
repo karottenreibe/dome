@@ -1,29 +1,31 @@
 require 'rubygems'
-Gem::manage_gems
+#Gem::manage_gems
 require 'rake/gempackagetask'
 require 'rake/rdoctask'
 
 spec = Gem::Specification.new do |s|
-    puts
-    puts
-    puts "Versioning policy:"
-    puts "1 = implementation details changed"
-    puts "2 = compatible new feature"
-    puts "3 = incompatible changes"
-    puts
-    puts "Last build: " + (Dir['pkg/*'].sort)[-1].to_s
-    print "Enter version number > "
-    ver = STDIN.gets.strip
-    print "Enter changelog > "
-    chl = STDIN.gets
+    if ARGV.any? { |arg| arg == 'gem' }
+        puts
+        puts
+        puts "Versioning policy:"
+        puts "1 = implementation details changed"
+        puts "2 = compatible new feature"
+        puts "3 = incompatible changes"
+        puts
+        puts "Last build: " + (Dir['pkg/*'].sort)[-1].to_s
+        print "Enter version number > "
+        ver = STDIN.gets.strip
+        print "Enter changelog > "
+        chl = STDIN.gets
 
-    File.open('CHANGELOG', 'a') do |f|
-        f.write "#{ver.ljust 8} :: #{chl}"
+        File.open('CHANGELOG', 'a') do |f|
+            f.write "#{ver.ljust 8} :: #{chl}"
+        end
     end
 
     s.platform  =   Gem::Platform::RUBY
     s.name      =   "Dome"
-    s.version   =   ver
+    s.version   =   ver || "0.0.0"
     s.author    =   "Fabian Streitel"
     s.email     =   "karottenreibe @nospam@ gmail.com"
     s.homepage  =   "http://dome.rubyforge.org/"
