@@ -73,6 +73,7 @@ module Dome
         # Creates a new XPath from the String +path+.
         #
         def initialize path
+            @path = []
             self.parse path
         end
 
@@ -260,12 +261,13 @@ module Dome
                 str = string.dup
 
                 # check '@' is first thing in there
-                raise XPathParserError.new
-                    "Unexpected '#{char}' at beginning of attribute descriptor, expected '@'" unless
+                raise XPathParserError.new(
+                    "Unexpected '#{str[0..0]}' at beginning of attribute descriptor, expected '@'") unless
                     str[0..0] == '@'
                 str = str[1..-1]
 
                 pos = :attribute
+                escaped = false
 
                 while str.length > 0
                     char = str[0..0]
@@ -289,8 +291,23 @@ module Dome
                         end
                     when :value
                         case char
-                        when "'" then break
-                        else @value << char
+                        when '\\'
+                                p str
+                            if escaped
+                                @value << char
+                                escaped = false
+                            else
+                                escaped = true
+                            end
+                        when "'"
+                            if escaped
+                                @value << char
+                                escaped = false
+                            else
+                                break
+                            end
+                        else
+                            @value << char
                         end
                     end
 
