@@ -50,10 +50,16 @@ module Dome
         end
 
         def inspect
-            "<#{@name} " +
-            "#{ @attributes.inject('') { |memo,a| "#{memo} #{a.inspect}" } }> " +
-            "#{ @children.inject('') { |memo,c| memo + c.inspect } } " +
-            ( @empty ? " />" : "</#{@name}>" )
+            ret = "<#{@name}"
+            ret += @attributes.inject(' ') { |memo,a| "#{memo} #{a.inspect}" } unless @attributes.empty?
+
+            if @empty
+                ret += '/>'
+            else
+                ret += ">#{ @children.inject('') { |memo,c| memo + c.inspect } }</#{@name}>"
+            end
+
+            ret
         end
     end
 
@@ -127,6 +133,7 @@ module Dome
             trunc = true
 
             # parse start tag
+            ##TODO: if it's an end tag: consume it and return the modified string
             while str.length > 0
                 char = str[0..0]
 
@@ -135,9 +142,20 @@ module Dome
                     pos = :tag_name if char == '<'
                 when :tag_name
                     case char
-                    when '>' then break
-                    when /\s/ then pos = :attributes
-                    else node.name << char
+                    when '>'
+                        break
+                    when '/'
+                        if str[1..1] == '>'
+                            str = str[1..-1]
+                            node.empty = true
+                            break
+                        else
+                            node.name << char
+                        end
+                    when /\s/
+                        pos = :attributes
+                    else
+                        node.name << char
                     end
                 when :attributes
                     if char == '/' and str[1..1] == '>'
@@ -163,7 +181,7 @@ module Dome
             str = str[1..-1]
 
             # parse data or nodes
-            node.children, str = ChildrenParser.new.parse str
+            node.children, str = ChildrenParser.new.parse str unless node.empty?
 
             # remove end tag
             end_tag = "</#{node.name}>"

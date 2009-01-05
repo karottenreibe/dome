@@ -17,6 +17,38 @@ class Tests < Test::Unit::TestCase
                     assert_equal 0, tree.roots[0].children[0].children.length
     end
 
+    def testRoots
+        doc = '<root><subnode></subnode></root><root2></root2>'
+        tree = Dome::parse doc
+        assert_equal 2, tree.roots.length
+            assert_equal 'root', tree.roots[0].name
+            assert_equal 0, tree.roots[0].attributes.length
+                assert_equal 1, tree.roots[0].children.length
+                assert_equal 'subnode', tree.roots[0].children[0].name
+                assert_equal 0, tree.roots[0].children[0].attributes.length
+                    assert_equal 0, tree.roots[0].children[0].children.length
+
+            assert_equal 'root2', tree.roots[1].name
+            assert_equal 0, tree.roots[1].attributes.length
+                assert_equal 0, tree.roots[1].children.length
+    end
+
+    def testSiblings
+        doc = '<root><subnode></subnode><subnode2></subnode2></root>'
+        tree = Dome::parse doc
+        assert_equal 1, tree.roots.length
+            assert_equal 'root', tree.roots[0].name
+            assert_equal 0, tree.roots[0].attributes.length
+                assert_equal 2, tree.roots[0].children.length
+                assert_equal 'subnode', tree.roots[0].children[0].name
+                assert_equal 0, tree.roots[0].children[0].attributes.length
+                    assert_equal 0, tree.roots[0].children[0].children.length
+
+                assert_equal 'subnode2', tree.roots[0].children[1].name
+                assert_equal 0, tree.roots[0].children[1].attributes.length
+                    assert_equal 0, tree.roots[0].children[1].children.length
+    end
+
     def testAttributes
         doc = '<root foo=bar loo="lar"><subnode chunky="bacon" bacon="chunky"></subnode></root>'
         tree = Dome::parse doc
@@ -113,14 +145,24 @@ class Tests < Test::Unit::TestCase
     end
 
     def testEmptyTag
-        doc = '<root><closeme /></root>'
+        doc = '<root><closeme args="22"/><closeme2 numba="rumba" /></root>'
         tree = Dome::parse doc
         assert_equal 1, tree.roots.length
             assert_equal 'root', tree.roots[0].name
-                assert_equal 1, tree.roots[0].children.length
+                assert_equal 2, tree.roots[0].children.length
                 assert_equal 'closeme', tree.roots[0].children[0].name
+                assert_equal 1, tree.roots[0].children[0].attributes.length
+                assert_equal 'args', tree.roots[0].children[0].attributes[0].name
+                assert_equal '22', tree.roots[0].children[0].attributes[0].value
                 assert_equal true, tree.roots[0].children[0].empty?
                     assert_equal 0, tree.roots[0].children[0].children.length
+
+                assert_equal 'closeme2', tree.roots[0].children[1].name
+                assert_equal 1, tree.roots[0].children[1].attributes.length
+                assert_equal 'numba', tree.roots[0].children[1].attributes[0].name
+                assert_equal 'rumba', tree.roots[0].children[1].attributes[0].value
+                assert_equal true, tree.roots[0].children[1].empty?
+                    assert_equal 0, tree.roots[0].children[1].children.length
     end
 
 end
