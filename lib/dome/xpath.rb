@@ -96,7 +96,7 @@ module Dome
         # Returns an Array of all elements matching the given XPath.
         #
         def all doc
-            self.all_nodes(doc.root).flatten
+            self.all_nodes(doc.root, @path).flatten
         end
 
         ##
@@ -145,9 +145,11 @@ module Dome
             elsif path.empty?
                 [node]
             else
-                path[0].collect(node, path) { |sub|
-                    self.all_nodes(sub, path[1..-1])
+                ret = []
+                path[0].all(node, path).each { |sub|
+                    ret += self.all_nodes(sub, path[1..-1])
                 }
+                ret
             end
         end
 
