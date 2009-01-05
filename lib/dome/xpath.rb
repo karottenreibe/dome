@@ -291,8 +291,7 @@ module Dome
             def matches? node, idx, idx_r
                 node.is_a? Node and
                 ( @tag == :star or node.name == @tag ) and
-                ( not @count or @count == idx or @count == idx_r ) and
-                @attr_parsers.all? { |a| a.matches? node }
+                @attr_parsers.all? { |a| a.matches? node, idx, idx_r }
             end
 
             ##
@@ -416,11 +415,12 @@ module Dome
 
             ##
             # Returns true if the AttrParser matches with the given
-            # +node+'s attributes.
+            # +node+'s attributes, its index +idx+ and its reverse index +idx_r+.
             #
-            def matches? node
+            def matches? node, idx, idx_r
                 node.attributes.any? { |attr|
-                    attr.name == @name and attr.value == @value
+                    (attr.name == @name and attr.value == @value) or
+                    @count == idx or @count == idx_r
                 }
             end
 

@@ -178,7 +178,32 @@ class XPathScrapingTests < Test::Unit::TestCase
 
     def testFirstWithCount
         doc = Dome::parse '<root><subnode id="chunky">1</subnode><subnode id="bacon">2</subnode></root>'
-        paths = ["/root/subnode[0]", "/root/subnode[-2]"]
+        path = "/root/subnode[1]"
+
+        xpath = XPath.new path
+        node = xpath.first doc
+
+        assert_instance_of Node, node
+        assert_equal 'subnode', node.name
+            assert_equal 'id', node.attributes[0].name
+            assert_equal 'chunky', node.attributes[0].value
+            assert_equal 1, node.children.length
+            assert_equal '1', node.children[0].data
+
+        path = "/root/subnode[last()-1]"
+
+        xpath = XPath.new path
+        node = xpath.first doc
+
+        assert_instance_of Node, node
+        assert_equal 'subnode', node.name
+            assert_equal 'id', node.attributes[0].name
+            assert_equal 'chunky', node.attributes[0].value
+            assert_equal 1, node.children.length
+            assert_equal '1', node.children[0].data
+
+        path = "/root/subnode[last()]"
+
         xpath = XPath.new path
         node = xpath.first doc
 
@@ -239,6 +264,45 @@ class XPathScrapingTests < Test::Unit::TestCase
         assert_equal 'subnode', nodes[1].name
             assert_equal 'class', nodes[1].attributes[0].name
             assert_equal 'chunkybacon', nodes[1].attributes[0].value
+    end
+
+    def testAllWithCount
+        doc = Dome::parse '<root><subnode id="chunky">1</subnode><subnode id="bacon">2</subnode></root>'
+        path = "/root/subnode[1]"
+
+        xpath = XPath.new path
+        nodes = xpath.all doc
+
+        assert_equal 1, nodes.length
+        assert_equal 'subnode', nodes[0].name
+            assert_equal 'id', nodes[0].attributes[0].name
+            assert_equal 'chunky', nodes[0].attributes[0].value
+            assert_equal 1, nodes[0].children.length
+            assert_equal '1', nodes[0].children[0].data
+
+        path = "/root/subnode[last()-1]"
+
+        xpath = XPath.new path
+        nodes = xpath.all doc
+
+        assert_equal 1, nodes.length
+        assert_equal 'subnode', nodes[0].name
+            assert_equal 'id', nodes[0].attributes[0].name
+            assert_equal 'chunky', nodes[0].attributes[0].value
+            assert_equal 1, nodes[0].children.length
+            assert_equal '1', nodes[0].children[0].data
+
+        path = "/root/subnode[last()]"
+
+        xpath = XPath.new path
+        nodes = xpath.all doc
+
+        assert_equal 1, nodes.length
+        assert_equal 'subnode', nodes[0].name
+            assert_equal 'id', nodes[0].attributes[0].name
+            assert_equal 'bacon', nodes[0].attributes[0].value
+            assert_equal 1, nodes[0].children.length
+            assert_equal '2', nodes[0].children[0].data
     end
 
 end
