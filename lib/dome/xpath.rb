@@ -96,7 +96,7 @@ module Dome
         # Returns an Array of all elements matching the given XPath.
         #
         def all doc
-            self.all_nodes(doc.root, @path).flatten
+            self.all_nodes(doc.root, @path)
         end
 
         ##
@@ -252,7 +252,7 @@ module Dome
                 case @tag
                 when :somewhere
                     path = path[1..-1]
-                    path.empty? ? [] : path[0].somewhere_all(node)
+                    path.empty? ? [] : path[0].somewhere_all(node).flatten
                 else
                     idx = 0
                     idx_r = -1 * node.children.length - 1
@@ -299,8 +299,13 @@ module Dome
             # Returns an Array of Nodes.
             #
             def somewhere_all node
+                idx = 0
+                idx_r = -1 * node.children.length - 1
+
                 node.children.find_all { |child|
-                    self.matches? child
+                    idx += 1
+                    idx_r += 1
+                    self.matches? child, idx, idx_r
                 } +
                 node.children.collect { |child|
                     somewhere_all child
@@ -312,8 +317,13 @@ module Dome
             # Returns a single Node or +nil+.
             #
             def somewhere_first node
+                idx = 0
+                idx_r = -1 * node.children.length - 1
+
                 node.children.each { |child|
-                    return child if self.matches? child
+                    idx += 1
+                    idx_r += 1
+                    return child if self.matches? child, idx, idx_r
                     grandchild = child.children.detect { |gc| somewhere_first gc }
                     return grandchild if grandchild
                 }

@@ -215,6 +215,18 @@ class XPathScrapingTests < Test::Unit::TestCase
             assert_equal '2', node.children[0].data
     end
 
+    def testFirstSomewhere
+        doc = Dome::parse '<root><subnode><nope/></subnode><subnode><getme id="first"><getme id="second"/></getme></subnode></root>'
+        path = "//getme"
+        xpath = XPath.new path
+        node = xpath.first doc
+
+        assert_instance_of Node, node
+        assert_equal 'getme', node.name
+            assert_equal 'id', node.attributes[0].name
+            assert_equal 'first', node.attributes[0].value
+    end
+
     def testAll
         doc = Dome::parse '<root><subnode>1</subnode><subnode>2</subnode></root>'
         path = "/bad/worse/worst"
@@ -303,6 +315,22 @@ class XPathScrapingTests < Test::Unit::TestCase
             assert_equal 'bacon', nodes[0].attributes[0].value
             assert_equal 1, nodes[0].children.length
             assert_equal '2', nodes[0].children[0].data
+    end
+
+    def testAllSomewhere
+        doc = Dome::parse '<root><subnode><nope/></subnode><subnode><getme id="first"><getme id="second"/></getme></subnode></root>'
+        path = "//getme"
+        xpath = XPath.new path
+        nodes = xpath.all doc
+
+        assert_equal 2, nodes.length
+        assert_equal 'getme', nodes[0].name
+            assert_equal 'id', nodes[0].attributes[0].name
+            assert_equal 'first', nodes[0].attributes[0].name
+
+        assert_equal 'getme', nodes[0].name
+            assert_equal 'id', nodes[0].attributes[0].name
+            assert_equal 'second', nodes[0].attributes[0].name
     end
 
 end
