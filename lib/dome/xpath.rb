@@ -331,7 +331,14 @@ module Dome
             end
 
             def inspect
-                ret = "/#{@tag}"
+                ret = ''
+
+                case @tag
+                when :star then "/*"
+                when :somewhere then "//"
+                else "/#{@tag}"
+                end
+
                 ret += '[' + @attr_parsers.inject(nil) { |memo,parser|
                     memo.nil? ? parser.inspect : memo + ',' + parser.inspect
                 } + ']' unless @attr_parsers.empty?

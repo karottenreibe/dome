@@ -317,6 +317,7 @@ class XPathScrapingTests < Test::Unit::TestCase
             assert_equal '2', nodes[0].children[0].data
     end
 
+    ##TODO: test empty elements as well
     def testAllSomewhere
         doc = Dome::parse '<root><subnode><nope/></subnode><subnode><getme id="first"><getme id="second"/></getme></subnode></root>'
         path = "//getme"
