@@ -89,14 +89,19 @@ module Dome
         # Returns the first element matching the given XPath.
         #
         def first doc
-            self.first_node doc.root, @path
+            doc.roots.each { |root|
+                ret = self.first_node root, @path
+                return ret if ret
+            }
         end
 
         ##
         # Returns an Array of all elements matching the given XPath.
         #
         def all doc
-            self.all_nodes(doc).flatten
+            doc.roots.collect { |root|
+                self.all_nodes(root)
+            }.flatten
         end
 
         ##
@@ -163,9 +168,10 @@ module Dome
         # must keep the thing and do the .. himself. else there would only be a throw
         #
         def first_node node, path
-            if path.empty? or not node then node
+            ret = if path.empty? or not node then node
             else first_node path[0].first(node, path), path[1..-1]
             end
+            ret
         end
 
         class XPathParserError < RuntimeError
@@ -249,7 +255,7 @@ module Dome
                 case @tag
                 when :somewhere
                     path = path[1..-1]
-                    path.empty? ? [] : path[0].somewhere_all node
+                    path.empty? ? [] : path[0].somewhere_all(node)
                 else
                     idx = 0
                     node.children.find_all { |child|
@@ -267,7 +273,7 @@ module Dome
                 case @tag
                 when :somewhere
                     path = path[1..-1]
-                    path.empty? ? nil : path[0].somewhere_first node
+                    path.empty? ? nil : path[0].somewhere_first(node)
                 else
                     idx = 0
                     node.children.detect { |child|
@@ -282,8 +288,8 @@ module Dome
             # Otherwise returns false.
             #
             def matches? node, idx
-                child.is_a? Node and
-                ( @tag == :star or node.tag == @tag ) and
+                node.is_a? Node and
+                ( @tag == :star or node.name == @tag ) and
                 ( not @count or @count == idx ) and
                 @attr_parsers.all? { |a| a.matches? child }
             end

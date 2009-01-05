@@ -132,12 +132,13 @@ class XPathScrapingTests < Test::Unit::TestCase
     include Dome
 
     def testFirst
-        doc = '<root><subnode>1</subnode><subnode>2</subnode></root>'
-        path = "/root/subnode"
+        doc = Dome::parse '<root><subnode>1</subnode><subnode>2</subnode></root>'
+        path = "/subnode"
         xpath = XPath.new path
         node = xpath.first doc
 
-        assert_equal 'subnode', node.tag
+        assert_instance_of Node, node
+        assert_equal 'subnode', node.name
             assert_equal 1, node.children.length
             assert_equal '1', node.children[0].data
     end
