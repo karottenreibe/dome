@@ -3,6 +3,8 @@ require 'rubygems'
 require 'rake/gempackagetask'
 require 'rake/rdoctask'
 
+$VERBOSE = nil
+
 spec = Gem::Specification.new do |s|
     if ARGV.any? { |arg| arg == 'gem' }
         puts
@@ -62,9 +64,7 @@ end
 
 task :test do
     #TODO: add param support for testrb -n someTest tests/someTestfile
-    Dir.glob('tests/**/*.rb').each do |f|
-        ruby f + ' -c test'
-    end
+    sh 'testrb tests/*'
 end
 
 task :upload do
