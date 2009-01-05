@@ -19,18 +19,23 @@ module Dome
 
     ##
     # Keeps a single Document.
-    # All the root Nodes are stored in the +roots+ Array.
+    # All the Nodes are accessible via the +root+ pseudo element's +children+
+    # accessor or via the +roots+ Array.
     #
     class Document
-        attr_accessor :roots
+        attr_accessor :roots, :root
 
         def initialize
-            @roots = []
+            @root = Node.new
+            @root.name = nil
+        end
+
+        def roots
+            @root.children
         end
 
         def inspect
-            "#<Dome::Document @roots=[" +
-            "#{ @roots.inject(nil) { |memo,n| memo ? "#{memo}, #{n.inspect}" : n.inspect } }]>"
+            "#<Dome::Document #{@root.inspect}"
         end
     end
 
@@ -50,6 +55,9 @@ module Dome
         end
 
         def inspect
+            # first handle root case
+            return "{ #{ @children.inject('') { |memo,c| memo + c.inspect } } }" if @name.nil?
+
             ret = "<#{@name}"
             ret += @attributes.inject(' ') { |memo,a| "#{memo} #{a.inspect}" } unless @attributes.empty?
 
