@@ -17,7 +17,7 @@ module Dome
     end
 end
 
-class XPathTests < Test::Unit::TestCase
+class XPathConstructionTests < Test::Unit::TestCase
     include Dome
 
     def testSingleNode
@@ -108,3 +108,7 @@ class XPathTests < Test::Unit::TestCase
     end
 end
 
+class XPathScrapingTests < Test::Unit::TestCase
+    include Dome
+
+end
