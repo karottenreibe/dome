@@ -10,7 +10,7 @@
 #               For further information regarding this license, you can go to
 #               http://creativecommons.org/licenses/by/3.0/de/
 # Homepage::    http://dome.rubyforge.org/
-# Git repo::    http://rubyforge.org/scm/?group_id=
+# Git repo::    http://rubyforge.org/scm/?group_id=7589
 #
 # This file contains the XPath related classes and functions.
 # It also extends the Document class to provide XPath functionality.

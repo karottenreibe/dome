@@ -10,7 +10,7 @@
 #               For further information regarding this license, you can go to
 #               http://creativecommons.org/licenses/by/3.0/de/
 # Homepage::    http://dome.rubyforge.org/
-# Git repo::    http://rubyforge.org/scm/?group_id=
+# Git repo::    http://rubyforge.org/scm/?group_id=7589
 #
 # Contains the Parser that can transform a String into a HTML Document.
 #
