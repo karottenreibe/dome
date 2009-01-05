@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require 'test/unit'
-require 'lib/dome'
+require 'lib/dome/document'
 
 class Tests < Test::Unit::TestCase
     include Dome
