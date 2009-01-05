@@ -107,6 +107,10 @@ module Dome
             self.all doc
         end
 
+        def inspect
+            @path.inject('') { |memo,parser| memo + parser.inspect }
+        end
+
         protected
 
         ##
@@ -237,36 +241,74 @@ module Dome
 
             def first node
             end
+
+            def inspect
+                ret = "/#{@tag}"
+                ret += '[' + @attr_parsers.inject(nil) { |memo,parser|
+                    memo.nil? ? parser.inspect : memo + ',' + parser.inspect
+                } + ']' unless @attr_parsers.empty?
+                ret
+            end
         end
 
         class AttrParser
             def initialize
-                @values = {}
+                @attr, @value = '', ''
             end
 
             def parse string
                 str = string.dup
 
-                pos = :at
+                # check '@' is first thing in there
+                raise XPathParserError.new
+                    "Unexpected '#{char}' at beginning of attribute descriptor, expected '@'" unless
+                    str[0..0] == '@'
+                str = str[1..-1]
+
+                pos = :attribute
 
                 while str.length > 0
                     char = str[0..0]
 
                     case pos
-                    when :at
-                    when 
+                    when :attribute
+                        case char
+                        when '@'
+                            raise XPathParserError.new "Unexpected second '@' in attribute descriptor"
+                        when '='
+                            if @attr.length == 0 then raise XPathParserError.new "Zero-length attribute given"
+                            else pos = :quote_start
+                            end
+                        else @attr << char
+                        end
+                    when :quote_start ##TODO: single and double quotes here and in html parser attributes
+                        case char
+                        when "'" then pos = :value
+                        ##TODO: allow special values here?
+                        else raise XPathParserError.new "Unquoted value in attribute descriptor, expecting ' (single quote)"
+                        end
+                    when :value
+                        case char
+                        when "'" then break
+                        else @value << char
+                        end
                     end
 
                     str = str[1..-1]
                 end
 
-                str
+
+                str[1..-1] # remove trailing "'"
             end
 
             def each node
             end
 
             def first node
+            end
+
+            def inspect
+                "#{@attr}='#{@value}'"
             end
         end
 
