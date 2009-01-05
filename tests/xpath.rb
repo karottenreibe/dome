@@ -133,7 +133,7 @@ class XPathScrapingTests < Test::Unit::TestCase
 
     def testFirst
         doc = Dome::parse '<root><subnode>1</subnode><subnode>2</subnode></root>'
-        path = "/subnode"
+        path = "/root/subnode"
         xpath = XPath.new path
         node = xpath.first doc
 

@@ -89,19 +89,14 @@ module Dome
         # Returns the first element matching the given XPath.
         #
         def first doc
-            doc.roots.each { |root|
-                ret = self.first_node root, @path
-                return ret if ret
-            }
+            self.first_node doc.root, @path
         end
 
         ##
         # Returns an Array of all elements matching the given XPath.
         #
         def all doc
-            doc.roots.collect { |root|
-                self.all_nodes(root)
-            }.flatten
+            self.all_nodes(doc.root).flatten
         end
 
         ##
