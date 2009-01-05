@@ -87,7 +87,7 @@ class XPathTests < Test::Unit::TestCase
     end
 
     def testEscapedAttributes
-        path = "/div[@foo='b\'ar']/p/span[@chunky='bacon']/em/a"
+        path = "/div[@foo='b\\'ar']/p/span[@chunky='ba\\\\con']/em/a"
         xpath = XPath.new path
 
         assert_equal 5, xpath.path.length
@@ -100,7 +100,7 @@ class XPathTests < Test::Unit::TestCase
         assert_equal 'span', xpath.path[2].tag
             assert_equal 1, xpath.path[2].attr_parsers.length
             assert_equal 'chunky', xpath.path[2].attr_parsers[0].attr
-            assert_equal 'bacon', xpath.path[2].attr_parsers[0].value
+            assert_equal 'ba\\con', xpath.path[2].attr_parsers[0].value
         assert_equal 'em', xpath.path[3].tag
             assert_equal 0, xpath.path[3].attr_parsers.length
         assert_equal 'a', xpath.path[4].tag

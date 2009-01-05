@@ -292,7 +292,6 @@ module Dome
                     when :value
                         case char
                         when '\\'
-                                p str
                             if escaped
                                 @value << char
                                 escaped = false
