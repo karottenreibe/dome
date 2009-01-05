@@ -138,10 +138,12 @@ module Dome
         # is called for it.
         #
         def each_node node, path, block
+            return nil unless node
+
             if path.empty?
                 block.call node
             else
-                path[0].each(node) { |sub|
+                path[0].each(node, path) { |sub|
                     each_node(sub, path[1..-1])
                 }
             end
@@ -160,7 +162,7 @@ module Dome
         #
         def first_node node, path
             if path.empty? or not node then node
-            else first_node path[0].first(node), path[1..-1]
+            else first_node path[0].first(node, path), path[1..-1]
             end
         end
 
@@ -237,10 +239,48 @@ module Dome
                 str
             end
 
-            def each node
+            def each node, path, &block
             end
 
-            def first node
+            def first node, path
+                case @tag
+                case :somewhere
+                    path = path[1..-1]
+                    return path[0].somewhere_first node, path unless path.empty?
+                    return nil
+                when :star
+                    idx = 0
+                    node.children.detect { |child|
+                        idx += 1
+                        self.matches? node, idx
+                    }
+                else
+                    node.children.detect { |child|
+                        idx += 1
+                        self.matches? node, idx
+                    }
+                end
+            end
+
+            def matches? node, idx
+                child.is_a? Node and
+                ( @tag == :star or node.tag == @tag ) and
+                ( not @count or @count == idx ) and
+                @attr_parsers.all? { |a| a.matches? child }
+            end
+
+            def somewhere_each node, path, &block
+                node.children.each { |child|
+                    self.each child, path[1..-1], &block if self.matches? child
+                }
+                node.children.each { |child|
+                    self.each child, path[1..-1], &block if self.somewhere_first child, path
+                }
+            end
+
+            def somewhere_first node, path
+                node.children.detect { |child| self.matches? child } or
+                node.children.detect { |child| self.somewhere_first child, path }
             end
 
             def inspect
