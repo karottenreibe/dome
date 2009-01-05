@@ -288,7 +288,7 @@ module Dome
                 node.is_a? Node and
                 ( @tag == :star or node.name == @tag ) and
                 ( not @count or @count == idx ) and
-                @attr_parsers.all? { |a| a.matches? child }
+                @attr_parsers.all? { |a| a.matches? node }
             end
 
             ##

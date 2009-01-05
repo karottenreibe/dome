@@ -133,12 +133,23 @@ class XPathScrapingTests < Test::Unit::TestCase
 
     def testFirst
         doc = Dome::parse '<root><subnode>1</subnode><subnode>2</subnode></root>'
+        path = "/bad/bad/bad"
+        xpath = XPath.new path
+        node = xpath.first doc
+
+        #-----
+
+        assert_instance_of NilClass, node
+
+        doc = Dome::parse '<root><subnode>1</subnode><subnode>2</subnode></root>'
         path = "/root"
         xpath = XPath.new path
         node = xpath.first doc
 
         assert_instance_of Node, node
         assert_equal 'root', node.name
+
+        #-----
 
         doc = Dome::parse '<root><subnode>1</subnode><subnode>2</subnode></root>'
         path = "/root/subnode"
@@ -151,7 +162,40 @@ class XPathScrapingTests < Test::Unit::TestCase
             assert_equal '1', node.children[0].data
     end
 
+    def testFirstWithAttributes
+        doc = Dome::parse '<root><subnode id="chunky">1</subnode><subnode id="bacon">2</subnode></root>'
+        path = "/root/subnode[@id='bacon']"
+        xpath = XPath.new path
+        node = xpath.first doc
+
+        assert_instance_of Node, node
+        assert_equal 'subnode', node.name
+            assert_equal 'id', node.attributes[0].name
+            assert_equal 'bacon', node.attributes[0].value
+            assert_equal 1, node.children.length
+            assert_equal '2', node.children[0].data
+    end
+
     def testAll
+        doc = Dome::parse '<root><subnode>1</subnode><subnode>2</subnode></root>'
+        path = "/bad/worse/worst"
+        xpath = XPath.new path
+        nodes = xpath.all doc
+
+        assert_equal 0, nodes.length
+
+        #------
+
+        doc = Dome::parse '<root><subnode>1</subnode><subnode>2</subnode></root>'
+        path = "/root"
+        xpath = XPath.new path
+        nodes = xpath.all doc
+
+        assert_equal 1, nodes.length
+        assert_equal 'root', nodes[0].name
+
+        #------
+
         doc = Dome::parse '<root><subnode>1</subnode><subnode>2</subnode></root>'
         path = "/root/subnode"
         xpath = XPath.new path
@@ -165,6 +209,22 @@ class XPathScrapingTests < Test::Unit::TestCase
         assert_equal 'subnode', nodes[1].name
             assert_equal 1, nodes[1].children.length
             assert_equal '2', nodes[1].children[0].data
+    end
+
+    def testAllWithAttributes
+        doc = Dome::parse '<root><subnode class="chunkybacon">1</subnode><subnode class="chunkybacon">2</subnode></root>'
+        path = "/root/subnode[@class='chunkybacon']"
+        xpath = XPath.new path
+        nodes = xpath.all doc
+
+        assert_equal 2, nodes.length
+        assert_equal 'subnode', nodes[0].name
+            assert_equal 'class', nodes[0].attributes[0].name
+            assert_equal 'chunkybacon', nodes[0].attributes[0].value
+
+        assert_equal 'subnode', nodes[1].name
+            assert_equal 'class', nodes[1].attributes[0].name
+            assert_equal 'chunkybacon', nodes[1].attributes[0].value
     end
 
 end
