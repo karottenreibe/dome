@@ -1,17 +1,9 @@
 #!/usr/bin/env ruby
 require 'test/unit'
-require 'lib/dome/document'
+require 'lib/dome/parser'
 
 class Tests < Test::Unit::TestCase
     include Dome
-
-	def self.val
-		@@val
-	end
-
-	def self.val= v
-		@@val = v
-	end
 
     def testNodes
         doc = '<root><subnode></subnode></root>'
