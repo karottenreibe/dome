@@ -12,7 +12,7 @@ module Dome
         end
 
         class AttrParser
-            attr_reader :attr, :value
+            attr_reader :attr, :value, :count
         end
     end
 end
@@ -106,9 +106,32 @@ class XPathConstructionTests < Test::Unit::TestCase
         assert_equal 'a', xpath.path[4].tag
             assert_equal 0, xpath.path[4].attr_parsers.length
     end
+
+    def testCount
+        path = "/div[55]/p/span[last()-3]/em[last()]/a"
+        xpath = XPath.new path
+
+        assert_equal 5, xpath.path.length
+        assert_equal 'div', xpath.path[0].tag
+            assert_equal 1, xpath.path[0].attr_parsers.length
+            assert_equal 55, xpath.path[0].attr_parsers[0].count
+        assert_equal 'p', xpath.path[1].tag
+            assert_equal 0, xpath.path[1].attr_parsers.length
+        assert_equal 'span', xpath.path[2].tag
+            assert_equal 1, xpath.path[2].attr_parsers.length
+            assert_equal -4, xpath.path[2].attr_parsers[0].count
+        assert_equal 'em', xpath.path[3].tag
+            assert_equal 1, xpath.path[3].attr_parsers.length
+            assert_equal -1, xpath.path[3].attr_parsers[0].count
+        assert_equal 'a', xpath.path[4].tag
+            assert_equal 0, xpath.path[4].attr_parsers.length
+    end
 end
 
 class XPathScrapingTests < Test::Unit::TestCase
     include Dome
+
+    def testNothing
+    end
 
 end

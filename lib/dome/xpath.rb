@@ -254,25 +254,43 @@ module Dome
 
         class AttrParser
             def initialize
-                @attr, @value = '', ''
+                @attr, @value, @count = '', '', nil
             end
 
             def parse string
                 str = string.dup
 
-                # check '@' is first thing in there
-                raise XPathParserError.new(
-                    "Unexpected '#{str[0..0]}' at beginning of attribute descriptor, expected '@'") unless
-                    str[0..0] == '@'
-                str = str[1..-1]
-
-                pos = :attribute
+                pos = :start
                 escaped = false
+                trunc = true
 
                 while str.length > 0
                     char = str[0..0]
 
                     case pos
+                    when :start
+                        case char
+                        when '@'
+                            pos = :attribute
+                        else
+                            pos = :count
+                            trunc = false
+                        end
+                    when :count
+                        num = /^[0-9]+/
+                        last = /^last\(\)(-([0-9]+))?/
+
+                        if (m = num.match str)
+                            @count = m[0].to_i
+                            str = str[(m[0].length)..-1]
+                        elsif (m = last.match str)
+                            @count = -1 - m[2].to_i
+                            str = str[(m[0].length)..-1]
+                        else
+                            raise XPathParserError.new "Illegal attribute descriptor with neither numeric nor attribute argument found"
+                        end
+
+                        break
                     when :attribute
                         case char
                         when '@'
@@ -303,6 +321,7 @@ module Dome
                                 @value << char
                                 escaped = false
                             else
+                                str = str[1..-1] # remove trailing "'"
                                 break
                             end
                         else
@@ -310,11 +329,11 @@ module Dome
                         end
                     end
 
-                    str = str[1..-1]
+                    str = str[1..-1] if trunc
+                    trunc = true
                 end
 
-
-                str[1..-1] # remove trailing "'"
+                str
             end
 
             def each node
