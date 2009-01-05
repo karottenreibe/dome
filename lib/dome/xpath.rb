@@ -255,9 +255,11 @@ module Dome
                     path.empty? ? [] : path[0].somewhere_all(node)
                 else
                     idx = 0
+                    idx_r = -1 * node.children.length - 1
                     node.children.find_all { |child|
                         idx += 1
-                        self.matches? child, idx
+                        idx_r += 1
+                        self.matches? child, idx, idx_r
                     }
                 end
             end
@@ -273,21 +275,23 @@ module Dome
                     path.empty? ? nil : path[0].somewhere_first(node)
                 else
                     idx = 0
+                    idx_r = -1 * node.children.length - 1
                     node.children.detect { |child|
                         idx += 1
-                        self.matches? child, idx
+                        idx_r += 1
+                        self.matches? child, idx, idx_r
                     }
                 end
             end
 
             ##
-            # Returns true if the +node+ with the index +idx+ matches this NodeParser.
-            # Otherwise returns false.
+            # Returns true if the +node+ with the index +idx+ and the reverse index +idx_r+
+            # matches this NodeParser. Otherwise returns false.
             #
-            def matches? node, idx
+            def matches? node, idx, idx_r
                 node.is_a? Node and
                 ( @tag == :star or node.name == @tag ) and
-                ( not @count or @count == idx ) and
+                ( not @count or @count == idx or @count == idx_r ) and
                 @attr_parsers.all? { |a| a.matches? node }
             end
 

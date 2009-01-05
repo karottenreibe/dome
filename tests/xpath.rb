@@ -176,6 +176,20 @@ class XPathScrapingTests < Test::Unit::TestCase
             assert_equal '2', node.children[0].data
     end
 
+    def testFirstWithCount
+        doc = Dome::parse '<root><subnode id="chunky">1</subnode><subnode id="bacon">2</subnode></root>'
+        paths = ["/root/subnode[0]", "/root/subnode[-2]"]
+        xpath = XPath.new path
+        node = xpath.first doc
+
+        assert_instance_of Node, node
+        assert_equal 'subnode', node.name
+            assert_equal 'id', node.attributes[0].name
+            assert_equal 'bacon', node.attributes[0].value
+            assert_equal 1, node.children.length
+            assert_equal '2', node.children[0].data
+    end
+
     def testAll
         doc = Dome::parse '<root><subnode>1</subnode><subnode>2</subnode></root>'
         path = "/bad/worse/worst"
