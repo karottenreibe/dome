@@ -56,17 +56,17 @@ module Dome
         end
 
         ##
-        # Alias for +XPath::all+.
+        # Shortcut for +XPath#match+.
         #
         def self.match doc, path
-            XPath.all doc, path
+            XPath.new(path).all doc
         end
 
         ##
         # Shortcut for +XPath#all+.
         #
         def self.all doc, path
-            XPath.new(path).match doc
+            XPath.new(path).all doc
         end
 
         ##
@@ -81,28 +81,26 @@ module Dome
         # Iterates over all elements matched by the given XPath and yields the
         # given +block+ for each of them.
         #
-        def each doc, &block
-            self.each_node doc.root, @path, block
+        def each doc
+            self.all(doc).each { |n| yield(n) }
         end
 
         ##
         # Returns the first element matching the given XPath.
         #
         def first doc
-            self.each_node doc.root, @path
+            self.first_node doc.root, @path
         end
 
         ##
         # Returns an Array of all elements matching the given XPath.
         #
         def all doc
-            ret = []
-            self.each(doc) { |e| ret << e }
-            ret
+            self.all_nodes(doc).flatten
         end
 
         ##
-        # Alias for +XPath#match+.
+        # Alias for +XPath#all+.
         #
         def match doc
             self.all doc
@@ -129,22 +127,26 @@ module Dome
         end
 
         ##
-        # Does the actual work for +XPath#each+.
+        # Does the actual work for +XPath#all+.
         #
         # Retrieves the next element under the current +node+ matching the first
-        # parser in the +path+ and calls +each_node+ recursively for it with the
+        # parser in the +path+ and calls +all_nodes+ recursively for it with the
         # first parser removed from the +path+.
-        # If the +path+ is empty, the +node+ has been found and the given +block+
-        # is called for it.
+        # If the +path+ is empty, the +node+ has been found and +[node]+ will be
+        # returned.
         #
-        def each_node node, path, block
-            return nil unless node
-
-            if path.empty?
-                block.call node
+        # The outermost function call will return an Array containing all the nodes
+        # matching the given path.
+        # NOTE: the returned Array may have to be flattened!
+        #
+        def all_nodes node, path
+            if not node
+                []
+            elsif path.empty?
+                [node]
             else
-                path[0].each(node, path) { |sub|
-                    each_node(sub, path[1..-1])
+                path[0].collect(node, path) { |sub|
+                    self.all_nodes(sub, path[1..-1])
                 }
             end
         end
@@ -239,29 +241,46 @@ module Dome
                 str
             end
 
-            def each node, path, &block
-            end
-
-            def first node, path
+            ##
+            # Returns an Array of all Nodes under +node+ matching this NodeParser.
+            ##TODO: Root node is not root node, but rather an imaginary empty node?
+            #
+            def all node, path
                 case @tag
-                case :somewhere
+                when :somewhere
                     path = path[1..-1]
-                    return path[0].somewhere_first node, path unless path.empty?
-                    return nil
-                when :star
-                    idx = 0
-                    node.children.detect { |child|
-                        idx += 1
-                        self.matches? node, idx
-                    }
+                    path.empty? ? [] : path[0].somewhere_all node
                 else
-                    node.children.detect { |child|
+                    idx = 0
+                    node.children.find_all { |child|
                         idx += 1
-                        self.matches? node, idx
+                        self.matches? child, idx
                     }
                 end
             end
 
+            ##
+            # Returns the first child of node matching this NodeParser or nil,
+            # if no match is found.
+            #
+            def first node, path
+                case @tag
+                when :somewhere
+                    path = path[1..-1]
+                    path.empty? ? nil : path[0].somewhere_first node
+                else
+                    idx = 0
+                    node.children.detect { |child|
+                        idx += 1
+                        self.matches? child, idx
+                    }
+                end
+            end
+
+            ##
+            # Returns true if the +node+ with the index +idx+ matches this NodeParser.
+            # Otherwise returns false.
+            #
             def matches? node, idx
                 child.is_a? Node and
                 ( @tag == :star or node.tag == @tag ) and
@@ -269,18 +288,30 @@ module Dome
                 @attr_parsers.all? { |a| a.matches? child }
             end
 
-            def somewhere_each node, path, &block
-                node.children.each { |child|
-                    self.each child, path[1..-1], &block if self.matches? child
-                }
-                node.children.each { |child|
-                    self.each child, path[1..-1], &block if self.somewhere_first child, path
+            ##
+            # Implements the '//' operator for a call to +#all+.
+            # Returns an Array of Nodes.
+            #
+            def somewhere_all node
+                node.children.find_all { |child|
+                    self.matches? child
+                } +
+                node.children.collect { |child|
+                    somewhere_all child
                 }
             end
 
-            def somewhere_first node, path
-                node.children.detect { |child| self.matches? child } or
-                node.children.detect { |child| self.somewhere_first child, path }
+            ##
+            # Implements the '//' operator for a call to +#first+.
+            # Returns a single Node or +nil+.
+            #
+            def somewhere_first node
+                node.children.each { |child|
+                    return child if self.matches? child
+                    grandchild = child.children.detect { |gc| somewhere_first gc }
+                    return grandchild if grandchild
+                }
+                nil
             end
 
             def inspect
@@ -294,7 +325,7 @@ module Dome
 
         class AttrParser
             def initialize
-                @attr, @value, @count = '', '', nil
+                @name, @value, @count = '', '', nil
             end
 
             def parse string
@@ -336,10 +367,10 @@ module Dome
                         when '@'
                             raise XPathParserError.new "Unexpected second '@' in attribute descriptor"
                         when '='
-                            if @attr.length == 0 then raise XPathParserError.new "Zero-length attribute given"
+                            if @name.length == 0 then raise XPathParserError.new "Zero-length attribute given"
                             else pos = :quote_start
                             end
-                        else @attr << char
+                        else @name << char
                         end
                     when :quote_start ##TODO: single and double quotes here and in html parser attributes
                         case char
@@ -376,14 +407,18 @@ module Dome
                 str
             end
 
-            def each node
-            end
-
-            def first node
+            ##
+            # Returns true if the AttrParser matches with the given
+            # +node+'s attributes.
+            #
+            def matches? node
+                node.attributes.any? { |attr|
+                    attr.name == @name and attr.value == @value
+                }
             end
 
             def inspect
-                "#{@attr}='#{@value}'"
+                "#{@name}='#{@value}'"
             end
         end
 
