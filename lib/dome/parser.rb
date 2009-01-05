@@ -12,12 +12,14 @@
 # Homepage::    http://dome.rubyforge.org/
 # Git repo::    http://rubyforge.org/scm/?group_id=
 #
+# Contains the Parser that can transform a String into a HTML Document.
+#
 
 module Dome
 
     ##
     # Keeps a single Document.
-    # All the root elements are stored in the +roots+ Array.
+    # All the root Nodes are stored in the +roots+ Array.
     #
     class Document
         attr_accessor :roots
