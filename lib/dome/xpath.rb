@@ -137,19 +137,19 @@ module Dome
         #
         # The outermost function call will return an Array containing all the nodes
         # matching the given path.
-        # NOTE: the returned Array may have to be flattened!
         #
         def all_nodes node, path
+            p '--all_nodes'
+            p node
+            p path
             if not node
                 []
             elsif path.empty?
                 [node]
             else
-                ret = []
-                path[0].all(node, path).each { |sub|
-                    ret += self.all_nodes(sub, path[1..-1])
-                }
-                ret
+                path[0].all(node, path).collect { |sub|
+                    self.all_nodes(sub, path[1..-1])
+                }.flatten
             end
         end
 
@@ -249,6 +249,9 @@ module Dome
             ##TODO: Root node is not root node, but rather an imaginary empty node?
             #
             def all node, path
+                p '--all'
+                p node
+                p path
                 case @tag
                 when :somewhere
                     path = path[1..-1]
@@ -331,13 +334,12 @@ module Dome
             end
 
             def inspect
-                ret = ''
-
-                case @tag
-                when :star then "/*"
-                when :somewhere then "//"
-                else "/#{@tag}"
-                end
+                ret = 
+                    case @tag
+                    when :star then "/*"
+                    when :somewhere then "/"
+                    else "/#{@tag}"
+                    end
 
                 ret += '[' + @attr_parsers.inject(nil) { |memo,parser|
                     memo.nil? ? parser.inspect : memo + ',' + parser.inspect
