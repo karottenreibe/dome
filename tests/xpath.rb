@@ -224,6 +224,44 @@ class XPathScrapingTests < Test::Unit::TestCase
         assert_instance_of Node, node
         assert_equal 'getme', node.name
             assert_equal 'id', node.attributes[0].name
+ 
+        doc = Dome::parse '<root><subnode><nope/></subnode><subnode><getme id="first"><getme id="second"/></getme></subnode></root>'
+        path = "//subnode"
+        xpath = XPath.new path
+        node = xpath.first doc
+
+        assert_instance_of Node, node
+        assert_equal 'subnode', node.name
+            assert_equal 1, node.children.length
+            assert_equal 'nope', node.children[0].name
+
+        doc = Dome::parse '<root><subnode><nope/></subnode><subnode><getme id="first"><getme id="second"/></getme></subnode></root><root></root>'
+        path = "//root"
+        xpath = XPath.new path
+        node = xpath.first doc
+
+        assert_instance_of Node, node
+        assert_equal 'root', node.name
+
+        doc = Dome::parse '<root><subnode><nope/></subnode><subnode><getme id="first"><getme id="second"/></getme></subnode></root><root></root>'
+        path = "//nope"
+        xpath = XPath.new path
+        node = xpath.first doc
+
+        assert_instance_of Node, node
+        assert_equal 'nope', node.name
+           assert_equal 'first', node.attributes[0].value
+    end
+
+    def testFirstSomewhereMiddle
+        doc = Dome::parse '<root><subnode><nope/></subnode><subnode><getme id="first"><getme id="second"/></getme></subnode></root>'
+        path = "//root/getme"
+        xpath = XPath.new path
+        node = xpath.first doc
+
+        assert_instance_of Node, node
+        assert_equal 'getme', node.name
+            assert_equal 'id', node.attributes[0].name
             assert_equal 'first', node.attributes[0].value
     end
 
@@ -293,7 +331,6 @@ class XPathScrapingTests < Test::Unit::TestCase
             assert_equal '1', nodes[0].children[0].data
 
         path = "/root/subnode[last()-1]"
-
         xpath = XPath.new path
         nodes = xpath.all doc
 
@@ -305,7 +342,6 @@ class XPathScrapingTests < Test::Unit::TestCase
             assert_equal '1', nodes[0].children[0].data
 
         path = "/root/subnode[last()]"
-
         xpath = XPath.new path
         nodes = xpath.all doc
 
@@ -323,6 +359,54 @@ class XPathScrapingTests < Test::Unit::TestCase
         path = "//getme"
         xpath = XPath.new path
         nodes = xpath.all doc
+
+        assert_equal 2, nodes.length
+        assert_equal 'getme', nodes[0].name
+            assert_equal 'id', nodes[0].attributes[0].name
+            assert_equal 'first', nodes[0].attributes[0].value
+
+        assert_equal 'getme', nodes[1].name
+            assert_equal 'id', nodes[1].attributes[0].name
+            assert_equal 'second', nodes[1].attributes[0].value
+
+        doc = Dome::parse '<root><subnode><nope/></subnode><subnode><getme id="first"><getme id="second"/></getme></subnode></root>'
+        path = "//subnode"
+        xpath = XPath.new path
+        nodes = xpath.all doc
+
+        assert_equal 2, nodes.length
+        assert_equal 'subnode', nodes[0].name
+            assert_equal 1, nodes[0].children.length
+            assert_equal 'nope', nodes[0].children[0].name
+
+        assert_equal 'subnode', nodes[1].name
+            assert_equal 1, nodes[1].children.length
+            assert_equal 'getme', nodes[1].children[0].name
+
+        doc = Dome::parse '<root><subnode><nope/></subnode><subnode><getme id="first"><getme id="second"/></getme></subnode></root><root></root>'
+        path = "//root"
+        xpath = XPath.new path
+        nodes = xpath.all doc
+
+        assert_equal 2, nodes.length
+        assert_equal 'root', nodes[0].name
+        assert_equal 'root', nodes[1].name
+
+        doc = Dome::parse '<root><subnode><nope/></subnode><subnode><getme id="first"><getme id="second"/></getme></subnode></root><root></root>'
+        path = "//nope"
+        xpath = XPath.new path
+        nodes = xpath.all doc
+
+        assert_equal 1, nodes.length
+        assert_equal 'nope', nodes[0].name
+    end
+
+    def testAllSomewhereMiddle
+        doc = Dome::parse '<root><subnode><nope/></subnode><subnode><getme id="first"><getme id="second"/></getme></subnode></root>'
+        path = "//root/getme"
+        xpath = XPath.new path
+        nodes = xpath.all doc
+        p nodes
 
         assert_equal 2, nodes.length
         assert_equal 'getme', nodes[0].name
