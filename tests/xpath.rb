@@ -323,16 +323,15 @@ class XPathScrapingTests < Test::Unit::TestCase
         path = "//getme"
         xpath = XPath.new path
         nodes = xpath.all doc
-        p nodes
 
         assert_equal 2, nodes.length
         assert_equal 'getme', nodes[0].name
             assert_equal 'id', nodes[0].attributes[0].name
-            assert_equal 'first', nodes[0].attributes[0].name
+            assert_equal 'first', nodes[0].attributes[0].value
 
-        assert_equal 'getme', nodes[0].name
-            assert_equal 'id', nodes[0].attributes[0].name
-            assert_equal 'second', nodes[0].attributes[0].name
+        assert_equal 'getme', nodes[1].name
+            assert_equal 'id', nodes[1].attributes[0].name
+            assert_equal 'second', nodes[1].attributes[0].value
     end
 
 end

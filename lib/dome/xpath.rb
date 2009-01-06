@@ -139,16 +139,13 @@ module Dome
         # matching the given path.
         #
         def all_nodes node, path
-            p '--all_nodes'
-            p node
-            p path
             if not node
                 []
             elsif path.empty?
                 [node]
             else
                 path[0].all(node, path).collect { |sub|
-                    self.all_nodes(sub, path[1..-1])
+                    self.all_nodes sub, (path[1..-1] || [])
                 }.flatten
             end
         end
@@ -248,14 +245,27 @@ module Dome
             # Returns an Array of all Nodes under +node+ matching this NodeParser.
             ##TODO: Root node is not root node, but rather an imaginary empty node?
             #
-            def all node, path
-                p '--all'
-                p node
-                p path
+            def all node, path, first = true
                 case @tag
                 when :somewhere
-                    path = path[1..-1]
-                    path.empty? ? [] : path[0].somewhere_all(node).flatten
+                    # try applying the next parser to the children and then
+                    # to the grand children etc.
+                    ##TODO: '//' at the end of the xpath?
+                    idx = 0
+                    idx_r = -1 * node.children.length - 1
+
+                    ret =
+                        node.children.find_all { |child|
+                            idx += 1
+                            idx_r += 1
+                            path[1].matches? child, idx, idx_r
+                        } +
+                        node.children.collect { |child|
+                            self.all child, path, false
+                        }.flatten
+
+                    path.delete_if { true } if first
+                    ret
                 else
                     idx = 0
                     idx_r = -1 * node.children.length - 1
@@ -295,24 +305,6 @@ module Dome
                 node.is_a? Node and
                 ( @tag == :star or node.name == @tag ) and
                 @attr_parsers.all? { |a| a.matches? node, idx, idx_r }
-            end
-
-            ##
-            # Implements the '//' operator for a call to +#all+.
-            # Returns an Array of Nodes.
-            #
-            def somewhere_all node
-                idx = 0
-                idx_r = -1 * node.children.length - 1
-
-                node.children.find_all { |child|
-                    idx += 1
-                    idx_r += 1
-                    self.matches? child, idx, idx_r
-                } +
-                node.children.collect { |child|
-                    somewhere_all child
-                }
             end
 
             ##
