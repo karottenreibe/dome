@@ -6,9 +6,10 @@
 #
 # Author::      Fabian Streitel (karottenreibe)
 # Copyright::   Copyright (c) 2008 Fabian Streitel
-# License::     Creative Commons Attribution 3.0 Germany
+# License::     Boost Software License 1.0
 #               For further information regarding this license, you can go to
-#               http://creativecommons.org/licenses/by/3.0/de/
+#               http://www.boost.org/LICENSE_1_0.txt
+#               or read the file LICENSE distributed with this software.
 # Homepage::    http://dome.rubyforge.org/
 # Git repo::    http://rubyforge.org/scm/?group_id=7589
 #
