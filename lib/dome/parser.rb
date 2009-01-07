@@ -16,7 +16,13 @@
 # Contains the Parser that can transform a String into a HTML Document.
 #
 
+require 'spectre/spectre'
+require 'spectre/std'
+
 module Dome
+
+    include Spectre
+    include Spectre::StringParsing
 
     ##
     # Keeps a single Document.
@@ -108,6 +114,10 @@ module Dome
     # The same parser can be used to parse different documents.
     #
     class Parser
+
+        def initialize
+            @parser =
+        end
 
         ##
         # Parses the passed +string+ into a Document.
