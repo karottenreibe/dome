@@ -14,11 +14,18 @@
 #
 
 require 'rubygems'
-#Gem::manage_gems
 require 'rake/gempackagetask'
 require 'rake/rdoctask'
+require 'rake/testtask'
 
 $VERBOSE = nil
+
+GEM_NAME        = 'Dome'
+GEM_AUTHORS     = ['Fabian Streitel']
+GEM_HOMEPAGE    = 'http://dome.rubyforge.org/'
+GEM_RUBYFORGE   = 'dome'
+GEM_SUMMARY     = "A pure Ruby HTML DOM parser with very simple XPath support"
+GEM_EMAIL       = "karottenreibe @nospam@ gmail.com"
 
 spec = Gem::Specification.new do |s|
     if ARGV.any? { |arg| arg == 'gem' }
@@ -40,18 +47,19 @@ spec = Gem::Specification.new do |s|
         end
     end
 
-    s.platform  =   Gem::Platform::RUBY
-    s.name      =   "Dome"
-    s.version   =   ver || "0.0.0"
-    s.author    =   "Fabian Streitel"
-    s.email     =   "karottenreibe @nospam@ gmail.com"
-    s.homepage  =   "http://dome.rubyforge.org/"
-    s.rubyforge_project = "dome"
-    s.summary   =   "A commandline parser for Ruby that is entirely based on blocks."
-    s.files     =   FileList['lib/**/*', 'test/*'].to_a
-    s.require_path  =   "lib"
-    s.test_files = Dir.glob('tests/*.rb')
-    s.has_rdoc  =   true
+    s.platform          =   Gem::Platform::RUBY
+    s.name              =   GEM_NAME
+    s.version           =   ver || "99"
+    s.authors           =   GEM_AUTHORS
+    s.email             =   GEM_EMAIL
+    s.homepage          =   GEM_HOMEPAGE
+    s.rubyforge_project =   GEM_RUBYFORGE
+    s.summary           =   GEM_SUMMARY
+    s.files             =   FileList['lib/**/*.rb', 'test/**/*', '[A-Z]*'].to_a
+    s.require_path      =   "lib"
+    s.autorequire       =   "dome/parser"
+    s.test_files        =   FileList['test/**/*.rb']
+    s.has_rdoc          =   true
     s.extra_rdoc_files  =   ["README", "CHANGELOG", "LICENSE"]
 end
 
@@ -59,7 +67,7 @@ Rake::GemPackageTask.new(spec) do |pkg|
     pkg.need_tar = true
 end
 
-task :gem => "pkg/#{spec.name}-#{spec.version}.gem" do
+task :gem => "pkg/#{GEM_NAME}-#{spec.version}.gem" do
     puts "generated gem"
 end
 
@@ -77,13 +85,19 @@ task :clean do
     sh 'rm -r pkg'
 end
 
-task :test do
-    #TODO: add param support for testrb -n someTest tests/someTestfile
-    sh 'testrb tests/*'
+Rake::TestTask.new do |t|
+    t.libs << "test" << "lib/dome"
+    t.test_files = ['test/tests.rb']
+    t.verbose = true
 end
 
 task :upload do
     sh "rsync -azv --no-perms --no-times rdoc/* karottenreibe@rubyforge.org:/var/www/gforge-projects/dome/rdoc/"
+end
+
+task :install => [:package] do
+    sh "sudo gem install pkg/#{GEM_NAME}-#{spec.version}.gem"
+    sh "rm pkg/#{GEM_NAME}-#{spec.version}.gem"
 end
 
 task :default => [:gem, :doc]
