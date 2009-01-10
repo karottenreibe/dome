@@ -18,95 +18,12 @@
 
 require 'spectre/spectre'
 require 'spectre/std'
+require 'dome/atoms'
 
 module Dome
 
     include Spectre
     include Spectre::StringParsing
-
-    ##
-    # Keeps a single Document.
-    # All the Nodes are accessible via the +root+ pseudo element's +children+
-    # accessor or via the +roots+ Array.
-    #
-    class Document
-        attr_accessor :roots, :root
-
-        def initialize
-            @root = Node.new
-            @root.name = nil
-        end
-
-        def roots
-            @root.children
-        end
-
-        def inspect
-            "#<Dome::Document #{@root.inspect}"
-        end
-    end
-
-    ##
-    # Keeps a single Node of a Document with its +name+ (String), +attributes+ (Array),
-    # +children+ (Array) and +empty+ flag.
-    #
-    class Node
-        attr_accessor :name, :attributes, :children, :empty
-        
-        def initialize
-            @name, @attributes, @children, @empty = '', [], [], false
-        end
-
-        def empty?
-            @empty
-        end
-
-        def inspect
-            # first handle root case
-            return "{ #{ @children.inject('') { |memo,c| memo + c.inspect } } }" if @name.nil?
-
-            ret = "<#{@name}"
-            ret += @attributes.inject(' ') { |memo,a| "#{memo} #{a.inspect}" } unless @attributes.empty?
-
-            if @empty
-                ret += '/>'
-            else
-                ret += ">#{ @children.inject('') { |memo,c| memo + c.inspect } }</#{@name}>"
-            end
-
-            ret
-        end
-    end
-
-    ##
-    # Keeps text +data+.
-    #
-    class Data
-        attr_accessor :data
-        
-        def initialize
-            @data = ''
-        end
-
-        def inspect
-            @data
-        end
-    end
-
-    ##
-    # Keeps a single Attribute of a Node with its +name+ and +value+.
-    #
-    class Attribute
-        attr_reader :name, :value
-
-        def initialize
-            @name, @value = '', ''
-        end
-
-        def inspect
-            "#{@name}=#{@value.inspect}"
-        end
-    end
 
     ##
     # Parses a string into a Document of Nodes and Attributes.
@@ -115,8 +32,56 @@ module Dome
     #
     class Parser
 
+        ##
+        # Creates the grammar.
+        #
         def initialize
-            @parser =
+            root_a = lambda { |val,closure|
+                doc.roots << closure[:sub]
+            }
+            element_a = lambda { |val,closure|
+                closure.super[:sub] << closure[:element]
+            }
+            attr_set_a = lambda { |val,closure|
+            }
+            tagname_a = lambda { |val,closure|
+                closure[:element] = Node.new
+                closure[:element].tag = val
+            }
+            attribute_a = lambda { |val,closure|
+                attrib = Attribute.new
+                attrib.name = closure[:name]
+                attrib.value = closure[:value]
+                closure.super[:element].attributes << attrib
+            }
+            inside_a = lambda { |val,closure|
+                closure.super[:element].attributes << closure[:sub]
+            }
+
+            @parser = Grammar.new do |doc|
+                var :document   => close( element[root_a] ).*
+                    :element    =>
+                        close(
+                            (elem|empty_elem)[element_a]
+                        )
+                    :elem       => start_tag >> inside >> end_tag
+                    :start_tag  => '<' >> tagname >> attribute.* >> '>'
+                    :end_tag    => '</' >> closure(:tag) >> '>'
+                    :empty_elem => '<' >> tagname >> attribute.* >> '/>'
+                    :tagname    => name[tagname_a]
+                    :attribute  => close( attr[attribute_a] )
+                    :attr       =>
+                        ' ' >> name[:name] >> '=' >>
+                        close(
+                            '"'[:quote] >>
+                            ( ( ~ ).* )[:value] >>
+                            closure(:quote)
+                        )
+                    :name       => alpha_char >> alnum_char.*
+                    :inside     => ( data|element )[inside_a].*
+                    :data       => ( ( ~char('<') ).+ )[:data]
+                @parser = document
+            end
         end
 
         ##
