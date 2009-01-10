@@ -61,6 +61,7 @@ spec = Gem::Specification.new do |s|
     s.test_files        =   FileList['test/**/*.rb']
     s.has_rdoc          =   true
     s.extra_rdoc_files  =   ["README", "CHANGELOG", "LICENSE"]
+    s.add_dependency        'Spectre', '>= 0.0.0'
 end
 
 Rake::GemPackageTask.new(spec) do |pkg|
