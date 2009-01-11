@@ -40,7 +40,7 @@ module Dome
                 doc.roots << closure[:sub]
             }
             element_a = lambda { |val,closure|
-                closure.super[:sub] << closure[:element]
+                closure.parent[:sub] << closure[:element]
             }
             attr_set_a = lambda { |val,closure|
             }
@@ -52,10 +52,10 @@ module Dome
                 attrib = Attribute.new
                 attrib.name = closure[:name]
                 attrib.value = closure[:value]
-                closure.super[:element].attributes << attrib
+                closure.parent[:element].attributes << attrib
             }
             inside_a = lambda { |val,closure|
-                closure.super[:element].attributes << closure[:sub]
+                closure.parent[:element].attributes << closure[:sub]
             }
 
             @parser = Grammar.new do |doc|
