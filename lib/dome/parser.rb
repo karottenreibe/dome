@@ -36,25 +36,25 @@ module Dome
         # Creates the grammar.
         #
         def initialize
-            root_a = lambda { |val,closure|
+            root_a = lambda { |match,closure|
                 doc.roots << closure[:sub]
             }
-            element_a = lambda { |val,closure|
+            element_a = lambda { |match,closure|
                 closure.parent[:sub] << closure[:element]
             }
-            attr_set_a = lambda { |val,closure|
+            attr_set_a = lambda { |match,closure|
             }
-            tagname_a = lambda { |val,closure|
+            tagname_a = lambda { |match,closure|
                 closure[:element] = Node.new
-                closure[:element].tag = val
+                closure[:element].tag = match.value
             }
-            attribute_a = lambda { |val,closure|
+            attribute_a = lambda { |match,closure|
                 attrib = Attribute.new
                 attrib.name = closure[:name]
-                attrib.value = closure[:value]
+                attrib.matchue = closure[:value]
                 closure.parent[:element].attributes << attrib
             }
-            inside_a = lambda { |val,closure|
+            inside_a = lambda { |match,closure|
                 closure.parent[:element].attributes << closure[:sub]
             }
 
@@ -66,7 +66,7 @@ module Dome
                         )
                     :elem       => start_tag >> inside >> end_tag
                     :start_tag  => '<' >> tagname >> attribute.* >> '>'
-                    :end_tag    => '</' >> closure(:tag) >> '>'
+                    :end_tag    => '</' >> closed(:tag) >> '>'
                     :empty_elem => '<' >> tagname >> attribute.* >> '/>'
                     :tagname    => name[tagname_a]
                     :attribute  => close( attr[attribute_a] )
@@ -75,7 +75,7 @@ module Dome
                         close(
                             '"'[:quote] >>
                             ( ( ~ ).* )[:value] >>
-                            closure(:quote)
+                            closed(:quote)
                         )
                     :name       => alpha_char >> alnum_char.*
                     :inside     => ( data|element )[inside_a].*
