@@ -94,7 +94,7 @@ module Dome
     # Keeps a single Attribute of a Node with its +name+ and +value+.
     #
     class Attribute
-        attr_reader :name, :value
+        attr_accessor :name, :value
 
         def initialize
             @name, @value = '', ''

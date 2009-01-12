@@ -50,7 +50,7 @@ module Dome
             attribute_a = lambda { |match,closure|
                 attrib = Attribute.new
                 attrib.name = closure[:name]
-                attrib.matchue = closure[:value]
+                attrib.value = closure[:value]
                 closure.parent[:element].attributes << attrib
             }
             inside_a = lambda { |match,closure|
