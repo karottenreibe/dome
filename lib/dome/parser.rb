@@ -41,8 +41,6 @@ module Dome
             element_a = lambda { |match,closure|
                 closure.parent[:sub] = closure[:element]
             }
-            attr_set_a = lambda { |match,closure|
-            }
             tagname_a = lambda { |match,closure|
                 closure[:element] = Node.new
                 closure[:element].name = match.value
@@ -54,7 +52,7 @@ module Dome
                 closure.parent[:element].attributes << attrib
             }
             inside_a = lambda { |match,closure|
-                closure.parent[:element].attributes << closure[:sub]
+                closure.parent[:element].children << closure[:sub]
             }
 
             @grammar = Spectre::Grammar.new do |doc|
