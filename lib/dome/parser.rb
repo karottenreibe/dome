@@ -20,6 +20,7 @@ require 'rubygems'
 require 'spectre/spectre'
 require 'spectre/std'
 require 'dome/atoms'
+require 'pp'
 
 module Dome
 
@@ -89,7 +90,7 @@ module Dome
         def parse string
             doc = Document.new
             @grammar.bind doc
-            @grammar.parse string
+            Spectre::StringParsing.parse string, @grammar
             doc
         end
 
