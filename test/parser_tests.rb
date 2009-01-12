@@ -28,7 +28,6 @@ class Tests < Test::Unit::TestCase
     def testNodes
         doc = '<root><subnode></subnode></root>'
         tree = Dome::parse doc
-        p tree
         assert_equal 1, tree.roots.length
             assert_equal 'root', tree.roots[0].name
             assert_equal 0, tree.roots[0].attributes.length

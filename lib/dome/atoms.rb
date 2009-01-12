@@ -44,18 +44,18 @@ module Dome
     end
 
     ##
-    # Keeps a single Node of a Document with its +name+ (String), +attributes+ (Array),
-    # +children+ (Array) and +empty+ flag.
+    # Keeps a single Node of a Document with its +name+ (String), +attributes+ (Array) and
+    # +children+ (Array).
     #
     class Node
-        attr_accessor :name, :attributes, :children, :empty
+        attr_accessor :name, :attributes, :children
         
         def initialize
-            @name, @attributes, @children, @empty = '', [], [], false
+            @name, @attributes, @children = '', [], []
         end
 
         def empty?
-            @empty
+            @children.empty?
         end
 
         def inspect
@@ -65,7 +65,7 @@ module Dome
             ret = "<#{@name}"
             ret += @attributes.inject(' ') { |memo,a| "#{memo} #{a.inspect}" } unless @attributes.empty?
 
-            if @empty
+            if empty?
                 ret += '/>'
             else
                 ret += ">#{ @children.inject('') { |memo,c| memo + c.inspect } }</#{@name}>"
