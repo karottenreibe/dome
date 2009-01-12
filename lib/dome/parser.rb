@@ -39,13 +39,13 @@ module Dome
         #
         def initialize
             element_a = lambda { |match,closure|
-                closure.parent[:sub] << closure[:element]
+                closure.parent[:sub] = closure[:element]
             }
             attr_set_a = lambda { |match,closure|
             }
             tagname_a = lambda { |match,closure|
                 closure[:element] = Node.new
-                closure[:element].tag = match.value
+                closure[:element].name = match.value
             }
             attribute_a = lambda { |match,closure|
                 attrib = Attribute.new
@@ -67,7 +67,7 @@ module Dome
                 var :start_tag  => '<' >> tagname >> attribute.* >> '>'
                 var :end_tag    => '</' >> closed(:tag) >> '>'
                 var :empty_elem => '<' >> tagname >> attribute.* >> '/>'
-                var :tagname    => name[tagname_a]
+                var :tagname    => name[:tag][tagname_a]
                 var :attribute  => close( attr[attribute_a] )
                 var :attr       =>
                         ' ' >> name[:name] >> '=' >>
