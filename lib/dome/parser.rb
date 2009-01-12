@@ -58,7 +58,7 @@ module Dome
             }
 
             @grammar = Spectre::Grammar.new do |doc|
-                var :document   => close( element[lambda{ doc.roots << closure[:sub] }] ).*
+                var :document   => close( element[lambda{ |match,closure| doc.roots << closure[:sub] }] ).*
                 var :element    =>
                         close(
                             (elem|empty_elem)[element_a]

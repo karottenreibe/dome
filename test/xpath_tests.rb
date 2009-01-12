@@ -421,7 +421,6 @@ class XPathScrapingTests < Test::Unit::TestCase
         path = "//root/getme"
         xpath = XPath.new path
         nodes = xpath.all doc
-        p nodes
 
         assert_equal 2, nodes.length
         assert_equal 'getme', nodes[0].name
