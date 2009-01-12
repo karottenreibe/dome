@@ -20,6 +20,11 @@ require 'lib/dome/parser'
 class Tests < Test::Unit::TestCase
     include Dome
 
+    def testEmpty
+        doc = ''
+        tree = Dome::parse doc
+    end
+
     def testNodes
         doc = '<root><subnode></subnode></root>'
         tree = Dome::parse doc

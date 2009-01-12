@@ -57,27 +57,27 @@ module Dome
             }
 
             @grammar = Spectre::Grammar.new do |doc|
-                var :document   => close( element[lambda{ doc.roots << closure[:sub] }] ).*,
-                    :element    =>
+                var :document   => close( element[lambda{ doc.roots << closure[:sub] }] ).*
+                var :element    =>
                         close(
                             (elem|empty_elem)[element_a]
-                        ),
-                    :elem       => start_tag >> inside >> end_tag,
-                    :start_tag  => '<' >> tagname >> attribute.* >> '>',
-                    :end_tag    => '</' >> closed(:tag) >> '>',
-                    :empty_elem => '<' >> tagname >> attribute.* >> '/>',
-                    :tagname    => name[tagname_a],
-                    :attribute  => close( attr[attribute_a] ),
-                    :attr       =>
+                        )
+                var :elem       => start_tag >> inside >> end_tag
+                var :start_tag  => '<' >> tagname >> attribute.* >> '>'
+                var :end_tag    => '</' >> closed(:tag) >> '>'
+                var :empty_elem => '<' >> tagname >> attribute.* >> '/>'
+                var :tagname    => name[tagname_a]
+                var :attribute  => close( attr[attribute_a] )
+                var :attr       =>
                         ' ' >> name[:name] >> '=' >>
                         close(
                             '"'.to_p[:quote] >>
                             ( ( ~closed(:quote) ).* )[:value] >>
                             closed(:quote)
-                        ),
-                    :name       => alpha_char >> alnum_char.*,
-                    :inside     => ( data|element )[inside_a].*,
-                    :data       => ( ( ~char('<') ).+ )[:data]
+                        )
+                var :name       => alpha_char >> alnum_char.*
+                var :inside     => ( data|element )[inside_a].*
+                var :data       => ( ( ~char('<') ).+ )[:data]
 
                 var :parser     => document
             end
