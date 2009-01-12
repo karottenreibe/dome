@@ -88,8 +88,8 @@ module Dome
         #
         def parse string
             doc = Document.new
-            gram = @grammar.bind doc
-            gram.parse parse string
+            @grammar.bind doc
+            @grammar.parse string
             doc
         end
 
