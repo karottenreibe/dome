@@ -16,6 +16,7 @@
 # Contains the Parser that can transform a String into a HTML Document.
 #
 
+require 'rubygems'
 require 'spectre/spectre'
 require 'spectre/std'
 require 'dome/atoms'
@@ -36,9 +37,6 @@ module Dome
         # Creates the grammar.
         #
         def initialize
-            root_a = lambda { |match,closure|
-                doc.roots << closure[:sub]
-            }
             element_a = lambda { |match,closure|
                 closure.parent[:sub] << closure[:element]
             }
@@ -58,29 +56,30 @@ module Dome
                 closure.parent[:element].attributes << closure[:sub]
             }
 
-            @parser = Grammar.new do |doc|
-                var :document   => close( element[root_a] ).*
+            @grammar = Spectre::Grammar.new do |doc|
+                var :document   => close( element[lambda{ doc.roots << closure[:sub] }] ).*,
                     :element    =>
                         close(
                             (elem|empty_elem)[element_a]
-                        )
-                    :elem       => start_tag >> inside >> end_tag
-                    :start_tag  => '<' >> tagname >> attribute.* >> '>'
-                    :end_tag    => '</' >> closed(:tag) >> '>'
-                    :empty_elem => '<' >> tagname >> attribute.* >> '/>'
-                    :tagname    => name[tagname_a]
-                    :attribute  => close( attr[attribute_a] )
+                        ),
+                    :elem       => start_tag >> inside >> end_tag,
+                    :start_tag  => '<' >> tagname >> attribute.* >> '>',
+                    :end_tag    => '</' >> closed(:tag) >> '>',
+                    :empty_elem => '<' >> tagname >> attribute.* >> '/>',
+                    :tagname    => name[tagname_a],
+                    :attribute  => close( attr[attribute_a] ),
                     :attr       =>
                         ' ' >> name[:name] >> '=' >>
                         close(
-                            '"'[:quote] >>
-                            ( ( ~ ).* )[:value] >>
+                            '"'.to_p[:quote] >>
+                            ( ( ~closed(:quote) ).* )[:value] >>
                             closed(:quote)
-                        )
-                    :name       => alpha_char >> alnum_char.*
-                    :inside     => ( data|element )[inside_a].*
+                        ),
+                    :name       => alpha_char >> alnum_char.*,
+                    :inside     => ( data|element )[inside_a].*,
                     :data       => ( ( ~char('<') ).+ )[:data]
-                @parser = document
+
+                var :parser     => document
             end
         end
 
@@ -88,6 +87,10 @@ module Dome
         # Parses the passed +string+ into a Document.
         #
         def parse string
+            doc = Document.new
+            gram = @grammar.bind doc
+            gram.parse parse string
+            doc
         end
 
     end
