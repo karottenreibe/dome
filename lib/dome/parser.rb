@@ -56,29 +56,29 @@ module Dome
             }
 
             @grammar = Spectre::Grammar.new do |doc|
-                var :document   => close( element[lambda{ |match,closure| doc.roots << closure[:sub] }] ).*
+                var :document   => close( :element.to_n[lambda{ |match,closure| doc.roots << closure[:sub] }] ).*
                 var :element    =>
                         close(
-                            (elem|empty_elem)[element_a]
+                            (:elem.to_n|:empty_elem)[element_a]
                         )
-                var :elem       => start_tag >> inside >> end_tag
-                var :start_tag  => '<' >> tagname >> attribute.* >> '>'
+                var :elem       => :start_tag.to_n >> :inside >> :end_tag
+                var :start_tag  => char('<') >> :tagname >> :attribute.to_n.* >> '>'
                 var :end_tag    => '</' >> closed(:tag) >> '>'
-                var :empty_elem => '<' >> tagname >> attribute.* >> '/>'
-                var :tagname    => name[:tag][tagname_a]
-                var :attribute  => close( attr[attribute_a] )
+                var :empty_elem => char('<') >> :tagname >> :attribute.to_n.* >> '/>'
+                var :tagname    => :name.to_n[:tag][tagname_a]
+                var :attribute  => close( :attr.to_n[attribute_a] )
                 var :attr       =>
-                        ' ' >> name[:name] >> '=' >>
+                        ' ' >> :name.to_n[:name] >> '=' >>
                         close(
-                            '"'.to_p[:quote] >>
+                            '"'.to_n[:quote] >>
                             ( ( ~closed(:quote) ).* )[:value] >>
                             closed(:quote)
                         )
                 var :name       => alpha_char >> alnum_char.*
-                var :inside     => ( data|element )[inside_a].*
+                var :inside     => ( :data.to_n|:element )[inside_a].*
                 var :data       => ( ( ~char('<') ).+ )[:data]
 
-                var :parser     => document
+                var :parser     => :document
             end
         end
 

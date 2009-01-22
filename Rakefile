@@ -92,8 +92,9 @@ Rake::TestTask.new do |t|
     t.verbose = true
 end
 
-task :upload do
+task :upload => [:rdoc] do
     sh "rsync -azv --no-perms --no-times rdoc/* karottenreibe@rubyforge.org:/var/www/gforge-projects/dome/rdoc/"
+    sh "rsync -azv --no-perms --no-times homepage/* karottenreibe@rubyforge.org:/var/www/gforge-projects/dome/"
 end
 
 task :install => [:package] do
