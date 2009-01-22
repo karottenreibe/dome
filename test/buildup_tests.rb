@@ -76,5 +76,52 @@ class Tests < Test::Unit::TestCase
         assert_kind_of NilClass, ret
     end
 
+    class Element
+        attr_accessor :tag, :attributes, :data
+    end
+
+    class Data
+        attr_accessor :data
+    end
+
+    def testNodeAction
+        val = 1
+
+        newelement_a = lambda { |match, closure|
+            closure[:element] = Element.new
+            closure[:element].tag = match.value
+            val += val
+        }
+
+        element = Grammar.new do ||
+            var :tagname   => ( ~char('>') & ~char(' ') ).+,
+                :element   => char('<') >> sym(:tagname)[:tag][newelement_a] >> char('>') >> :data >> string('</') >> closed(:tag) >> char('>'),
+                :data      => ( ~char('<') ).*,
+                :parser    => :element
+        end
+
+        element.closure = Closure.new
+        
+
+        ret = parse '<foo></foo>', element
+        assert_kind_of Spectre::Match, ret
+        assert_equal 11, ret.length
+
+        ret = parse '<foo>data</foo>', element
+        assert_kind_of Spectre::Match, ret
+        assert_equal 15, ret.length
+
+        ret = parse '<foo><</foo>', element
+        assert_kind_of NilClass, ret
+
+        ret = parse '<foo></bar>', element
+        assert_kind_of NilClass, ret
+        
+        assert_equal 16, val
+    end
+
+    def testDataAction
+    end
+
 end
 

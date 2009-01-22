@@ -28,7 +28,7 @@ module Dome
     include Spectre::StringParsing
 
     ##
-    # Parses a string into a Document of Nodes and Attributes.
+    # Parses a string into a Document of Elements and Attributes.
     # Parsing is started by calling +parse+.
     # The same parser can be used to parse different documents.
     #
@@ -42,7 +42,7 @@ module Dome
                 closure.parent[:sub] = closure[:element]
             }
             tagname_a = lambda { |match,closure|
-                closure[:element] = Node.new
+                closure[:element] = Element.new
                 closure[:element].name = match.value
             }
             attribute_a = lambda { |match,closure|

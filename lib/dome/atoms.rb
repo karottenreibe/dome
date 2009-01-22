@@ -23,14 +23,14 @@ module Dome
 
     ##
     # Keeps a single Document.
-    # All the Nodes are accessible via the +root+ pseudo element's +children+
+    # All the Elements are accessible via the +root+ pseudo element's +children+
     # accessor or via the +roots+ Array.
     #
     class Document
         attr_accessor :roots, :root
 
         def initialize
-            @root = Node.new
+            @root = Element.new
             @root.name = nil
         end
 
@@ -44,10 +44,10 @@ module Dome
     end
 
     ##
-    # Keeps a single Node of a Document with its +name+ (String), +attributes+ (Array) and
+    # Keeps a single Element of a Document with its +name+ (String), +attributes+ (Array) and
     # +children+ (Array).
     #
-    class Node
+    class Element
         attr_accessor :name, :attributes, :children
         
         def initialize
@@ -91,7 +91,7 @@ module Dome
     end
 
     ##
-    # Keeps a single Attribute of a Node with its +name+ and +value+.
+    # Keeps a single Attribute of an Element with its +name+ and +value+.
     #
     class Attribute
         attr_accessor :name, :value

@@ -37,7 +37,7 @@ module Dome
 
     ##
     # Stores an XPath over a Document.
-    # Can be used to iterate over all the Nodes identified by the XPath
+    # Can be used to iterate over all the Elements identified by the XPath
     # and to extract all of them or only the first one.
     #
     class XPath
@@ -120,7 +120,7 @@ module Dome
             str = '/' + str unless str[0..0] == '/'
 
             while str.length > 0
-                nodep = NodeParser.new
+                nodep = ElementParser.new
                 str = nodep.parse str
                 @path << nodep
             end
@@ -171,7 +171,7 @@ module Dome
         class XPathParserError < RuntimeError
         end
 
-        class NodeParser
+        class ElementParser
             def initialize
                 @tag, @attr_parsers = '', []
             end
@@ -242,7 +242,7 @@ module Dome
             end
 
             ##
-            # Returns an Array of all Nodes under +node+ matching this NodeParser.
+            # Returns an Array of all Elements under +node+ matching this ElementParser.
             ##TODO: Root node is not root node, but rather an imaginary empty node?
             #
             def all node, path, first = true
@@ -278,7 +278,7 @@ module Dome
             end
 
             ##
-            # Returns the first child of node matching this NodeParser or nil,
+            # Returns the first child of node matching this ElementParser or nil,
             # if no match is found.
             #
             def first node, path
@@ -299,17 +299,17 @@ module Dome
 
             ##
             # Returns true if the +node+ with the index +idx+ and the reverse index +idx_r+
-            # matches this NodeParser. Otherwise returns false.
+            # matches this ElementParser. Otherwise returns false.
             #
             def matches? node, idx, idx_r
-                node.is_a? Node and
+                node.is_a? Element and
                 ( @tag == :star or node.name == @tag ) and
                 @attr_parsers.all? { |a| a.matches? node, idx, idx_r }
             end
 
             ##
             # Implements the '//' operator for a call to +#first+.
-            # Returns a single Node or +nil+.
+            # Returns a single Element or +nil+.
             #
             def somewhere_first node
                 idx = 0
