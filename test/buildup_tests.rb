@@ -131,11 +131,14 @@ class Tests < Test::Unit::TestCase
             var :tagname   => ( ~char('>') & ~char(' ') ).+,
                 :element   => char('<') >> sym(:tagname)[:tag] >> char('>') >> sym(:data)[:data] >> string('</') >> closed(:tag) >> char('>'),
                 :data      => ( ~char('<') ).*,
-                :parser    => close(:element)[newelement_a]
+                :parser    => sym(:element)[newelement_a]
         end
+
+        element.closure = Closure.new
 
         ret = parse '<foo></foo>', element
         assert_kind_of Spectre::Match, ret
+        assert_kind_of Element, element.closure[:element]
         assert_equal 11, ret.length
 
         ret = parse '<foo>data</foo>', element
