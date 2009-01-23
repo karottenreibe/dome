@@ -97,11 +97,8 @@ class Tests < Test::Unit::TestCase
             var :tagname   => ( ~char('>') & ~char(' ') ).+,
                 :element   => char('<') >> sym(:tagname)[:tag][newelement_a] >> char('>') >> :data >> string('</') >> closed(:tag) >> char('>'),
                 :data      => ( ~char('<') ).*,
-                :parser    => :element
+                :parser    => close(:element)
         end
-
-        element.closure = Closure.new
-        
 
         ret = parse '<foo></foo>', element
         assert_kind_of Spectre::Match, ret
@@ -126,24 +123,16 @@ class Tests < Test::Unit::TestCase
         newelement_a = lambda { |match, closure|
             closure[:element] = Element.new
             closure[:element].tag = match.value
+            closure[:element].tag = match.value
             val += val
-        }
-
-        newdata_a = lambda { |match, closure|
-            dat = Data.new
-            dat.data = match.value
-            closure[:element].children << dat
         }
 
         element = Grammar.new do ||
             var :tagname   => ( ~char('>') & ~char(' ') ).+,
-                :element   => char('<') >> sym(:tagname)[:tag][newelement_a] >> char('>') >> :data >> string('</') >> closed(:tag) >> char('>'),
+                :element   => char('<') >> sym(:tagname)[:tag] >> char('>') >> sym(:data)[:data] >> string('</') >> closed(:tag) >> char('>'),
                 :data      => ( ~char('<') ).*,
-                :parser    => :element
+                :parser    => close(:element)[newelement_a]
         end
-
-        element.closure = Closure.new
-        
 
         ret = parse '<foo></foo>', element
         assert_kind_of Spectre::Match, ret
@@ -159,7 +148,7 @@ class Tests < Test::Unit::TestCase
         ret = parse '<foo></bar>', element
         assert_kind_of NilClass, ret
         
-        assert_equal 16, val
+        assert_equal 4, val
     end
 
 end
