@@ -122,8 +122,8 @@ class Tests < Test::Unit::TestCase
 
         newelement_a = lambda { |match, closure|
             closure[:element] = Element.new
-            closure[:element].tag = match.value
-            closure[:element].tag = match.value
+            closure[:element].tag = closure[:tag]
+            closure[:element].data = closure[:data]
             val += val
         }
 
