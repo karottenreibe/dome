@@ -24,18 +24,16 @@ module Dome
     ##
     # Keeps a single Document.
     # All the Elements are accessible via the +root+ pseudo element's +children+
-    # accessor or via the +roots+ Array.
+    # accessor.
     #
     class Document
-        attr_accessor :roots, :root
+        ##
+        # The root pseudo Element.
+        attr_accessor :root
 
         def initialize
             @root = Element.new
-            @root.name = nil
-        end
-
-        def roots
-            @root.children
+            @root.tag = nil
         end
 
         def inspect
@@ -44,23 +42,54 @@ module Dome
     end
 
     ##
-    # Keeps a single Element of a Document with its +name+ (String), +attributes+ (Array) and
-    # +children+ (Array).
+    # Keeps a single Element of a Document with its +tag+, +attributes+ and +children+.
     #
     class Element
-        attr_accessor :name, :attributes, :children
+        ##
+        # The Element's tag - String
+        attr_accessor :tag
+
+        ##
+        # The Element's attributes - Hash: String => String
+        attr_accessor :attributes
+
+        ##
+        # The Element's children - Array
+        attr_accessor :children
+
+        ##
+        # The Element's parent - Element
+        attr_accessor :parent
         
-        def initialize
-            @name, @attributes, @children = '', [], []
+        def initialize name = "", attributes = {}, children = []
+            @name, @attributes, @children = name, attributes, children
         end
 
+        ##
+        # Whether or not the Element has children.
+        #
         def empty?
             @children.empty?
         end
 
+        ##
+        # Whether or not the Element is the root pseudo Element.
+        #
+        def root?
+            @tag.nil?
+        end
+
+        ##
+        # Retrieves the attribute specified by +key+ from the attributes hash, or +nil+ if
+        # no such attribute was specified.
+        #
+        def [] key
+            @attributes[key]
+        end
+
         def inspect
             # first handle root case
-            return "{ #{ @children.inject('') { |memo,c| memo + c.inspect } } }" if @name.nil?
+            return "{ #{ @children.inject('') { |memo,c| memo + c.inspect } } }" if self.root?
 
             ret = "<#{@name}"
             ret += @attributes.inject(' ') { |memo,a| "#{memo} #{a.inspect}" } unless @attributes.empty?
@@ -76,32 +105,23 @@ module Dome
     end
 
     ##
-    # Keeps text +data+.
+    # Keeps text data, either normally or as a CDATA section.
     #
     class Data
-        attr_accessor :data
+        ##
+        # The data enclosed in this object - String
+        attr_accessor :value
+
+        ##
+        # Whether or not the data is enclosed in a CDATA section - Boolean
+        attr_accessor :CDATA
         
-        def initialize
-            @data = ''
+        def initialize value = '', CDATA = false
+            @value, @CDATA = value, CDATA
         end
 
         def inspect
-            @data
-        end
-    end
-
-    ##
-    # Keeps a single Attribute of an Element with its +name+ and +value+.
-    #
-    class Attribute
-        attr_accessor :name, :value
-
-        def initialize
-            @name, @value = '', ''
-        end
-
-        def inspect
-            "#{@name}=#{@value.inspect}"
+            @CDATA ? "<[CDATA[#{@data}]]>" : @data
         end
     end
 

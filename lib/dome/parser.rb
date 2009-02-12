@@ -16,89 +16,234 @@
 # Contains the Parser that can transform a String into a HTML Document.
 #
 
-require 'rubygems'
-require 'spectre/spectre'
-require 'spectre/std'
 require 'dome/atoms'
-require 'pp'
 
 module Dome
 
     include Spectre
     include Spectre::StringParsing
 
-    ##
-    # Parses a string into a Document of Elements and Attributes.
-    # Parsing is started by calling +parse+.
-    # The same parser can be used to parse different documents.
-    #
-    class Parser
+    class Token
 
         ##
-        # Creates the grammar.
-        #
-        def initialize
-            element_a = lambda { |match,closure|
-                closure.parent[:sub] = closure[:element]
-            }
-            tagname_a = lambda { |match,closure|
-                closure[:element] = Element.new
-                closure[:element].name = match.value
-            }
-            attribute_a = lambda { |match,closure|
-                attrib = Attribute.new
-                attrib.name = closure[:name]
-                attrib.value = closure[:value]
-                closure.parent[:element].attributes << attrib
-            }
-            inside_a = lambda { |match,closure|
-                closure.parent[:element].children << closure[:sub]
-            }
-
-            @grammar = Spectre::Grammar.new do |doc|
-                var :document   => close( :element.to_n[lambda{ |match,closure| doc.roots << closure[:sub] }] ).*
-                var :element    =>
-                        close(
-                            (:elem.to_n|:empty_elem)[element_a]
-                        )
-                var :elem       => :start_tag.to_n >> :inside >> :end_tag
-                var :start_tag  => char('<') >> :tagname >> :attribute.to_n.* >> '>'
-                var :end_tag    => '</' >> closed(:tag) >> '>'
-                var :empty_elem => char('<') >> :tagname >> :attribute.to_n.* >> '/>'
-                var :tagname    => :name.to_n[:tag][tagname_a]
-                var :attribute  => close( :attr.to_n[attribute_a] )
-                var :attr       =>
-                        ' ' >> :name.to_n[:name] >> '=' >>
-                        close(
-                            '"'.to_n[:quote] >>
-                            ( ( ~closed(:quote) ).* )[:value] >>
-                            closed(:quote)
-                        )
-                var :name       => alpha_char >> alnum_char.*
-                var :inside     => ( :data.to_n|:element )[inside_a].*
-                var :data       => ( ( ~char('<') ).+ )[:data]
-
-                var :parser     => :document
-            end
-        end
+        # The type of the token - Symbol
+        # Possible values:
+        # - :left_bracket
+        # - :right_bracket
+        # - :equal
+        # - :whitespace
+        # - :text
+        # - :element_end
+        # - :cdata_start
+        # - :cdata_end
+        attr_accessor :type
 
         ##
-        # Parses the passed +string+ into a Document.
+        # The value of the token - String or +nil+
+        attr_accessor :value
+
+        ##
+        # Initializes the Token's +type+ and +value+ fields.
         #
-        def parse string
-            doc = Document.new
-            @grammar.bind doc
-            Spectre::StringParsing.parse string, @grammar
-            doc
+        def initialize type, value = nil
+            @type, @value = type, value
         end
 
     end
 
     ##
-    # Shortcut for +Dome::Parser.new.parse string+.
+    # Splits a given String into small components that are consumed by the Parser.
     #
-    def self.parse string
-        Parser.new.parse string
+    class Lexer
+
+        ##
+        # Initializes the Lexer with the input +string+.
+        #
+        def initialize string
+            @string, @pos, @tokens = string, 0, []
+            self.split!
+        end
+
+        ##
+        # Retrieves the next token from the input.
+        #
+        def next
+            @tokens[@pos]
+        end
+
+        ##
+        # Retrieves the next token from the input and advances by one.
+        #
+        def next!
+            @pos += 1
+            @tokens[@pos-1]
+        end
+
+        ##
+        # Whether or not the lexer has more tokens in it's storage.
+        #
+        def next?
+            @pos < @tokens.length
+        end
+
+        ##
+        # Returns an object that can be used to backtrack to the current position by calling
+        # +undo+.
+        #
+        def trace
+            @pos
+        end
+
+        ##
+        # Backtraces to the position identified by the +trace+ object.
+        #
+        def undo trace
+            @pos = trace
+        end
+
+        protected:
+
+            ##
+            # Splits the input up into Tokens and stores them in +@tokens+.
+            #
+            def split!
+                @string.split(/<|=|\s|\/>|>|<!\[CDATA\[|\]\]>/).each do |token|
+                    type = 
+                        case token
+                        when '<' then :left_bracket
+                        when '>' then :right_bracket
+                        when '=' then :equal
+                        when /\s/ then :whitespace
+                        when '/>' then :element_end
+                        when '<![CDATA[' then :cdata_start
+                        when ']]>' then :cdata_end
+                        else :text
+                        end
+                    @tokens << Token.new type, token
+                end
+            end
+
+    end
+
+    ##
+    # Parses a string into a Document of Elements and Attributes.
+    # Parsing is started by calling +parse+.
+    #
+    class Parser
+
+        class << self
+
+            ##
+            # Whether or not the Parser should output warning messages to
+            # +STDERR+ when the input is not correct.
+            attr_accessor :verbose
+
+        end
+
+        ##
+        # Whether or not the parsing process consumed all input.
+        attr_reader :consumed_all
+
+        def initialize lexer
+            @lexer, @doc = lexer, Document.new
+        end
+
+        ##
+        # Starts the parsing with the given +lexer+.
+        #
+        def parse lexer
+            while @lexer.next?
+                success,elem = parse_element
+                
+                if success
+                    @doc.root.children << elem
+                else
+                    break
+                end
+            end
+
+            @doc
+        end
+
+        ##
+        # Parses the children of an Element.
+        # Returns +[success,[chilren]]+
+        #
+        def parse_children
+            parseCDATA or parseData
+        end
+
+        ##
+        # Parses a data section.
+        # Returns +[success,data]+
+        #
+        def parse_data
+            buf = ''
+
+            while @lexer.next?
+                token = @lexer.next!
+                
+                case token.type
+                when :cdata_start, :left_bracket then break
+                else buf << token.value
+                end
+            end
+            
+            [buf.empty?, Data.new(buf)]
+        end
+
+        ##
+        # Parses a CDATA section.
+        # Returns +[success,cdata]+
+        #
+        def parse_cdata
+            return [false, nil] unless @lexer.next? and @lexer.next!.type == :cdata_start
+
+            buf = ''
+
+            while @lexer.next?
+                token = @lexer.next!
+                
+                case token.type
+                when :cdata_end then break
+                else buf << token.value
+                end
+            end
+            
+            [buf.empty?, Data.new(buf, true)]
+        end
+
+        ##
+        # Parses an element section.
+        # Returns +[success,element]+
+        #
+        def parse_element
+        end
+
+        ##
+        # Parses an element tag.
+        # Returns +[success,tag_string]+
+        #
+        def parse_tag
+            return [false, nil] unless @lexer.next? and @lexer.next.type == :text
+            [true, @lexer.next!]
+        end
+
+        ##
+        # Parses an attribute section.
+        # Returns +[success,{name=>value}]+
+        #
+        def parse_attribute
+        end
+    end
+
+    class << self
+        ##
+        # Shortcut for +Dome::Parser.new.parse string+.
+        #
+        def parse string
+            Parser.new( Lexer.new(string) ).parse
+        end
     end
 
 end
