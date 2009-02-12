@@ -101,27 +101,27 @@ module Dome
             @pos = trace
         end
 
-        protected:
+        protected
 
-            ##
-            # Splits the input up into Tokens and stores them in +@tokens+.
-            #
-            def split!
-                @string.split(/<|=|\s|\/>|>|<!\[CDATA\[|\]\]>/).each do |token|
-                    type = 
-                        case token
-                        when '<' then :left_bracket
-                        when '>' then :right_bracket
-                        when '=' then :equal
-                        when /\s/ then :whitespace
-                        when '/>' then :element_end
-                        when '<![CDATA[' then :cdata_start
-                        when ']]>' then :cdata_end
-                        else :text
-                        end
-                    @tokens << Token.new type, token
-                end
+        ##
+        # Splits the input up into Tokens and stores them in +@tokens+.
+        #
+        def split!
+            @string.split(/<|=|\s|\/>|>|<!\[CDATA\[|\]\]>/).each do |token|
+                type = 
+                    case token
+                    when '<' then :left_bracket
+                    when '>' then :right_bracket
+                    when '=' then :equal
+                    when /\s/ then :whitespace
+                    when '/>' then :element_end
+                    when '<![CDATA[' then :cdata_start
+                    when ']]>' then :cdata_end
+                    else :text
+                    end
+                @tokens << Token.new type, token
             end
+        end
 
     end
 
@@ -144,38 +144,50 @@ module Dome
         # Whether or not the parsing process consumed all input.
         attr_reader :consumed_all
 
+        ##
+        # Initializes the Parser with a given +lexer+.
+        #
         def initialize lexer
-            @lexer, @doc = lexer, Document.new
+            @lexer = lexer
+        end
+
+        ##
+        # Starts/continues parsing until the next object can be constructed.
+        # Returns that object.
+        #
+        def next
+            # set up a return continuation which will be called when someting
+            # was parsed successfully
+            callcc do |@ret|
+                # either return to point in parsing where we left off, or start
+                # over if there is no such point
+                if @cc then @cc.call
+                else parse_doc
+                end
+            end
         end
 
         ##
         # Starts the parsing with the given +lexer+.
+        # Returns +nil+ when parsing has finished.
         #
-        def parse lexer
-            while @lexer.next?
-                success,elem = parse_element
-                
-                if success
-                    @doc.root.children << elem
-                else
-                    break
-                end
-            end
-
-            @doc
+        def parse_doc
+            parse_element while @lexer.next?
+            nil
         end
 
         ##
-        # Parses the children of an Element.
-        # Returns +[success,[chilren]]+
+        # Parses all the children of an Element.
+        # Always returns +true+.
         #
         def parse_children
-            parseCDATA or parseData
+            nil while parse_cdata or parse_data or parse_element
+            true
         end
 
         ##
         # Parses a data section.
-        # Returns +[success,data]+
+        # Returns +true+ on success and +false+ otherwise.
         #
         def parse_data
             buf = ''
@@ -188,13 +200,18 @@ module Dome
                 else buf << token.value
                 end
             end
-            
-            [buf.empty?, Data.new(buf)]
+
+            if buf.empty?
+                false
+            else
+                found Data.new(buf)
+                true
+            end
         end
 
         ##
         # Parses a CDATA section.
-        # Returns +[success,cdata]+
+        # Returns +true+ on success and +false+ otherwise.
         #
         def parse_cdata
             return [false, nil] unless @lexer.next? and @lexer.next!.type == :cdata_start
@@ -210,31 +227,57 @@ module Dome
                 end
             end
             
-            [buf.empty?, Data.new(buf, true)]
+            if buf.empty?
+                false
+            else
+                found Data.new(buf, true)
+                true
+            end
         end
 
         ##
         # Parses an element section.
-        # Returns +[success,element]+
+        # Returns +true+ on success and +false+ otherwise.
         #
         def parse_element
         end
 
         ##
         # Parses an element tag.
-        # Returns +[success,tag_string]+
+        # Returns either the parsed tag or +nil+ if no tag was recognized.
         #
         def parse_tag
-            return [false, nil] unless @lexer.next? and @lexer.next.type == :text
-            [true, @lexer.next!]
+            return nil unless @lexer.next? and @lexer.next.type == :text
+            @lexer.next!
         end
 
         ##
-        # Parses an attribute section.
-        # Returns +[success,{name=>value}]+
+        # Parses all the attributes of an Element.
+        # Always returns +true+.
+        #
+        def parse_attributes
+            nil while parse_attribute
+            true
+        end
+
+        ##
+        # Parses one attribute.
+        # Returns +true+ on success and +false+ otherwise.
         #
         def parse_attribute
         end
+
+        protected
+
+        ##
+        # Returns to the return continuation set up in +#next+, returning the
+        # given +value+. At the same time it sets up +@cc+ so +#next+ can jump
+        # back into the parsing process.
+        #
+        def found value
+            callcc { |@cc| @ret.call value }
+        end
+
     end
 
     class << self
