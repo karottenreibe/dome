@@ -93,8 +93,12 @@ Rake::TestTask.new do |t|
 end
 
 task :upload => [:rdoc] do
-    sh "rsync -azv --no-perms --no-times rdoc/* karottenreibe@rubyforge.org:/var/www/gforge-projects/dome/rdoc/"
-    sh "rsync -azv --no-perms --no-times homepage/* karottenreibe@rubyforge.org:/var/www/gforge-projects/dome/"
+    sh "rsync -azv --no-perms --no-times rdoc/* karottenreibe@rubyforge.org:/var/www/gforge-projects/#{GEM_RUBYFORGE}/rdoc/"
+    sh "rsync -azv --no-perms --no-times homepage/* karottenreibe@rubyforge.org:/var/www/gforge-projects/#{GEM_RUBYFORGE}/"
+end
+
+task :sftp do
+    sh "sftp karottenreibe@rubyforge.org:/var/www/gforge-projects/#{GEM_RUBYFORGE}/"
 end
 
 task :install => [:package] do
