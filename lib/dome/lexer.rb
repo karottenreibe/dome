@@ -110,7 +110,7 @@ module Dome
         #
         def split!
             @gen = Generator.new do |gen|
-                @string.split(/<|=|\s|\/>|>|<!\[CDATA\[|\]\]>|'|"/).each do |token|
+                tokenize do |token|
                     type = 
                         case token
                         when '<' then :left_bracket
@@ -128,6 +128,28 @@ module Dome
             end
 
             nil
+        end
+
+        ##
+        # Splits the input string up into tokens and yields the given block for
+        # each of them.
+        #
+        def tokenize
+            delims = /<|=|\s|\/>|>|<!\[CDATA\[|\]\]>|'|"/
+            pos = 0
+
+            while pos < @string.length
+                match = delims.match @string[pos..-1]
+
+                if match
+                    yield match.pre_match unless match.pre_match.empty?
+                    pos += match[0].length + match.pre_match.length
+                    yield match[0]
+                else
+                    yield @string[pos..-1]
+                    break
+                end
+            end
         end
 
     end

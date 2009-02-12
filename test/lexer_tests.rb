@@ -32,5 +32,21 @@ class LexerTests < Test::Unit::TestCase
         assert_kind_of NilClass, lex.next
     end
 
+    def testLeftB
+        lex = Lexer.new "<foo"
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :left_bracket, t.type
+        assert_equal "<", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :text, t.type
+        assert_equal "foo", t.value
+        assert_equal false, lex.next?
+    end
+
 end
 
