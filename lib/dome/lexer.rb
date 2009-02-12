@@ -17,6 +17,8 @@
 # of tokens for the Parser.
 #
 
+require 'generator'
+
 module Dome
 
     class Token
@@ -58,6 +60,7 @@ module Dome
         #
         def initialize string
             @string, @pos, @tokens, @done = string, 0, [], false
+            self.split!
             self.next!
         end
 
@@ -72,10 +75,8 @@ module Dome
         # Advances by one token.
         #
         def next!
-            @token = callcc do |@ret|
-                if @cc then @cc.call
-                else split!
-                end
+            if @gen.next? then @token = @gen.next
+            else @token = nil
             end
         end
 
@@ -83,7 +84,7 @@ module Dome
         # Whether or not the lexer has more tokens in it's storage.
         #
         def next?
-            !@done
+            @gen.next?
         end
 
         ##
@@ -91,7 +92,7 @@ module Dome
         # +undo+.
         #
         def trace
-            @cc
+            @gen.dup
         end
 
         ##
@@ -99,32 +100,33 @@ module Dome
         #
         def undo trace
             @token = nil
-            @cc = trace
+            @gen = trace
         end
 
         protected
 
         ##
-        # Splits the input up into Tokens.
+        # Generates the generator (*g*), which splits the input up into Tokens.
         #
         def split!
-            @string.split(/<|=|\s|\/>|>|<!\[CDATA\[|\]\]>|'|"/).each do |token|
-                type = 
-                    case token
-                    when '<' then :left_bracket
-                    when '>' then :right_bracket
-                    when '=' then :equal
-                    when '"', "'" then :quote
-                    when /\s/ then :whitespace
-                    when '/>' then :element_end
-                    when '<![CDATA[' then :cdata_start
-                    when ']]>' then :cdata_end
-                    else :text
-                    end
-                callcc { |@cc| @ret.call Token.new(type, token) }
+            @gen = Generator.new do |gen|
+                @string.split(/<|=|\s|\/>|>|<!\[CDATA\[|\]\]>|'|"/).each do |token|
+                    type = 
+                        case token
+                        when '<' then :left_bracket
+                        when '>' then :right_bracket
+                        when '=' then :equal
+                        when '"', "'" then :quote
+                        when /\s/ then :whitespace
+                        when '/>' then :element_end
+                        when '<![CDATA[' then :cdata_start
+                        when ']]>' then :cdata_end
+                        else :text
+                        end
+                    gen.yield Token.new(type, token)
+                end
             end
 
-            @done = true
             nil
         end
 

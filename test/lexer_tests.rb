@@ -22,16 +22,13 @@ class LexerTests < Test::Unit::TestCase
 
     def testText
         lex = Lexer.new "asdf"
-        assert_equal true, lex.next?
         t = lex.next
         assert_kind_of Token, t
         assert_equal :text, t.type
         assert_equal "asdf", t.value
 
-        p lex.next
-        lex.next!
-        p lex.next
         assert_equal false, lex.next?
+        lex.next!
         assert_kind_of NilClass, lex.next
     end
 
