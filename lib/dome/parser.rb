@@ -249,8 +249,14 @@ module Dome
         # Returns either the parsed tag or +nil+ if no tag was recognized.
         #
         def parse_tag
-            return nil unless @lexer.next? and @lexer.next.type == :text
-            @lexer.next!
+            token = @lexer.next
+
+            if @lexer.next? and token.type == :text
+                @lexer.next!
+                token
+            else
+                nil
+            end
         end
 
         ##
