@@ -18,9 +18,6 @@
 
 module Dome
 
-    include Spectre
-    include Spectre::StringParsing
-
     ##
     # Keeps a single Document.
     # All the Elements are accessible via the +root+ pseudo element's +children+
@@ -114,14 +111,14 @@ module Dome
 
         ##
         # Whether or not the data is enclosed in a CDATA section - Boolean
-        attr_accessor :CDATA
+        attr_accessor :cdata
         
-        def initialize value = '', CDATA = false
-            @value, @CDATA = value, CDATA
+        def initialize value = '', cdata = false
+            @value, @cdata = value, cdata
         end
 
         def inspect
-            @CDATA ? "<[CDATA[#{@data}]]>" : @data
+            @cdata ? "<[CDATA[#{@data}]]>" : @data
         end
     end
 

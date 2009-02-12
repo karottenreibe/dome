@@ -21,5 +21,8 @@ require 'lib/dome/xpath'
 class XPathTests < Test::Unit::TestCase
     include Dome
 
+    def testNothing
+    end
+
 end
 

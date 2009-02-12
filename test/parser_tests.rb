@@ -20,5 +20,8 @@ require 'lib/dome/parser'
 class ParserTests < Test::Unit::TestCase
     include Dome
 
+    def testNothing
+    end
+
 end
 

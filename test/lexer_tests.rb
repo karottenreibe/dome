@@ -20,5 +20,18 @@ require 'lib/dome/lexer'
 class LexerTests < Test::Unit::TestCase
     include Dome
 
+    def testText
+        lex = Lexer.new "asdf"
+        assert_equal true, lex.next?
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :text, t
+        assert_equal "asdf", t.value
+
+        lex.next!
+        assert_equal false, lex.next?
+        assert_kind_of NilClass, lex.next
+    end
+
 end
 

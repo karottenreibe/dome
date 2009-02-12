@@ -58,7 +58,6 @@ module Dome
         #
         def initialize string
             @string, @pos, @tokens = string, 0, []
-            self.split!
         end
 
         ##
