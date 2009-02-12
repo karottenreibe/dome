@@ -18,7 +18,7 @@ require 'test/unit'
 require 'lib/dome/parser'
 require 'lib/dome/xpath'
 
-class XPathConstructionTests < Test::Unit::TestCase
+class XPathTests < Test::Unit::TestCase
     include Dome
 
 end

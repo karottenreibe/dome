@@ -15,9 +15,9 @@
 #
 
 require 'test/unit'
-require 'lib/dome/parser'
+require 'lib/dome/lexer'
 
-class ParserTests < Test::Unit::TestCase
+class LexerTests < Test::Unit::TestCase
     include Dome
 
 end
