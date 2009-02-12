@@ -64,21 +64,27 @@ module Dome
         # Retrieves the next token from the input.
         #
         def next
-            @tokens[@pos]
+            @token = callcc do |@ret|
+                if @cc then @cc.call
+                else split!
+                end
+            end unless @token
+
+            @token
         end
 
         ##
         # Advances by one token.
         #
         def next!
-            @pos += 1
+            @token = nil
         end
 
         ##
         # Whether or not the lexer has more tokens in it's storage.
         #
         def next?
-            @pos < @tokens.length
+            @done
         end
 
         ##
@@ -86,22 +92,24 @@ module Dome
         # +undo+.
         #
         def trace
-            @pos
+            @cc
         end
 
         ##
         # Backtraces to the position identified by the +trace+ object.
         #
         def undo trace
-            @pos = trace
+            @cc = trace
         end
 
         protected
 
         ##
-        # Splits the input up into Tokens and stores them in +@tokens+.
+        # Splits the input up into Tokens.
         #
         def split!
+            @done = false
+
             @string.split(/<|=|\s|\/>|>|<!\[CDATA\[|\]\]>/).each do |token|
                 type = 
                     case token
@@ -114,8 +122,11 @@ module Dome
                     when ']]>' then :cdata_end
                     else :text
                     end
-                @tokens << Token.new type, token
+                callcc { |@cc| @ret.call Token.new(type, token) }
             end
+
+            @done = true
+            nil
         end
 
     end
