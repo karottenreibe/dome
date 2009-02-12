@@ -57,19 +57,14 @@ module Dome
         # Initializes the Lexer with the input +string+.
         #
         def initialize string
-            @string, @pos, @tokens = string, 0, []
+            @string, @pos, @tokens, @done = string, 0, [], false
+            self.next!
         end
 
         ##
         # Retrieves the next token from the input.
         #
         def next
-            @token = callcc do |@ret|
-                if @cc then @cc.call
-                else split!
-                end
-            end unless @token
-
             @token
         end
 
@@ -77,14 +72,18 @@ module Dome
         # Advances by one token.
         #
         def next!
-            @token = nil
+            @token = callcc do |@ret|
+                if @cc then @cc.call
+                else split!
+                end
+            end
         end
 
         ##
         # Whether or not the lexer has more tokens in it's storage.
         #
         def next?
-            @done
+            !@done
         end
 
         ##
@@ -109,8 +108,6 @@ module Dome
         # Splits the input up into Tokens.
         #
         def split!
-            @done = false
-
             @string.split(/<|=|\s|\/>|>|<!\[CDATA\[|\]\]>|'|"/).each do |token|
                 type = 
                     case token
