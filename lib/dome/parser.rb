@@ -72,11 +72,10 @@ module Dome
         end
 
         ##
-        # Retrieves the next token from the input and advances by one.
+        # Advances by one token.
         #
         def next!
             @pos += 1
-            @tokens[@pos-1]
         end
 
         ##
@@ -190,23 +189,25 @@ module Dome
         # Returns +true+ on success and +false+ otherwise.
         #
         def parse_data
+            pos = @lexer.trace
             buf = ''
 
-            while @lexer.next?
-                token = @lexer.next!
+            done = while @lexer.next?
+                token = @lexer.next
                 
                 case token.type
-                when :cdata_start, :left_bracket then break
+                when :cdata_start, :left_bracket then break true
                 else buf << token.value
                 end
+
+                @lexer.next!
             end
 
-            if buf.empty?
-                false
-            else
-                found Data.new(buf)
-                true
+            if done then found Data.new(buf)
+            else @lexer.undo pos
             end
+
+            done
         end
 
         ##
@@ -214,25 +215,26 @@ module Dome
         # Returns +true+ on success and +false+ otherwise.
         #
         def parse_cdata
-            return [false, nil] unless @lexer.next? and @lexer.next!.type == :cdata_start
+            trace = @lexer.trace
+            return false unless @lexer.next? and @lexer.next.type == :cdata_start
+            @lexer.next!
 
             buf = ''
 
-            while @lexer.next?
+            done = while @lexer.next?
                 token = @lexer.next!
                 
                 case token.type
-                when :cdata_end then break
+                when :cdata_end then break true
                 else buf << token.value
                 end
             end
             
-            if buf.empty?
-                false
-            else
-                found Data.new(buf, true)
-                true
+            if done then found Data.new(buf, true)
+            else @lexer.undo pos
             end
+
+            done
         end
 
         ##
