@@ -27,6 +27,7 @@ module Dome
         # - :left_bracket
         # - :right_bracket
         # - :equal
+        # - :quote
         # - :whitespace
         # - :text
         # - :element_end
@@ -35,7 +36,7 @@ module Dome
         attr_accessor :type
 
         ##
-        # The value of the token - String or +nil+
+        # The value of the token - String
         attr_accessor :value
 
         ##
@@ -111,12 +112,13 @@ module Dome
         def split!
             @done = false
 
-            @string.split(/<|=|\s|\/>|>|<!\[CDATA\[|\]\]>/).each do |token|
+            @string.split(/<|=|\s|\/>|>|<!\[CDATA\[|\]\]>|'|"/).each do |token|
                 type = 
                     case token
                     when '<' then :left_bracket
                     when '>' then :right_bracket
                     when '=' then :equal
+                    when '"', "'" then :quote
                     when /\s/ then :whitespace
                     when '/>' then :element_end
                     when '<![CDATA[' then :cdata_start

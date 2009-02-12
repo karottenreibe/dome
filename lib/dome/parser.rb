@@ -175,7 +175,7 @@ module Dome
             return terminate trace if not @lexer.next? or @lexer.next.type != :left_bracket
             lexer.next!
 
-            tag = parse_tag
+            tag = parse_text
             return terminate trace unless tag
 
             found :element_start, tag
@@ -197,7 +197,7 @@ module Dome
             return missing_end tag, end_trace if not @lexer.next? or @lexer.next.type != :left_bracket
             @lexer.next!
 
-            tag = parse_tag
+            tag = parse_text
             return missing_end tag, end_trace if not tag or not @lexer.next? or @lexer.next.type != :right_bracket
             @lexer.next!
 
@@ -206,10 +206,10 @@ module Dome
         end
 
         ##
-        # Parses an element tag.
-        # Returns either the parsed tag or +nil+ if no tag was recognized.
+        # Parses a single text Token.
+        # Returns either the parsed text or +false+ if no text was recognized.
         #
-        def parse_tag
+        def parse_text
             token = @lexer.next
 
             if @lexer.next? and token.type == :text
@@ -236,11 +236,11 @@ module Dome
         def parse_attribute
             trace = @lexer.trace
 
-            tag = parse_tag
-            return terminate trace if not tag
+            name = parse_text
+            return terminate trace if not name
 
             if not @lexer.next? or not @lexer.next.type == :equal
-                found :attribute, [tag,nil]
+                found :attribute, [name,nil]
                 return true
             end
 
@@ -250,15 +250,30 @@ module Dome
 
             return terminate trace if not value
 
-            found :attribute, [tag,value]
+            found :attribute, [name,value]
             true
         end
 
         ##
         # Parses one attribute value.
-        # Returns +true+ on success and +false+ otherwise.
+        # Returns the value string on success, +false+ otherwise.
         #
         def parse_value
+            trace = @lexer.trace
+            quote = false
+
+            if @lexer.next? and @lexer.next.type == :quote
+                quote = @lexer.next.value
+                @lexer.next!
+            end
+                
+            value = parse_text
+            return terminate trace unless value
+
+            return terminate trace if quote and
+                ( not @lexer.next? or @lexer.next.type != :quote or @lexer.next.value != quote )
+
+            value
         end
 
         protected
