@@ -43,7 +43,7 @@ module Dome
         # - :element_start => String (tag)
         # - :element_end => String (tag)
         # - :missing_end => String (tag)
-        # - :attribute => [String,String]
+        # - :attribute => [String,String|nil]
         attr_accessor :value
 
         ##
@@ -145,7 +145,7 @@ module Dome
         #
         def parse_cdata
             trace = @lexer.trace
-            return terminate trace unless @lexer.next? and @lexer.next.type == :cdata_start
+            return terminate trace if not @lexer.next? or @lexer.next.type != :cdata_start
             @lexer.next!
 
             buf = ''
@@ -172,7 +172,7 @@ module Dome
         def parse_element
             trace = @lexer.trace
 
-            return terminate trace unless @lexer.next.type == :left_bracket
+            return terminate trace if not @lexer.next? or @lexer.next.type != :left_bracket
             lexer.next!
 
             tag = parse_tag
@@ -182,23 +182,23 @@ module Dome
 
             parse_attributes
 
-            if @lexer.next.type == :element_end
+            if @lexer.next? and @lexer.next.type == :element_end
                 @lexer.next!
                 found :element_end, tag
                 return true
             end
 
-            return terminate trace unless @lexer.next.type == :right_bracket
+            return terminate trace if not @lexer.next? or @lexer.next.type != :right_bracket
             @lexer.next!
 
             parse_children
 
             end_trace = @lexer.trace
-            return missing_end tag, end_trace unless @lexer.next.type == :left_bracket
+            return missing_end tag, end_trace if not @lexer.next? or @lexer.next.type != :left_bracket
             @lexer.next!
 
             tag = parse_tag
-            return missing_end tag, end_trace if not tag or @lexer.next.type != :right_bracket
+            return missing_end tag, end_trace if not tag or not @lexer.next? or @lexer.next.type != :right_bracket
             @lexer.next!
 
             found :element_end, tag
@@ -234,6 +234,31 @@ module Dome
         # Returns +true+ on success and +false+ otherwise.
         #
         def parse_attribute
+            trace = @lexer.trace
+
+            tag = parse_tag
+            return terminate trace if not tag
+
+            if not @lexer.next? or not @lexer.next.type == :equal
+                found :attribute, [tag,nil]
+                return true
+            end
+
+            @lexer.next!
+
+            value = parse_value
+
+            return terminate trace if not value
+
+            found :attribute, [tag,value]
+            true
+        end
+
+        ##
+        # Parses one attribute value.
+        # Returns +true+ on success and +false+ otherwise.
+        #
+        def parse_value
         end
 
         protected
