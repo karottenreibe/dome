@@ -22,6 +22,39 @@ require 'dome/lexer'
 module Dome
 
     ##
+    # Keeps a Finding of the Parser.
+    #
+    class Finding
+
+        ##
+        # The Finding's type:
+        # - :data
+        # - :cdata
+        # - :element_start
+        # - :element_end
+        # - :missing_end
+        # - :attribute
+        attr_accessor :type
+
+        ##
+        # The Finding's value, depends on it's type.
+        # - :data => String
+        # - :cdata => String
+        # - :element_start => String (tag)
+        # - :element_end => String (tag)
+        # - :missing_end => String (tag)
+        # - :attribute => [String,String]
+        attr_accessor :value
+
+        ##
+        # Initializes the Finding's +type+ and +value+.
+        #
+        def initialize type, value
+        end
+
+    end
+
+    ##
     # Parses a string into a Document of Elements and Attributes.
     # Parsing is started by calling +parse+.
     #
@@ -86,7 +119,7 @@ module Dome
         # Returns +true+ on success and +false+ otherwise.
         #
         def parse_data
-            pos = @lexer.trace
+            trace = @lexer.trace
             buf = ''
 
             done = while @lexer.next?
@@ -100,11 +133,10 @@ module Dome
                 @lexer.next!
             end
 
-            if done then found Data.new(buf)
-            else @lexer.undo pos
-            end
+            return terminate trace unless done
 
-            done
+            found :data, buf
+            true
         end
 
         ##
@@ -113,7 +145,7 @@ module Dome
         #
         def parse_cdata
             trace = @lexer.trace
-            return false unless @lexer.next? and @lexer.next.type == :cdata_start
+            return terminate trace unless @lexer.next? and @lexer.next.type == :cdata_start
             @lexer.next!
 
             buf = ''
@@ -127,11 +159,10 @@ module Dome
                 end
             end
             
-            if done then found Data.new(buf, true)
-            else @lexer.undo pos
-            end
+            return terminate trace unless done
 
-            done
+            found :cdata, buf
+            true
         end
 
         ##
@@ -139,6 +170,39 @@ module Dome
         # Returns +true+ on success and +false+ otherwise.
         #
         def parse_element
+            trace = @lexer.trace
+
+            return terminate trace unless @lexer.next.type == :left_bracket
+            lexer.next!
+
+            tag = parse_tag
+            return terminate trace unless tag
+
+            found :element_start, tag
+
+            parse_attributes
+
+            if @lexer.next.type == :element_end
+                @lexer.next!
+                found :element_end, tag
+                return true
+            end
+
+            return terminate trace unless @lexer.next.type == :right_bracket
+            @lexer.next!
+
+            parse_children
+
+            end_trace = @lexer.trace
+            return missing_end tag, end_trace unless @lexer.next.type == :left_bracket
+            @lexer.next!
+
+            tag = parse_tag
+            return missing_end tag, end_trace if not tag or @lexer.next.type != :right_bracket
+            @lexer.next!
+
+            found :element_end, tag
+            true
         end
 
         ##
@@ -179,8 +243,25 @@ module Dome
         # given +value+. At the same time it sets up +@cc+ so +#next+ can jump
         # back into the parsing process.
         #
-        def found value
-            callcc { |@cc| @ret.call value }
+        def found type, value
+            callcc { |@cc| @ret.call Finding.new(type, value) }
+        end
+
+        ##
+        # Returns the lexer to the given +trace+ and returns +false+.
+        #
+        def terminate trace
+            @lexer.undo trace
+            false
+        end
+
+        ##
+        # Reports a missing end +tag+, returns the lexer to the +trace+ and returns +true+.
+        #
+        def missing_end tag, trace
+            found :missing_end, tag
+            @lexer.undo trace
+            true
         end
 
     end

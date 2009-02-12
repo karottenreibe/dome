@@ -99,6 +99,7 @@ module Dome
         # Backtraces to the position identified by the +trace+ object.
         #
         def undo trace
+            @token = nil
             @cc = trace
         end
 
