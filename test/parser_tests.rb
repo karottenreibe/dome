@@ -33,5 +33,23 @@ class ParserTests < Test::Unit::TestCase
         assert_equal "foo", ret.value
     end
 
+    def testData
+        p = Parser.new Lexer.new("<bar>data</bar>")
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_start, ret.type
+        assert_equal "bar", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :data, ret.type
+        assert_equal "data", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_end, ret.type
+        assert_equal "bar", ret.value
+    end
+
 end
 

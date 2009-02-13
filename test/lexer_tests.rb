@@ -179,7 +179,45 @@ class LexerTests < Test::Unit::TestCase
         assert_equal ">", t.value
     end
 
-    def testElementEnd
+    def testEndElement
+        lex = Lexer.new "<foo></foo>"
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :left_bracket, t.type
+        assert_equal "<", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :text, t.type
+        assert_equal "foo", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :right_bracket, t.type
+        assert_equal ">", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :end_element_start, t.type
+        assert_equal "</", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :text, t.type
+        assert_equal "foo", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :right_bracket, t.type
+        assert_equal ">", t.value
+    end
+
+    def testEmptyElementEnd
         lex = Lexer.new "<foo/>"
         t = lex.get
         assert_kind_of Token, t
@@ -195,7 +233,7 @@ class LexerTests < Test::Unit::TestCase
         lex.next!
         t = lex.get
         assert_kind_of Token, t
-        assert_equal :element_end, t.type
+        assert_equal :empty_element_end, t.type
         assert_equal "/>", t.value
     end
 

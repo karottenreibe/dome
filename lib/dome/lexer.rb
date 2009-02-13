@@ -32,7 +32,8 @@ module Dome
         # - :quote
         # - :whitespace
         # - :text
-        # - :element_end
+        # - :empty_element_end
+        # - :end_element_start
         # - :cdata_start
         # - :cdata_end
         attr_accessor :type
@@ -112,7 +113,8 @@ module Dome
                     when '=' then :equal
                     when '"', "'" then :quote
                     when /\s/ then :whitespace
-                    when '/>' then :element_end
+                    when '/>' then :empty_element_end
+                    when '</' then :end_element_start
                     when '<![CDATA[' then :cdata_start
                     when ']]>' then :cdata_end
                     else :text
@@ -130,7 +132,7 @@ module Dome
         # each of them.
         #
         def tokenize
-            delims = /<!\[CDATA\[|=|\s|\/>|>|<|\]\]>|'|"/
+            delims = /<!\[CDATA\[|<\/|=|\s|\/>|>|<|\]\]>|'|"/
             pos = 0
 
             while pos < @string.length

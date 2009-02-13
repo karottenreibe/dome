@@ -138,7 +138,7 @@ module Dome
                 @lexer.next!
             end
 
-            return terminate trace unless done
+            return terminate trace if not done or buf.empty?
 
             found :data, buf
             true
@@ -187,7 +187,7 @@ module Dome
 
             parse_attributes
 
-            if @lexer.get and @lexer.get.type == :element_end
+            if @lexer.get and @lexer.get.type == :empty_element_end
                 @lexer.next!
                 found :element_end, tag
                 return true
