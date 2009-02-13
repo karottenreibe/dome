@@ -50,6 +50,7 @@ module Dome
         # Initializes the Finding's +type+ and +value+.
         #
         def initialize type, value
+            @type, @value = type, value
         end
 
     end
@@ -81,8 +82,8 @@ module Dome
         end
 
         ##
-        # Starts/continues parsing until the next object can be constructed.
-        # Returns that object.
+        # Starts/continues parsing until the next Finding can be constructed.
+        # Returns that Finding.
         #
         def next
             # set up a return continuation which will be called when someting
@@ -173,7 +174,7 @@ module Dome
             trace = @lexer.trace
 
             return terminate trace if not @lexer.next? or @lexer.next.type != :left_bracket
-            lexer.next!
+            @lexer.next!
 
             tag = parse_text
             return terminate trace unless tag
@@ -214,7 +215,7 @@ module Dome
 
             if @lexer.next? and token.type == :text
                 @lexer.next!
-                token
+                token.value
             else
                 nil
             end

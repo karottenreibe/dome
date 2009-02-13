@@ -20,7 +20,17 @@ require 'lib/dome/parser'
 class ParserTests < Test::Unit::TestCase
     include Dome
 
-    def testNothing
+    def testEmptyElem
+        p = Parser.new Lexer.new("<foo/>")
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_start, ret.type
+        assert_equal "foo", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_end, ret.type
+        assert_equal "foo", ret.value
     end
 
 end
