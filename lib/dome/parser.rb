@@ -109,7 +109,7 @@ module Dome
             @parse_started = true
             parse_element while @lexer.get
             @cc = nil
-            nil
+            @ret.call nil
         end
 
         ##

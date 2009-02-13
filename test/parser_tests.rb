@@ -31,6 +31,9 @@ class ParserTests < Test::Unit::TestCase
         assert_kind_of Finding, ret
         assert_equal :element_end, ret.type
         assert_equal "foo", ret.value
+
+        ret = p.next
+        assert_kind_of NilClass, ret
     end
 
     def testData
@@ -49,6 +52,9 @@ class ParserTests < Test::Unit::TestCase
         assert_kind_of Finding, ret
         assert_equal :element_end, ret.type
         assert_equal "bar", ret.value
+
+        ret = p.next
+        assert_kind_of NilClass, ret
     end
 
 end
