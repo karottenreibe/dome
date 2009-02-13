@@ -78,31 +78,37 @@ module Dome
         # Initializes the Parser with a given +lexer+.
         #
         def initialize lexer
-            @lexer = lexer
+            @lexer, @parse_started = lexer, false
         end
 
         ##
         # Starts/continues parsing until the next Finding can be constructed.
-        # Returns that Finding.
+        # Returns that Finding (or +nil+ if there are no more).
         #
         def next
-            # set up a return continuation which will be called when someting
+            return callcc { |@ret| parse_doc } unless @parse_started
+            # set up a return continuation which will be called when something
             # was parsed successfully
-            callcc do |@ret|
-                # either return to point in parsing where we left off, or start
-                # over if there is no such point
-                if @cc then @cc.call
-                else parse_doc
-                end
-            end
+            return callcc { |@ret| @cc.call } if @cc
+            nil
         end
 
         ##
-        # Starts the parsing with the given +lexer+.
+        # Returns true if the Parser hasn't finished yet.
+        # This does not mean that there are more Findings to be expected.
+        #
+        def next?
+            @cc.nil?
+        end
+
+        ##
+        # Starts the parsing with the given lexer.
         # Returns +nil+ when parsing has finished.
         #
         def parse_doc
-            parse_element while @lexer.next?
+            @parse_started = true
+            parse_element while @lexer.get
+            @cc = nil
             nil
         end
 
@@ -123,9 +129,7 @@ module Dome
             trace = @lexer.trace
             buf = ''
 
-            done = while @lexer.next?
-                token = @lexer.next
-                
+            done = while token = @lexer.get
                 case token.type
                 when :cdata_start, :left_bracket then break true
                 else buf << token.value
@@ -146,18 +150,18 @@ module Dome
         #
         def parse_cdata
             trace = @lexer.trace
-            return terminate trace if not @lexer.next? or @lexer.next.type != :cdata_start
+            return terminate trace if not @lexer.get or @lexer.get.type != :cdata_start
             @lexer.next!
 
             buf = ''
 
-            done = while @lexer.next?
-                token = @lexer.next!
-                
+            done = while token = @lexer.get
                 case token.type
                 when :cdata_end then break true
                 else buf << token.value
                 end
+
+                @lexer.next!
             end
             
             return terminate trace unless done
@@ -173,7 +177,7 @@ module Dome
         def parse_element
             trace = @lexer.trace
 
-            return terminate trace if not @lexer.next? or @lexer.next.type != :left_bracket
+            return terminate trace if not @lexer.get or @lexer.get.type != :left_bracket
             @lexer.next!
 
             tag = parse_text
@@ -183,23 +187,23 @@ module Dome
 
             parse_attributes
 
-            if @lexer.next? and @lexer.next.type == :element_end
+            if @lexer.get and @lexer.get.type == :element_end
                 @lexer.next!
                 found :element_end, tag
                 return true
             end
 
-            return terminate trace if not @lexer.next? or @lexer.next.type != :right_bracket
+            return terminate trace if not @lexer.get or @lexer.get.type != :right_bracket
             @lexer.next!
 
             parse_children
 
             end_trace = @lexer.trace
-            return missing_end tag, end_trace if not @lexer.next? or @lexer.next.type != :left_bracket
+            return missing_end tag, end_trace if not @lexer.get or @lexer.get.type != :left_bracket
             @lexer.next!
 
             tag = parse_text
-            return missing_end tag, end_trace if not tag or not @lexer.next? or @lexer.next.type != :right_bracket
+            return missing_end tag, end_trace if not tag or not @lexer.get or @lexer.get.type != :right_bracket
             @lexer.next!
 
             found :element_end, tag
@@ -211,9 +215,9 @@ module Dome
         # Returns either the parsed text or +false+ if no text was recognized.
         #
         def parse_text
-            token = @lexer.next
+            token = @lexer.get
 
-            if @lexer.next? and token.type == :text
+            if token and token.type == :text
                 @lexer.next!
                 token.value
             else
@@ -240,7 +244,7 @@ module Dome
             name = parse_text
             return terminate trace if not name
 
-            if not @lexer.next? or not @lexer.next.type == :equal
+            if not @lexer.get or not @lexer.get.type == :equal
                 found :attribute, [name,nil]
                 return true
             end
@@ -263,8 +267,8 @@ module Dome
             trace = @lexer.trace
             quote = false
 
-            if @lexer.next? and @lexer.next.type == :quote
-                quote = @lexer.next.value
+            if @lexer.get and @lexer.get.type == :quote
+                quote = @lexer.get.value
                 @lexer.next!
             end
                 
@@ -272,7 +276,7 @@ module Dome
             return terminate trace unless value
 
             return terminate trace if quote and
-                ( not @lexer.next? or @lexer.next.type != :quote or @lexer.next.value != quote )
+                ( not @lexer.get or @lexer.get.type != :quote or @lexer.get.value != quote )
 
             value
         end

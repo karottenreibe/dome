@@ -64,9 +64,9 @@ module Dome
         end
 
         ##
-        # Retrieves the next token from the input.
+        # Retrieves the current token from the input.
         #
-        def next
+        def get
             @tokens[@pos]
         end
 
