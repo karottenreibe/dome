@@ -21,6 +21,7 @@ require 'rake/testtask'
 $VERBOSE = nil
 
 GEM_NAME        = 'Dome'
+GEM_NAMESPACE   = 'Dome'
 GEM_AUTHORS     = ['Fabian Streitel']
 GEM_HOMEPAGE    = 'http://dome.rubyforge.org/'
 GEM_RUBYFORGE   = 'dome'
@@ -109,6 +110,15 @@ end
 task :rcov do
     sh "rcov -Ilib test/*_tests.rb"
     sh "firefox coverage/index.html &"
+end
+
+task :heckle do
+    print "class: "
+    klass = STDIN.gets.strip
+    print "method (leave empty for all methods): "
+    meth = STDIN.gets.strip
+
+    sh "heckle -t test/tests.rb '#{GEM_NAMESPACE ? GEM_NAMESPACE + "::" : ""}#{klass}' #{meth.empty? ? "" : "'" + meth + "'"}"
 end
 
 task :default => [:gem, :doc]
