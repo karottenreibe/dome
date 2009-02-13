@@ -131,7 +131,7 @@ module Dome
 
             done = while token = @lexer.get
                 case token.type
-                when :cdata_start, :left_bracket then break true
+                when :cdata_start, :left_bracket, :end_element_start then break true
                 else buf << token.value
                 end
 
@@ -199,7 +199,7 @@ module Dome
             parse_children
 
             end_trace = @lexer.trace
-            return missing_end tag, end_trace if not @lexer.get or @lexer.get.type != :left_bracket
+            return missing_end tag, end_trace if not @lexer.get or @lexer.get.type != :end_element_start
             @lexer.next!
 
             tag = parse_text
