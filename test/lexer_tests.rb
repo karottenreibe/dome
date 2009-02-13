@@ -27,7 +27,6 @@ class LexerTests < Test::Unit::TestCase
         assert_equal :text, t.type
         assert_equal "asdf", t.value
 
-        assert_equal false, lex.next?
         lex.next!
         assert_kind_of NilClass, lex.get
     end
@@ -39,13 +38,11 @@ class LexerTests < Test::Unit::TestCase
         assert_equal :left_bracket, t.type
         assert_equal "<", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :text, t.type
         assert_equal "foo", t.value
-        assert_equal false, lex.next?
     end
 
     def testRightB
@@ -55,20 +52,17 @@ class LexerTests < Test::Unit::TestCase
         assert_equal :left_bracket, t.type
         assert_equal "<", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :text, t.type
         assert_equal "foo", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :right_bracket, t.type
         assert_equal ">", t.value
-        assert_equal false, lex.next?
     end
 
     def testEqual
@@ -78,27 +72,23 @@ class LexerTests < Test::Unit::TestCase
         assert_equal :left_bracket, t.type
         assert_equal "<", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :text, t.type
         assert_equal "foo", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :equal, t.type
         assert_equal "=", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :right_bracket, t.type
         assert_equal ">", t.value
-        assert_equal false, lex.next?
     end
 
     def testQuote
@@ -108,41 +98,35 @@ class LexerTests < Test::Unit::TestCase
         assert_equal :left_bracket, t.type
         assert_equal "<", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :text, t.type
         assert_equal "foo", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :equal, t.type
         assert_equal "=", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :quote, t.type
         assert_equal "\"", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :quote, t.type
         assert_equal "'", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :right_bracket, t.type
         assert_equal ">", t.value
-        assert_equal false, lex.next?
     end
 
     def testWhiteSpace
@@ -152,55 +136,47 @@ class LexerTests < Test::Unit::TestCase
         assert_equal :left_bracket, t.type
         assert_equal "<", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :text, t.type
         assert_equal "foo", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :whitespace, t.type
         assert_equal " ", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :whitespace, t.type
         assert_equal "\n", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :whitespace, t.type
         assert_equal "\r", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :whitespace, t.type
         assert_equal "\f", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :whitespace, t.type
         assert_equal "\t", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :right_bracket, t.type
         assert_equal ">", t.value
-        assert_equal false, lex.next?
     end
 
     def testElementEnd
@@ -210,43 +186,37 @@ class LexerTests < Test::Unit::TestCase
         assert_equal :left_bracket, t.type
         assert_equal "<", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :text, t.type
         assert_equal "foo", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :element_end, t.type
         assert_equal "/>", t.value
-        assert_equal false, lex.next?
     end
 
     def testCDATA
-        lex = Lexer.new "<![CDATA[chunky_wunky_baconary_timey_wimey_thing...]]>"
+        lex = Lexer.new "<![CDATA[" + "chunky_wunky_baconary_timey_wimey_thing..."*10 + "]]>"
         t = lex.get
         assert_kind_of Token, t
         assert_equal :cdata_start, t.type
         assert_equal "<![CDATA[", t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :text, t.type
-        assert_equal "chunky_wunky_baconary_timey_wimey_thing...", t.value
+        assert_equal "chunky_wunky_baconary_timey_wimey_thing..."*10, t.value
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
         assert_equal :cdata_end, t.type
         assert_equal "]]>", t.value
-        assert_equal false, lex.next?
     end
 
     def testTraceUndo
@@ -258,7 +228,6 @@ class LexerTests < Test::Unit::TestCase
 
         trace = lex.trace
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t
@@ -267,7 +236,6 @@ class LexerTests < Test::Unit::TestCase
 
         lex.undo trace
 
-        assert_equal true, lex.next?
         lex.next!
         t = lex.get
         assert_kind_of Token, t

@@ -79,13 +79,6 @@ module Dome
         end
 
         ##
-        # Whether or not the lexer has more tokens in it's storage.
-        #
-        def next?
-            not @cc.nil?
-        end
-
-        ##
         # Returns an object that can be used to backtrack to the current position by calling
         # +undo+.
         #
