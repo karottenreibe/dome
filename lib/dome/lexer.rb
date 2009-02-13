@@ -59,8 +59,8 @@ module Dome
         # Initializes the Lexer with the input +string+.
         #
         def initialize string
-            @string, @pos, @tokens, @done = string, 0, [], false
-            self.split!
+            @string, @pos, @tokens = string, 0, []
+            callcc { |@ret| self.split! }
         end
 
         ##
@@ -75,13 +75,14 @@ module Dome
         #
         def next!
             @pos += 1
+            callcc { |@ret| @cc.call } if @pos >= @tokens.length and @cc
         end
 
         ##
         # Whether or not the lexer has more tokens in it's storage.
         #
         def next?
-            @pos+1 < @tokens.length
+            not @cc.nil?
         end
 
         ##
@@ -105,7 +106,12 @@ module Dome
         # Generates the generator (*g*), which splits the input up into Tokens.
         #
         def split!
+            first = true
+
             tokenize do |token|
+                callcc { |@cc| @ret.call } unless first
+                first = false
+
                 type = 
                     case token
                     when '<' then :left_bracket
@@ -118,8 +124,12 @@ module Dome
                     when ']]>' then :cdata_end
                     else :text
                     end
+
                 @tokens << Token.new(type, token)
             end
+
+            @cc = nil
+            @ret.call
         end
 
         ##
