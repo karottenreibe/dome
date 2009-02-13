@@ -106,6 +106,11 @@ task :install => [:package] do
     sh "rm pkg/#{GEM_NAME}-#{spec.version}.gem"
 end
 
+task :rcov do
+    sh "rcov -Ilib test/*_tests.rb"
+    sh "firefox coverage/index.html &"
+end
+
 task :default => [:gem, :doc]
 task :all => [:clean, :gem, :doc, :test]
 task :rdoc => [:doc]
