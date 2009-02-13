@@ -61,30 +61,27 @@ module Dome
         def initialize string
             @string, @pos, @tokens, @done = string, 0, [], false
             self.split!
-            self.next!
         end
 
         ##
         # Retrieves the next token from the input.
         #
         def next
-            @token
+            @tokens[@pos]
         end
 
         ##
         # Advances by one token.
         #
         def next!
-            if @gen.next? then @token = @gen.next
-            else @token = nil
-            end
+            @pos += 1
         end
 
         ##
         # Whether or not the lexer has more tokens in it's storage.
         #
         def next?
-            @gen.next?
+            @pos+1 < @tokens.length
         end
 
         ##
@@ -92,15 +89,14 @@ module Dome
         # +undo+.
         #
         def trace
-            @gen.dup
+            @pos
         end
 
         ##
         # Backtraces to the position identified by the +trace+ object.
         #
         def undo trace
-            @token = nil
-            @gen = trace
+            @pos = trace
         end
 
         protected
@@ -109,25 +105,21 @@ module Dome
         # Generates the generator (*g*), which splits the input up into Tokens.
         #
         def split!
-            @gen = Generator.new do |gen|
-                tokenize do |token|
-                    type = 
-                        case token
-                        when '<' then :left_bracket
-                        when '>' then :right_bracket
-                        when '=' then :equal
-                        when '"', "'" then :quote
-                        when /\s/ then :whitespace
-                        when '/>' then :element_end
-                        when '<![CDATA[' then :cdata_start
-                        when ']]>' then :cdata_end
-                        else :text
-                        end
-                    gen.yield Token.new(type, token)
-                end
+            tokenize do |token|
+                type = 
+                    case token
+                    when '<' then :left_bracket
+                    when '>' then :right_bracket
+                    when '=' then :equal
+                    when '"', "'" then :quote
+                    when /\s/ then :whitespace
+                    when '/>' then :element_end
+                    when '<![CDATA[' then :cdata_start
+                    when ']]>' then :cdata_end
+                    else :text
+                    end
+                @tokens << Token.new(type, token)
             end
-
-            nil
         end
 
         ##
