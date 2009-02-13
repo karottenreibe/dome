@@ -249,7 +249,7 @@ class LexerTests < Test::Unit::TestCase
         assert_equal false, lex.next?
     end
 
-    def testTrace
+    def testTraceUndo
         lex = Lexer.new "<foo='12'>"
         t = lex.next
         assert_kind_of Token, t
@@ -273,9 +273,6 @@ class LexerTests < Test::Unit::TestCase
         assert_kind_of Token, t
         assert_equal :text, t.type
         assert_equal "foo", t.value
-    end
-
-    def testUndo
     end
 
 end
