@@ -48,5 +48,206 @@ class LexerTests < Test::Unit::TestCase
         assert_equal false, lex.next?
     end
 
+    def testRightB
+        lex = Lexer.new "<foo>"
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :left_bracket, t.type
+        assert_equal "<", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :text, t.type
+        assert_equal "foo", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :right_bracket, t.type
+        assert_equal ">", t.value
+        assert_equal false, lex.next?
+    end
+
+    def testEqual
+        lex = Lexer.new "<foo=>"
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :left_bracket, t.type
+        assert_equal "<", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :text, t.type
+        assert_equal "foo", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :equal, t.type
+        assert_equal "=", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :right_bracket, t.type
+        assert_equal ">", t.value
+        assert_equal false, lex.next?
+    end
+
+    def testQuote
+        lex = Lexer.new "<foo=\"'>"
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :left_bracket, t.type
+        assert_equal "<", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :text, t.type
+        assert_equal "foo", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :equal, t.type
+        assert_equal "=", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :quote, t.type
+        assert_equal "\"", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :quote, t.type
+        assert_equal "'", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :right_bracket, t.type
+        assert_equal ">", t.value
+        assert_equal false, lex.next?
+    end
+
+    def testWhiteSpace
+        lex = Lexer.new "<foo \n\r\f\t>"
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :left_bracket, t.type
+        assert_equal "<", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :text, t.type
+        assert_equal "foo", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :whitespace, t.type
+        assert_equal " ", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :whitespace, t.type
+        assert_equal "\n", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :whitespace, t.type
+        assert_equal "\r", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :whitespace, t.type
+        assert_equal "\f", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :whitespace, t.type
+        assert_equal "\t", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :right_bracket, t.type
+        assert_equal ">", t.value
+        assert_equal false, lex.next?
+    end
+
+    def testElementEnd
+        lex = Lexer.new "<foo/>"
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :left_bracket, t.type
+        assert_equal "<", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :text, t.type
+        assert_equal "foo", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :element_end, t.type
+        assert_equal "/>", t.value
+        assert_equal false, lex.next?
+    end
+
+    def testCDATA
+        lex = Lexer.new "<![CDATA[chunky]]>"
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :cdata_start, t.type
+        assert_equal "<![CDATA[", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :text, t.type
+        assert_equal "chunky", t.value
+
+        assert_equal true, lex.next?
+        lex.next!
+        t = lex.next
+        assert_kind_of Token, t
+        assert_equal :cdata_end, t.type
+        assert_equal "]]>", t.value
+        assert_equal false, lex.next?
+    end
+
 end
 

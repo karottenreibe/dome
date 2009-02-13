@@ -135,7 +135,7 @@ module Dome
         # each of them.
         #
         def tokenize
-            delims = /<|=|\s|\/>|>|<!\[CDATA\[|\]\]>|'|"/
+            delims = /<!\[CDATA\[|=|\s|\/>|>|<|\]\]>|'|"/
             pos = 0
 
             while pos < @string.length
