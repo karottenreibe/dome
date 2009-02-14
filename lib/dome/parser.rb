@@ -34,6 +34,7 @@ module Dome
         # - :element_end
         # - :missing_end
         # - :attribute
+        # - :tail
         attr_accessor :type
 
         ##
@@ -44,6 +45,7 @@ module Dome
         # - :element_end => String (tag)
         # - :missing_end => String (tag)
         # - :attribute => [String,String|nil]
+        # - :tail => String
         attr_accessor :value
 
         ##
@@ -102,7 +104,7 @@ module Dome
             goon = true
             goon = parse_element while @lexer.get and goon
             # in case there was an error and there is still data stuff
-            parse_rest
+            parse_tail
             @cc = nil
             @ret.call nil
         end
@@ -117,7 +119,7 @@ module Dome
         ##
         # Parses any remaining input into a data section.
         #
-        def parse_rest
+        def parse_tail
             buf = ''
 
             while token = @lexer.get
@@ -125,7 +127,7 @@ module Dome
                 @lexer.next!
             end
 
-            found :data, buf unless buf.empty?
+            found :tail, buf unless buf.empty?
         end
 
         ##

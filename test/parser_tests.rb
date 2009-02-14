@@ -235,5 +235,36 @@ class ParserTests < Test::Unit::TestCase
         assert_equal "holographic", ret.value
     end
 
+    def testTail
+        p = Parser.new Lexer.new("<chuck></chuck>bartowski")
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_start, ret.type
+        assert_equal "chuck", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_end, ret.type
+        assert_equal "chuck", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :tail, ret.type
+        assert_equal "bartowski", ret.value
+    end
+
+    def testRestNil
+        p = Parser.new Lexer.new("demorgan")
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :tail, ret.type
+        assert_equal "demorgan", ret.value
+
+        assert_kind_of NilClass, p.next
+        assert_kind_of NilClass, p.next
+        assert_kind_of NilClass, p.next
+        assert_kind_of NilClass, p.next
+    end
+
 end
 

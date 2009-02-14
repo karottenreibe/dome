@@ -70,7 +70,7 @@ class ParserFailTests < Test::Unit::TestCase
 
         ret = p.next
         assert_kind_of Finding, ret
-        assert_equal :data, ret.type
+        assert_equal :tail, ret.type
         assert_equal "<captain awesome='devon></woodcomb>", ret.value
 
         ret = p.next
