@@ -326,14 +326,5 @@ module Dome
 
     end
 
-    class << self
-        ##
-        # Shortcut for +Dome::Parser.new.parse string+.
-        #
-        def parse string
-            Parser.new( Lexer.new(string) ).parse
-        end
-    end
-
 end
 
