@@ -119,7 +119,7 @@ module Dome
             trace = @lexer.trace
             buf = ''
 
-            done = while token = @lexer.get
+            while token = @lexer.get
                 case token.type
                 when :cdata_start, :left_bracket, :end_element_start then break true
                 else buf << token.value
@@ -128,7 +128,7 @@ module Dome
                 @lexer.next!
             end
 
-            return terminate trace if not done or buf.empty?
+            return terminate trace if buf.empty?
 
             found :data, buf
             true
@@ -146,16 +146,13 @@ module Dome
             buf = ''
 
             done = while token = @lexer.get
+                @lexer.next!
+
                 case token.type
                 when :cdata_end then break true
                 else buf << token.value
                 end
-
-                @lexer.next!
             end
-            
-            return terminate trace unless done
-            @lexer.next!
 
             found :cdata, buf
             true

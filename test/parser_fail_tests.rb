@@ -44,6 +44,21 @@ class ParserFailTests < Test::Unit::TestCase
     end
 
     def testMissingCDATAEnd
+        p = Parser.new Lexer.new("<coolness><![CDATA[foo</coolness>")
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_start, ret.type
+        assert_equal "coolness", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :cdata, ret.type
+        assert_equal "foo</coolness>", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :missing_end, ret.type
+        assert_equal "coolness", ret.value
     end
 
     def testMissingAttributeQuote
