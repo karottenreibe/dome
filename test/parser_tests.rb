@@ -57,7 +57,7 @@ class ParserTests < Test::Unit::TestCase
         assert_kind_of NilClass, ret
     end
 
-    def testAttribute
+    def testEmptyAttribute
         p = Parser.new Lexer.new("<bacon lulu />")
         ret = p.next
         assert_kind_of Finding, ret
@@ -68,6 +68,27 @@ class ParserTests < Test::Unit::TestCase
         assert_kind_of Finding, ret
         assert_equal :attribute, ret.type
         assert_equal ["lulu",nil], ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_end, ret.type
+        assert_equal "bacon", ret.value
+
+        ret = p.next
+        assert_kind_of NilClass, ret
+    end
+
+    def testUnquotedAttribute
+        p = Parser.new Lexer.new("<bacon lulu=22 />")
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_start, ret.type
+        assert_equal "bacon", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :attribute, ret.type
+        assert_equal ["lulu","22"], ret.value
 
         ret = p.next
         assert_kind_of Finding, ret
