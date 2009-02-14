@@ -47,7 +47,7 @@ module Dome
         attr_accessor :tag
 
         ##
-        # The Element's attributes - Hash: String => String
+        # The Element's attributes - Array of Attributes
         attr_accessor :attributes
 
         ##
@@ -119,6 +119,35 @@ module Dome
 
         def inspect
             @cdata ? "<[CDATA[#{@data}]]>" : @data
+        end
+    end
+
+    ##
+    # Keeps a single Element Attribute.
+    #
+    # = Why don't we use Hashes? =
+    #
+    # Because there could be stuff like:
+    #
+    #   <a href="foo" href="bar">...
+    #
+    # And we'd like to let the user decide how to handle this.
+    #
+    class Attribute
+
+        ##
+        # The Attribute's name - String.
+        attr_accessor :name
+
+        ##
+        # The Attribute's value - String | nil
+        attr_accessor :value
+
+        ##
+        # Initializes the Attribute's +name+ and +value+.
+        #
+        def initialize name, value
+            @name, @value = name, value
         end
     end
 
