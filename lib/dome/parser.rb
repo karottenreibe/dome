@@ -287,6 +287,7 @@ module Dome
 
             return terminate trace if quote and
                 ( not @lexer.get or @lexer.get.type != :quote or @lexer.get.value != quote )
+            @lexer.next!
 
             value
         end
