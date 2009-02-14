@@ -17,40 +17,28 @@
 # of tokens for the Parser.
 #
 
-require 'generator'
+require 'dome/helpers/primitive'
 
 module Dome
 
-    class Token
-
-        ##
-        # The type of the token - Symbol
-        # Possible values:
-        # - :left_bracket
-        # - :right_bracket
-        # - :equal
-        # - :quote
-        # - :escape
-        # - :whitespace
-        # - :text
-        # - :empty_element_end
-        # - :end_element_start
-        # - :cdata_start
-        # - :cdata_end
-        attr_accessor :type
-
-        ##
-        # The value of the token - String
-        attr_accessor :value
-
-        ##
-        # Initializes the Token's +type+ and +value+ fields.
-        #
-        def initialize type, value = nil
-            @type, @value = type, value
-        end
-
-    end
+    ##
+    # Represents a single Token processed by the Lexer.
+    #
+    # The type of the Token is one of the following
+    # possible values:
+    # - :left_bracket
+    # - :right_bracket
+    # - :equal
+    # - :quote
+    # - :escape
+    # - :whitespace
+    # - :text
+    # - :empty_element_end
+    # - :end_element_start
+    # - :cdata_start
+    # - :cdata_end
+    #
+    primitive :Token, [:type, :value]
 
     ##
     # Splits a given String into small components that are consumed by the Parser.

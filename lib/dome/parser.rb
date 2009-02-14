@@ -24,38 +24,25 @@ module Dome
     ##
     # Keeps a Finding of the Parser.
     #
-    class Finding
-
-        ##
-        # The Finding's type:
-        # - :data
-        # - :cdata
-        # - :element_start
-        # - :element_end
-        # - :missing_end
-        # - :attribute
-        # - :tail
-        attr_accessor :type
-
-        ##
-        # The Finding's value, depends on it's type.
-        # - :data => String
-        # - :cdata => String
-        # - :element_start => String (tag)
-        # - :element_end => String (tag)
-        # - :missing_end => String (tag)
-        # - :attribute => [String,String|nil]
-        # - :tail => String
-        attr_accessor :value
-
-        ##
-        # Initializes the Finding's +type+ and +value+.
-        #
-        def initialize type, value
-            @type, @value = type, value
-        end
-
-    end
+    # The Finding's type can be:
+    # - :data
+    # - :cdata
+    # - :element_start
+    # - :element_end
+    # - :missing_end
+    # - :attribute
+    # - :tail
+    #
+    # The Finding's value depends on it's type:
+    # - :data => String
+    # - :cdata => String
+    # - :element_start => String (tag)
+    # - :element_end => String (tag)
+    # - :missing_end => String (tag)
+    # - :attribute => [String,String|nil]
+    # - :tail => String
+    #
+    primitive :Finding, [:type, :value]
 
     ##
     # Parses a string into a Document of Elements and Attributes.

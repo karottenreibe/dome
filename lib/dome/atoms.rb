@@ -124,6 +124,7 @@ module Dome
 
     ##
     # Keeps a single Element Attribute.
+    # NOTE: It's value may be +nil+.
     #
     # = Why don't we use Hashes? =
     #
@@ -133,21 +134,9 @@ module Dome
     #
     # And we'd like to let the user decide how to handle this.
     #
-    class Attribute
-
-        ##
-        # The Attribute's name - String.
-        attr_accessor :name
-
-        ##
-        # The Attribute's value - String | nil
-        attr_accessor :value
-
-        ##
-        # Initializes the Attribute's +name+ and +value+.
-        #
-        def initialize name, value
-            @name, @value = name, value
+    primitive :Attribute, [:name, :value] do
+        def inspect
+            @value ? "#{@name}='#{@value}'" : @name
         end
     end
 
