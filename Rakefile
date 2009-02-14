@@ -118,7 +118,10 @@ task :heckle do
     print "method (leave empty for all methods): "
     meth = STDIN.gets.strip
 
-    sh "heckle -t test/tests.rb '#{GEM_NAMESPACE ? GEM_NAMESPACE + "::" : ""}#{klass}' #{meth.empty? ? "" : "'" + meth + "'"}"
+    v = $VERBOSE
+    $VERBOSE = nil
+    sh "heckle -t test/tests.rb '#{GEM_NAMESPACE ? GEM_NAMESPACE + "::" : ""}#{klass}' #{meth.empty? ? "" : "'" + meth + "'"} | less"
+    $VERBOSE = v
 end
 
 task :default => [:gem, :doc]

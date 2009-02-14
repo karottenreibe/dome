@@ -94,14 +94,6 @@ module Dome
         end
 
         ##
-        # Returns true if the Parser hasn't finished yet.
-        # This does not mean that there are more Findings to be expected.
-        #
-        def next?
-            @cc.nil?
-        end
-
-        ##
         # Starts the parsing with the given lexer.
         # Returns +nil+ when parsing has finished.
         #
@@ -114,11 +106,9 @@ module Dome
 
         ##
         # Parses all the children of an Element.
-        # Always returns +true+.
         #
         def parse_children
             nil while parse_cdata or parse_data or parse_element
-            true
         end
 
         ##
@@ -238,11 +228,9 @@ module Dome
 
         ##
         # Parses all the attributes of an Element, including any preceding whitespace.
-        # Always returns +true+.
         #
         def parse_attributes
             nil while parse_whitespace and parse_attribute
-            true
         end
 
         ##
@@ -313,12 +301,11 @@ module Dome
         end
 
         ##
-        # Reports a missing end +tag+, returns the lexer to the +trace+ and returns +true+.
+        # Reports a missing end +tag+, returns the lexer to the +trace+.
         #
         def missing_end tag, trace
             found :missing_end, tag
             @lexer.undo trace
-            true
         end
 
     end
