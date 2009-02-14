@@ -62,6 +62,19 @@ class ParserFailTests < Test::Unit::TestCase
     end
 
     def testMissingAttributeQuote
+        p = Parser.new Lexer.new("<captain awesome='devon></woodcomb>")
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_start, ret.type
+        assert_equal "captain", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :data, ret.type
+        assert_equal "<captain awesome='devon></woodcomb>", ret.value
+
+        ret = p.next
+        assert_kind_of NilClass, ret
     end
 
 end
