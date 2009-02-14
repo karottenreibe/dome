@@ -186,6 +186,7 @@ module Dome
             found :element_start, tag
 
             parse_attributes
+            parse_whitespace
 
             if @lexer.get and @lexer.get.type == :empty_element_end
                 @lexer.next!
@@ -211,6 +212,15 @@ module Dome
         end
 
         ##
+        # Parses 0..* whitespace characters.
+        # Always returns +true+.
+        #
+        def parse_whitespace
+            @lexer.next! while @lexer.get and @lexer.get.type == :whitespace
+            true
+        end
+
+        ##
         # Parses a single text Token.
         # Returns either the parsed text or +false+ if no text was recognized.
         #
@@ -226,11 +236,11 @@ module Dome
         end
 
         ##
-        # Parses all the attributes of an Element.
+        # Parses all the attributes of an Element, including any preceding whitespace.
         # Always returns +true+.
         #
         def parse_attributes
-            nil while parse_attribute
+            nil while parse_whitespace and parse_attribute
             true
         end
 
