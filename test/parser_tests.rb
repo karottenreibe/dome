@@ -159,5 +159,81 @@ class ParserTests < Test::Unit::TestCase
         assert_equal "random", ret.value
     end
 
+    def testSubElements
+        p = Parser.new Lexer.new("<extreme><being>mostly</being></extreme>")
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_start, ret.type
+        assert_equal "extreme", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_start, ret.type
+        assert_equal "being", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :data, ret.type
+        assert_equal "mostly", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_end, ret.type
+        assert_equal "being", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_end, ret.type
+        assert_equal "extreme", ret.value
+    end
+
+    def testMix
+        p = Parser.new Lexer.new("<holographic>and shiny<bees>always look like</bees><![CDATA[being]]><like /></holographic>")
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_start, ret.type
+        assert_equal "holographic", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :data, ret.type
+        assert_equal "and shiny", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_start, ret.type
+        assert_equal "bees", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :data, ret.type
+        assert_equal "always look like", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_end, ret.type
+        assert_equal "bees", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :cdata, ret.type
+        assert_equal "being", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_start, ret.type
+        assert_equal "like", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_end, ret.type
+        assert_equal "like", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_end, ret.type
+        assert_equal "holographic", ret.value
+    end
+
 end
 
