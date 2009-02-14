@@ -141,5 +141,23 @@ class ParserTests < Test::Unit::TestCase
         assert_kind_of NilClass, ret
     end
 
+    def testCDATA
+        p = Parser.new Lexer.new("<random><![CDATA[<stuff><<>>\"'''fool]]></random>")
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_start, ret.type
+        assert_equal "random", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :cdata, ret.type
+        assert_equal "<stuff><<>>\"'''fool", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_end, ret.type
+        assert_equal "random", ret.value
+    end
+
 end
 

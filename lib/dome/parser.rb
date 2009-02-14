@@ -165,6 +165,7 @@ module Dome
             end
             
             return terminate trace unless done
+            @lexer.next!
 
             found :cdata, buf
             true
