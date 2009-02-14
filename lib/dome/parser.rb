@@ -298,7 +298,7 @@ module Dome
                 @lexer.next!
             end
                 
-            value = parse_text true
+            value = parse_text quote
             return terminate trace unless value
 
             return terminate trace if quote and
