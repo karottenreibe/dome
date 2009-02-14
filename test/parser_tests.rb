@@ -120,6 +120,27 @@ class ParserTests < Test::Unit::TestCase
         assert_kind_of NilClass, ret
     end
 
+    def testEscapedAttribute
+        p = Parser.new Lexer.new("<ellie bartowski='gr\\'eat' />")
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_start, ret.type
+        assert_equal "ellie", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :attribute, ret.type
+        assert_equal ["bartowski","gr'eat"], ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_end, ret.type
+        assert_equal "ellie", ret.value
+
+        ret = p.next
+        assert_kind_of NilClass, ret
+    end
+
     def testDoubleQuotedAttribute
         p = Parser.new Lexer.new("<bacon lala=\"heckle\" />")
         ret = p.next

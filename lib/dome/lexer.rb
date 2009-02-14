@@ -30,6 +30,7 @@ module Dome
         # - :right_bracket
         # - :equal
         # - :quote
+        # - :escape
         # - :whitespace
         # - :text
         # - :empty_element_end
@@ -111,6 +112,7 @@ module Dome
                     when '<' then :left_bracket
                     when '>' then :right_bracket
                     when '=' then :equal
+                    when '\\' then :escape
                     when '"', "'" then :quote
                     when /\s/ then :whitespace
                     when '/>' then :empty_element_end
@@ -132,7 +134,7 @@ module Dome
         # each of them.
         #
         def tokenize
-            delims = /<!\[CDATA\[|<\/|=|\s|\/>|>|<|\]\]>|'|"/
+            delims = /<!\[CDATA\[|<\/|=|\\|\s|\/>|>|<|\]\]>|'|"/
             pos = 0
 
             while pos < @string.length

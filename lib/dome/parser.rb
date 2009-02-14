@@ -228,18 +228,29 @@ module Dome
         end
 
         ##
-        # Parses a single text Token.
+        # Parses a single text Token, ignoring escaped tokens if +escape+ is true+.
         # Returns either the parsed text or +false+ if no text was recognized.
         #
-        def parse_text
-            token = @lexer.get
+        def parse_text escape = false
+            escaped = false
+            buf = ''
 
-            if token and token.type == :text
+            loop do
+                token = @lexer.get
+
+                if token and ( token.type == :text or escaped )
+                    buf << token.value
+                    escaped = false
+                elsif escape and token.type == :escape
+                    escaped = true
+                else
+                    break
+                end
+
                 @lexer.next!
-                token.value
-            else
-                nil
             end
+
+            buf.empty? ? nil : buf
         end
 
         ##
@@ -287,7 +298,7 @@ module Dome
                 @lexer.next!
             end
                 
-            value = parse_text
+            value = parse_text true
             return terminate trace unless value
 
             return terminate trace if quote and
