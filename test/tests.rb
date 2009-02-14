@@ -14,7 +14,8 @@
 # Git repo::    http://rubyforge.org/scm/?group_id=7589
 #
 
-require 'parser_tests.rb'
 require 'lexer_tests.rb'
+require 'parser_tests.rb'
+require 'parser_fail_tests.rb'
 require 'xpath_tests.rb'
 

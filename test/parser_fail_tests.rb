@@ -21,22 +21,26 @@ class ParserFailTests < Test::Unit::TestCase
     include Dome
 
     def testMissingEndTag
-        return
-        p = Parser.new Lexer.new("<random></random>")
+        p = Parser.new Lexer.new("<coolness><empty></coolness>")
         ret = p.next
         assert_kind_of Finding, ret
         assert_equal :element_start, ret.type
-        assert_equal "random", ret.value
+        assert_equal "coolness", ret.value
 
         ret = p.next
         assert_kind_of Finding, ret
-        assert_equal :cdata, ret.type
-        assert_equal "<stuff><<>>\"'''fool", ret.value
+        assert_equal :element_start, ret.type
+        assert_equal "empty", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :missing_end, ret.type
+        assert_equal "empty", ret.value
 
         ret = p.next
         assert_kind_of Finding, ret
         assert_equal :element_end, ret.type
-        assert_equal "random", ret.value
+        assert_equal "coolness", ret.value
     end
 
     def testMissingCDATAEnd

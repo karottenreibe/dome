@@ -204,11 +204,11 @@ module Dome
             return missing_end tag, end_trace if not @lexer.get or @lexer.get.type != :end_element_start
             @lexer.next!
 
-            tag = parse_text
-            return missing_end tag, end_trace if not tag or not @lexer.get or @lexer.get.type != :right_bracket
+            end_tag = parse_text
+            return missing_end tag, end_trace if not end_tag or end_tag != tag or not @lexer.get or @lexer.get.type != :right_bracket
             @lexer.next!
 
-            found :element_end, tag
+            found :element_end, end_tag
             true
         end
 
