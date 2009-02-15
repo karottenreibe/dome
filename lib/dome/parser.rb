@@ -82,6 +82,8 @@ module Dome
             nil
         end
 
+        protected
+
         ##
         # Starts the parsing with the given lexer.
         # Returns +nil+ when parsing has finished.
@@ -97,24 +99,50 @@ module Dome
         end
 
         ##
+        # Parses an element section.
+        # Returns +true+ on success and +false+ otherwise.
+        #
+        def parse_element
+            return false if not @lexer.get or @lexer.get.type != :left_bracket
+            trace = @lexer.trace
+            @lexer.next!
+
+            tag = parse_text
+            return terminate trace unless tag
+
+            found :element_start, tag
+
+            parse_attributes
+            parse_whitespace
+
+            if @lexer.get and @lexer.get.type == :empty_element_end
+                @lexer.next!
+                found :element_end, tag
+                return true
+            end
+
+            return terminate trace if not @lexer.get or @lexer.get.type != :right_bracket
+            @lexer.next!
+
+            parse_children
+
+            end_trace = @lexer.trace
+            return missing_end tag, end_trace if not @lexer.get or @lexer.get.type != :end_element_start
+            @lexer.next!
+
+            end_tag = parse_text
+            return missing_end tag, end_trace if not end_tag or end_tag != tag or not @lexer.get or @lexer.get.type != :right_bracket
+            @lexer.next!
+
+            found :element_end, end_tag
+            true
+        end
+
+        ##
         # Parses all the children of an Element.
         #
         def parse_children
             nil while parse_cdata or parse_data or parse_element
-        end
-
-        ##
-        # Parses any remaining input into a data section.
-        #
-        def parse_tail
-            buf = ''
-
-            while token = @lexer.get
-                buf << token.value
-                @lexer.next!
-            end
-
-            found :tail, buf unless buf.empty?
         end
 
         ##
@@ -162,81 +190,6 @@ module Dome
 
             found :cdata, buf
             true
-        end
-
-        ##
-        # Parses an element section.
-        # Returns +true+ on success and +false+ otherwise.
-        #
-        def parse_element
-            return false if not @lexer.get or @lexer.get.type != :left_bracket
-            trace = @lexer.trace
-            @lexer.next!
-
-            tag = parse_text
-            return terminate trace unless tag
-
-            found :element_start, tag
-
-            parse_attributes
-            parse_whitespace
-
-            if @lexer.get and @lexer.get.type == :empty_element_end
-                @lexer.next!
-                found :element_end, tag
-                return true
-            end
-
-            return terminate trace if not @lexer.get or @lexer.get.type != :right_bracket
-            @lexer.next!
-
-            parse_children
-
-            end_trace = @lexer.trace
-            return missing_end tag, end_trace if not @lexer.get or @lexer.get.type != :end_element_start
-            @lexer.next!
-
-            end_tag = parse_text
-            return missing_end tag, end_trace if not end_tag or end_tag != tag or not @lexer.get or @lexer.get.type != :right_bracket
-            @lexer.next!
-
-            found :element_end, end_tag
-            true
-        end
-
-        ##
-        # Parses 0..* whitespace characters.
-        # Always returns +true+.
-        #
-        def parse_whitespace
-            @lexer.next! while @lexer.get and @lexer.get.type == :whitespace
-            true
-        end
-
-        ##
-        # Parses a single text Token, ignoring escaped tokens if +escape+ is true+.
-        # Returns either the parsed text or +false+ if no text was recognized.
-        #
-        def parse_text escape = false
-            escaped = false
-            buf = ''
-
-            loop do
-                token = @lexer.get
-
-                if token and ( token.type == :text or escaped )
-                    buf << token.value
-                    escaped = false
-                elsif escape and token.type == :escape
-                    escaped = true
-                else
-                    break
-                end
-
-                @lexer.next!
-            end
-
-            buf.empty? ? nil : buf
         end
 
         ##
@@ -293,7 +246,54 @@ module Dome
             value
         end
 
-        protected
+        ##
+        # Parses 0..* whitespace characters.
+        # Always returns +true+.
+        #
+        def parse_whitespace
+            @lexer.next! while @lexer.get and @lexer.get.type == :whitespace
+            true
+        end
+
+        ##
+        # Parses a single text Token, ignoring escaped tokens if +escape+ is true+.
+        # Returns either the parsed text or +false+ if no text was recognized.
+        #
+        def parse_text escape = false
+            escaped = false
+            buf = ''
+
+            loop do
+                token = @lexer.get
+
+                if token and ( token.type == :text or escaped )
+                    buf << token.value
+                    escaped = false
+                elsif escape and token.type == :escape
+                    escaped = true
+                else
+                    break
+                end
+
+                @lexer.next!
+            end
+
+            buf.empty? ? nil : buf
+        end
+
+        ##
+        # Parses any remaining input into a data section.
+        #
+        def parse_tail
+            buf = ''
+
+            while token = @lexer.get
+                buf << token.value
+                @lexer.next!
+            end
+
+            found :tail, buf unless buf.empty?
+        end
 
         ##
         # Returns to the return continuation set up in +#next+, returning the
