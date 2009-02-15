@@ -60,10 +60,6 @@ module Dome
         end
 
         ##
-        # Whether or not the parsing process consumed all input.
-        attr_reader :consumed_all
-
-        ##
         # Initializes the Parser with a given +lexer+.
         #
         def initialize lexer
