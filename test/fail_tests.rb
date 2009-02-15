@@ -136,5 +136,21 @@ class ParserFailTests < Test::Unit::TestCase
         assert_kind_of NilClass, ret
     end
 
+    def testNotMatchingAttributeQuote
+        p = Parser.new Lexer.new("<the intersect=\"chuck' />")
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_start, ret.type
+        assert_equal "the", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :tail, ret.type
+        assert_equal "<the intersect=\"chuck' />", ret.value
+
+        ret = p.next
+        assert_kind_of NilClass, ret
+    end
+
 end
 
