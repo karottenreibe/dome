@@ -145,8 +145,8 @@ module Dome
         # Returns +true+ on success and +false+ otherwise.
         #
         def parse_cdata
+            return false if not @lexer.get or @lexer.get.type != :cdata_start
             trace = @lexer.trace
-            return terminate trace if not @lexer.get or @lexer.get.type != :cdata_start
             @lexer.next!
 
             buf = ''
@@ -169,9 +169,8 @@ module Dome
         # Returns +true+ on success and +false+ otherwise.
         #
         def parse_element
+            return false if not @lexer.get or @lexer.get.type != :left_bracket
             trace = @lexer.trace
-
-            return terminate trace if not @lexer.get or @lexer.get.type != :left_bracket
             @lexer.next!
 
             tag = parse_text
@@ -286,10 +285,9 @@ module Dome
             end
                 
             value = parse_text quote
-            return terminate trace unless value
-
-            return terminate trace if quote and
-                ( not @lexer.get or @lexer.get.type != :quote or @lexer.get.value != quote )
+            return terminate trace if not value or
+                ( quote and ( not @lexer.get or @lexer.get.type != :quote or
+                     @lexer.get.value != quote ) )
             @lexer.next!
 
             value
