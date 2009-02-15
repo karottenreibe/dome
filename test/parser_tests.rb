@@ -163,11 +163,16 @@ class ParserTests < Test::Unit::TestCase
     end
 
     def testCDATA
-        p = Parser.new Lexer.new("<random><![CDATA[<stuff><<>>\"'''fool]]></random>")
+        p = Parser.new Lexer.new("<random>you<![CDATA[<stuff><<>>\"'''fool]]></random>")
         ret = p.next
         assert_kind_of Finding, ret
         assert_equal :element_start, ret.type
         assert_equal "random", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :data, ret.type
+        assert_equal "you", ret.value
 
         ret = p.next
         assert_kind_of Finding, ret
