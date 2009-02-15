@@ -13,17 +13,17 @@
 # Homepage::    http://dome.rubyforge.org/
 # Git repo::    http://rubyforge.org/scm/?group_id=7589
 #
-# Contains the atomic objects that compose a document tree.
+# Contains the atomic objects that compose a DOM tree.
 #
 
 module Dome
 
     ##
-    # Keeps a single Document.
+    # Keeps a single Tree.
     # All the Elements are accessible via the +root+ pseudo element's +children+
     # accessor.
     #
-    class Document
+    class Tree
         ##
         # The root pseudo Element.
         attr_accessor :root
@@ -34,12 +34,12 @@ module Dome
         end
 
         def inspect
-            "#<Dome::Document #{@root.inspect}"
+            "#<Dome::Tree #{@root.inspect}"
         end
     end
 
     ##
-    # Keeps a single Element of a Document with its +tag+, +attributes+ and +children+.
+    # Keeps a single Element of a Tree with its +tag+, +attributes+ and +children+.
     #
     class Element
         ##
@@ -58,8 +58,8 @@ module Dome
         # The Element's parent - Element
         attr_accessor :parent
         
-        def initialize name = "", attributes = {}, children = []
-            @name, @attributes, @children = name, attributes, children
+        def initialize name = "", parent = nil, attributes = [], children = []
+            @name, @attributes, @children, @parent = name, attributes, children, parent
         end
 
         ##

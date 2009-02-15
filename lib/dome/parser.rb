@@ -16,7 +16,6 @@
 # Contains the Parser that can transform a list of Lexer Tokens into a HTML Document.
 #
 
-require 'dome/atoms'
 require 'dome/lexer'
 
 module Dome
