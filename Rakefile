@@ -18,7 +18,13 @@ require 'rake/gempackagetask'
 require 'rake/rdoctask'
 require 'rake/testtask'
 
+# turn off verbosity (annoying)
+#...............................
+
 $VERBOSE = nil
+
+# global constants
+#...............................
 
 GEM_NAME        = 'Dome'
 GEM_NAMESPACE   = 'Dome'
@@ -27,6 +33,9 @@ GEM_HOMEPAGE    = 'http://dome.rubyforge.org/'
 GEM_RUBYFORGE   = 'dome'
 GEM_SUMMARY     = "A pure Ruby HTML DOM parser with very simple XPath support"
 GEM_EMAIL       = "karottenreibe @nospam@ gmail.com"
+
+# gem stuff
+#...............................
 
 spec = Gem::Specification.new do |s|
     if ARGV.any? { |arg| arg == 'gem' }
@@ -73,6 +82,9 @@ task :gem => "pkg/#{GEM_NAME}-#{spec.version}.gem" do
     puts "generated gem"
 end
 
+# rdoc stuff
+#...............................
+
 Rake::RDocTask.new :real_doc do |rdoc|
     rdoc.rdoc_files.include "lib/**/*.rb"
 end
@@ -81,6 +93,9 @@ task :doc => [:real_doc] do
     sh 'rm -r rdoc' if File::exists? 'rdoc'
     sh 'mv html rdoc'
 end
+
+# clean up
+#...............................
 
 task :clean do
     sh 'rm -r rdoc'
@@ -93,6 +108,9 @@ Rake::TestTask.new do |t|
     t.verbose = true
 end
 
+# rubyforge
+#...............................
+
 task :upload => [:rdoc] do
     sh "rsync -azv --no-perms --no-times rdoc/* karottenreibe@rubyforge.org:/var/www/gforge-projects/#{GEM_RUBYFORGE}/rdoc/"
     sh "rsync -azv --no-perms --no-times homepage/* karottenreibe@rubyforge.org:/var/www/gforge-projects/#{GEM_RUBYFORGE}/"
@@ -102,10 +120,16 @@ task :sftp do
     sh "sftp karottenreibe@rubyforge.org:/var/www/gforge-projects/#{GEM_RUBYFORGE}/"
 end
 
+# install current version as gem locally
+#...............................
+
 task :install => [:package] do
     sh "sudo gem install pkg/#{GEM_NAME}-#{spec.version}.gem"
     sh "rm pkg/#{GEM_NAME}-#{spec.version}.gem"
 end
+
+# code coverage and test analysis
+#...............................
 
 task :rcov do
     sh "rcov -Ilib test/*_tests.rb"
@@ -121,6 +145,16 @@ task :heckle do
     sh "heckle -t test/tests.rb '#{GEM_NAMESPACE ? GEM_NAMESPACE + "::" : ""}#{klass}' #{meth.empty? ? "" : "'" + meth + "'"} | tee heckle.log"
     sh "vim heckle.log"
 end
+
+# git stuff
+#...............................
+
+task :push => [:test] do
+    sh "git push origin master"
+end
+
+# aliases and groupings
+#...............................
 
 task :default => [:gem, :doc]
 task :all => [:clean, :gem, :doc, :test]
