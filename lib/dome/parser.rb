@@ -142,7 +142,7 @@ module Dome
 
             while token = @lexer.get
                 case token.type
-                when :cdata_start, :left_bracket, :end_element_start then break true
+                when :cdata_start, :left_bracket, :end_element_start then break
                 else buf << token.value
                 end
 
@@ -161,16 +161,15 @@ module Dome
         #
         def parse_cdata
             return false if not @lexer.get or @lexer.get.type != :cdata_start
-            trace = @lexer.trace
             @lexer.next!
 
             buf = ''
 
-            done = while token = @lexer.get
+            while token = @lexer.get
                 @lexer.next!
 
                 case token.type
-                when :cdata_end then break true
+                when :cdata_end then break
                 else buf << token.value
                 end
             end

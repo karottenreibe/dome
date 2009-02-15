@@ -120,5 +120,21 @@ class ParserFailTests < Test::Unit::TestCase
         assert_kind_of NilClass, ret
     end
 
+    def testEscapedNonQuotedAttribute
+        p = Parser.new Lexer.new("<john casey=\"/>")
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_start, ret.type
+        assert_equal "john", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :tail, ret.type
+        assert_equal "<john casey=\"/>", ret.value
+
+        ret = p.next
+        assert_kind_of NilClass, ret
+    end
+
 end
 

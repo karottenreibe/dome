@@ -168,7 +168,7 @@ class ParserTests < Test::Unit::TestCase
     end
 
     def testDoubleQuotedAttribute
-        p = Parser.new Lexer.new("<bacon lala=\"heckle\" />")
+        p = Parser.new Lexer.new("<bacon lala=\"heckle\"    />")
         ret = p.next
         assert_kind_of Finding, ret
         assert_equal :element_start, ret.type
