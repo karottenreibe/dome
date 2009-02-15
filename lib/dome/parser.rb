@@ -50,15 +50,6 @@ module Dome
     #
     class Parser
 
-        class << self
-
-            ##
-            # Whether or not the Parser should output warning messages to
-            # +STDERR+ when the input is not correct.
-            attr_accessor :verbose
-
-        end
-
         ##
         # Initializes the Parser with a given +lexer+.
         #
