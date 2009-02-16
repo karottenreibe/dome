@@ -118,7 +118,7 @@ module Dome
         end
 
         def inspect
-            @cdata ? "<[CDATA[#{@data}]]>" : @data
+            @cdata ? "<[CDATA[#{@data}]]>" : @data.to_s
         end
     end
 
