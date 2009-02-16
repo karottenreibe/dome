@@ -60,5 +60,53 @@ class ParserTests < Test::Unit::TestCase
         assert_equal nil, doctor.value
     end
 
+    def testUnquotedAttribute
+        tree = Dome "<martha jones=brilliant />"
+        assert_kind_of Tree, tree
+
+        assert_equal false, tree.root.children.empty?
+        martha = tree.root.children[0]
+        assert_kind_of Element, martha
+        assert_equal "martha", martha.tag
+
+        assert_equal false, martha.attributes.empty?
+        jones = martha.attributes[0]
+        assert_kind_of Attribute, jones
+        assert_equal "jones", jones.name
+        assert_equal "brilliant", jones.value
+    end
+
+    def testQuotedAttribute
+        tree = Dome "<rose tyler='marvellous' />"
+        assert_kind_of Tree, tree
+
+        assert_equal false, tree.root.children.empty?
+        rose = tree.root.children[0]
+        assert_kind_of Element, rose
+        assert_equal "rose", rose.tag
+
+        assert_equal false, rose.attributes.empty?
+        tyler = rose.attributes[0]
+        assert_kind_of Attribute, tyler
+        assert_equal "tyler", tyler.name
+        assert_equal "marvellous", tyler.value
+    end
+
+    def testQuotedAttribute2
+        tree = Dome '<rose tyler="marvellous" />'
+        assert_kind_of Tree, tree
+
+        assert_equal false, tree.root.children.empty?
+        rose = tree.root.children[0]
+        assert_kind_of Element, rose
+        assert_equal "rose", rose.tag
+
+        assert_equal false, rose.attributes.empty?
+        tyler = rose.attributes[0]
+        assert_kind_of Attribute, tyler
+        assert_equal "tyler", tyler.name
+        assert_equal "marvellous", tyler.value
+    end
+
 end
 

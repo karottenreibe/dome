@@ -120,6 +120,27 @@ class ParserTests < Test::Unit::TestCase
         assert_kind_of NilClass, ret
     end
 
+    def testQuotedAttribute2
+        p = Parser.new Lexer.new('<bacon lala="heckle" />')
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_start, ret.type
+        assert_equal "bacon", ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :attribute, ret.type
+        assert_equal ["lala","heckle"], ret.value
+
+        ret = p.next
+        assert_kind_of Finding, ret
+        assert_equal :element_end, ret.type
+        assert_equal "bacon", ret.value
+
+        ret = p.next
+        assert_kind_of NilClass, ret
+    end
+
     def testNoSpaceAttributes
         p = Parser.new Lexer.new("<lester friend='jeff'boss='mike' />")
         ret = p.next
