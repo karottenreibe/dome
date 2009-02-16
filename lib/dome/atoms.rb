@@ -58,8 +58,8 @@ module Dome
         # The Element's parent - Element
         attr_accessor :parent
         
-        def initialize name = "", parent = nil, attributes = [], children = []
-            @name, @attributes, @children, @parent = name, attributes, children, parent
+        def initialize tag = "", parent = nil, attributes = [], children = []
+            @tag, @attributes, @children, @parent = tag, attributes, children, parent
         end
 
         ##

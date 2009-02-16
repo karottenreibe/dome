@@ -20,19 +20,19 @@
 require 'dome/atoms'
 require 'dome/parser'
 
-module Dome
+##
+# Shortcut for calling +Dome::Dom.new(input).tree+.
+#
+def Dome input
+    Dome::Dom.new(input).tree
+end
 
-    ##
-    # Shortcut for calling +Dom.new(input).tree+.
-    #
-    def Dome input
-        Dom.new(input).tree
-    end
+module Dome
 
     ##
     # Takes the input and parses it into a DOM tree.
     #
-    class Dome
+    class Dom
 
         ##
         # The tree the DOM Parser produced.
@@ -72,8 +72,6 @@ module Dome
                 when :data, :tail
                     @cur.children << Data.new(finding.value)
                 end
-
-                @parser.next!
             end
 
             close until @open.empty?

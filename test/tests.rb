@@ -17,5 +17,6 @@
 require 'lexer_tests.rb'
 require 'parser_tests.rb'
 require 'fail_tests.rb'
+require 'dom_tests.rb'
 require 'xpath_tests.rb'
 
