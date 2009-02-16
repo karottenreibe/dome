@@ -44,5 +44,21 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, noble.cdata
     end
 
+    def testEmptyAttribute
+        tree = Dome "<the doctor />"
+        assert_kind_of Tree, tree
+
+        assert_equal false, tree.root.children.empty?
+        the = tree.root.children[0]
+        assert_kind_of Element, the
+        assert_equal "the", the.tag
+
+        assert_equal false, the.attributes.empty?
+        doctor = the.attributes[0]
+        assert_kind_of Attribute, doctor
+        assert_equal "doctor", doctor.name
+        assert_equal nil, doctor.value
+    end
+
 end
 
