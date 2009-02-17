@@ -44,7 +44,7 @@ module Dome
         # DOM tree will be located in +tree+.
         #
         def initialize input
-            @parser = Parser.new Lexer.new(input)
+            @parser = Parser.new HTMLLexer.new(input)
             @open, @tree = [], Tree.new
             @cur = @tree.root
             parse!

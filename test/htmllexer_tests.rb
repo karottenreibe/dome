@@ -17,11 +17,11 @@
 require 'test/unit'
 require 'lib/dome/lexer'
 
-class LexerTests < Test::Unit::TestCase
+class HTMLLexerTests < Test::Unit::TestCase
     include Dome
 
     def testText
-        lex = Lexer.new "asdf"
+        lex = HTMLLexer.new "asdf"
         t = lex.get
         assert_kind_of Token, t
         assert_equal :text, t.type
@@ -32,7 +32,7 @@ class LexerTests < Test::Unit::TestCase
     end
 
     def testLeftB
-        lex = Lexer.new "<foo"
+        lex = HTMLLexer.new "<foo"
         t = lex.get
         assert_kind_of Token, t
         assert_equal :left_bracket, t.type
@@ -46,7 +46,7 @@ class LexerTests < Test::Unit::TestCase
     end
 
     def testRightB
-        lex = Lexer.new "<foo>"
+        lex = HTMLLexer.new "<foo>"
         t = lex.get
         assert_kind_of Token, t
         assert_equal :left_bracket, t.type
@@ -66,7 +66,7 @@ class LexerTests < Test::Unit::TestCase
     end
 
     def testEqual
-        lex = Lexer.new "<foo=>"
+        lex = HTMLLexer.new "<foo=>"
         t = lex.get
         assert_kind_of Token, t
         assert_equal :left_bracket, t.type
@@ -92,7 +92,7 @@ class LexerTests < Test::Unit::TestCase
     end
 
     def testQuote
-        lex = Lexer.new "<foo=\"'>"
+        lex = HTMLLexer.new "<foo=\"'>"
         t = lex.get
         assert_kind_of Token, t
         assert_equal :left_bracket, t.type
@@ -130,7 +130,7 @@ class LexerTests < Test::Unit::TestCase
     end
 
     def testWhiteSpace
-        lex = Lexer.new "<foo \n\r\f\t>"
+        lex = HTMLLexer.new "<foo \n\r\f\t>"
         t = lex.get
         assert_kind_of Token, t
         assert_equal :left_bracket, t.type
@@ -180,7 +180,7 @@ class LexerTests < Test::Unit::TestCase
     end
 
     def testEndElement
-        lex = Lexer.new "<foo></foo>"
+        lex = HTMLLexer.new "<foo></foo>"
         t = lex.get
         assert_kind_of Token, t
         assert_equal :left_bracket, t.type
@@ -218,7 +218,7 @@ class LexerTests < Test::Unit::TestCase
     end
 
     def testEmptyElementEnd
-        lex = Lexer.new "<foo/>"
+        lex = HTMLLexer.new "<foo/>"
         t = lex.get
         assert_kind_of Token, t
         assert_equal :left_bracket, t.type
@@ -238,7 +238,7 @@ class LexerTests < Test::Unit::TestCase
     end
 
     def testCDATA
-        lex = Lexer.new "<![CDATA[" + "chunky_wunky_baconary_timey_wimey_thing..."*10 + "]]>"
+        lex = HTMLLexer.new "<![CDATA[" + "chunky_wunky_baconary_timey_wimey_thing..."*10 + "]]>"
         t = lex.get
         assert_kind_of Token, t
         assert_equal :cdata_start, t.type
@@ -258,7 +258,7 @@ class LexerTests < Test::Unit::TestCase
     end
 
     def testTraceUndo
-        lex = Lexer.new "<foo='12'>"
+        lex = HTMLLexer.new "<foo='12'>"
         t = lex.get
         assert_kind_of Token, t
         assert_equal :left_bracket, t.type

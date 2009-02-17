@@ -14,7 +14,7 @@
 # Git repo::    http://rubyforge.org/scm/?group_id=7589
 #
 
-require 'lexer_tests.rb'
+require 'htmllexer_tests.rb'
 require 'parser_tests.rb'
 require 'fail_tests.rb'
 require 'dom_tests.rb'

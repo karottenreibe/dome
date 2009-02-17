@@ -94,23 +94,7 @@ module Dome
             tokenize do |token|
                 callcc { |@cc| @ret.call } unless first
                 first = false
-
-                type = 
-                    case token
-                    when '<' then :left_bracket
-                    when '>' then :right_bracket
-                    when '=' then :equal
-                    when '\\' then :escape
-                    when '"', "'" then :quote
-                    when /\s/ then :whitespace
-                    when '/>' then :empty_element_end
-                    when '</' then :end_element_start
-                    when '<![CDATA[' then :cdata_start
-                    when ']]>' then :cdata_end
-                    else :text
-                    end
-
-                @tokens << Token.new(type, token)
+                @tokens << Token.new(meaning(token), token)
             end
 
             @cc = nil
@@ -122,7 +106,7 @@ module Dome
         # each of them.
         #
         def tokenize
-            delims = /<!\[CDATA\[|<\/|=|\\|\s|\/>|>|<|\]\]>|'|"/
+            delims = delimiters
             pos = 0
 
             while pos < @string.length
@@ -140,5 +124,63 @@ module Dome
         end
 
     end
+
+    class HTMLLexer < Lexer
+        protected
+
+        def delimiters
+            /<!\[CDATA\[|<\/|=|\\|\s|\/>|>|<|\]\]>|'|"/
+        end
+
+        def meaning token
+            case token
+            when '<' then :left_bracket
+            when '>' then :right_bracket
+            when '=' then :equal
+            when '\\' then :escape
+            when '"', "'" then :quote
+            when /\s/ then :whitespace
+            when '/>' then :empty_element_end
+            when '</' then :end_element_start
+            when '<![CDATA[' then :cdata_start
+            when ']]>' then :cdata_end
+            else :text
+            end
+        end
+    end
+
+    class CSSLexer < Lexer
+        protected
+
+        def delimiters
+            /[|]|:|\*|~=|\^=|\$=|\*=|=|\(|\)|#|\.|>|\+|\s|~|\\|'|"/
+        end
+
+        def meaning token
+            case token
+            when '[' then :left_bracket
+            when ']' then :right_bracket
+            when '(' then :left_parenthesis
+            when ')' then :right_parenthesis
+            when '\\' then :escape
+            when '"', "'" then :quote
+            when /\s/ then :whitespace
+            when ':' then :pseudo
+            when '*' then :any
+            when '.' then :class
+            when '>' then :child
+            when '+' then :neighbours
+            when '~' then :preceded
+            when '#' then :id
+            when '=' then :equal
+            when '~=' then :in_list
+            when '$=' then :ends_with
+            when '^=' then :begins_with
+            when '*=' then :contains
+            else :text
+            end
+        end
+    end
+
 end
 
