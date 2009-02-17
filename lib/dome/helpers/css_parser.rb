@@ -13,36 +13,14 @@
 # Homepage::    http://dome.rubyforge.org/
 # Git repo::    http://rubyforge.org/scm/?group_id=7589
 #
-# Contains the Parser that can transform a list of Lexer Tokens into a HTML Document.
+# Contains the Parser that can transform a list of Lexer Tokens into a list of
+# CSS Selectors.
 #
 
-require 'dome/helpers/primitive'
 require 'dome/helpers/lexer'
+require 'dome/helpers/finding'
 
 module Dome
-
-    ##
-    # Keeps a Finding of the Parser.
-    #
-    # The Finding's type can be:
-    # - :data
-    # - :cdata
-    # - :element_start
-    # - :element_end
-    # - :missing_end
-    # - :attribute
-    # - :tail
-    #
-    # The Finding's value depends on it's type:
-    # - :data => String
-    # - :cdata => String
-    # - :element_start => String (tag)
-    # - :element_end => String (tag)
-    # - :missing_end => String (tag)
-    # - :attribute => [String,String|nil]
-    # - :tail => String
-    #
-    primitive :Finding, [:type, :value]
 
     ##
     # Parses a string into a Document of Elements and Attributes.
