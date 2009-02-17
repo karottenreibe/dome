@@ -183,6 +183,30 @@ class ParserTests < Test::Unit::TestCase
     end
 
     def testMix
+        tree = Dome "<sarah>jane<adventures /><![CDATA[[the dog!]]]></sarah>"
+        assert_kind_of Tree, tree
+
+        assert_equal false, tree.root.children.empty?
+        sarah = tree.root.children[0]
+        assert_kind_of Element, sarah
+        assert_equal "sarah", sarah.tag
+
+        assert_equal 3, sarah.children.length
+        jane = sarah.children[0]
+        assert_kind_of Data, jane
+        assert_equal "jane", jane.value
+        assert_equal false, jane.cdata?
+
+        assert_equal false, sarah.children.empty?
+        adventures = sarah.children[1]
+        assert_kind_of Element, adventures
+        assert_equal "adventures", adventures.tag
+
+        assert_equal false, sarah.children.empty?
+        cdata = sarah.children[2]
+        assert_kind_of Data, cdata
+        assert_equal "[the dog!]", cdata.value
+        assert_equal true, cdata.cdata?
     end
 
 end
