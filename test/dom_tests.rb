@@ -209,5 +209,20 @@ class ParserTests < Test::Unit::TestCase
         assert_equal true, cdata.cdata?
     end
 
+    def testTail
+        tree = Dome "<shadow />proclamation"
+        assert_kind_of Tree, tree
+
+        assert_equal 2, tree.root.children.length
+        shadow = tree.root.children[0]
+        assert_kind_of Element, shadow
+        assert_equal "shadow", shadow.tag
+
+        proclamation = tree.root.children[1]
+        assert_kind_of Data, proclamation
+        assert_equal "proclamation", proclamation.value
+        assert_equal false, proclamation.cdata?
+    end
+
 end
 
