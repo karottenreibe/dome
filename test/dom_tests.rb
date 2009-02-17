@@ -41,7 +41,7 @@ class ParserTests < Test::Unit::TestCase
         noble = donna.children[0]
         assert_kind_of Data, noble
         assert_equal "noble", noble.value
-        assert_equal false, noble.cdata
+        assert_equal false, noble.cdata?
     end
 
     def testEmptyAttribute
@@ -106,6 +106,59 @@ class ParserTests < Test::Unit::TestCase
         assert_kind_of Attribute, tyler
         assert_equal "tyler", tyler.name
         assert_equal "marvellous", tyler.value
+    end
+
+    def testNoSpaceAttributes
+        tree = Dome "<rose tyler=\"back\"to='earth' />"
+        assert_kind_of Tree, tree
+
+        assert_equal false, tree.root.children.empty?
+        rose = tree.root.children[0]
+        assert_kind_of Element, rose
+        assert_equal "rose", rose.tag
+
+        assert_equal 2, rose.attributes.length
+        tyler = rose.attributes[0]
+        assert_kind_of Attribute, tyler
+        assert_equal "tyler", tyler.name
+        assert_equal "back", tyler.value
+
+        to = rose.attributes[1]
+        assert_kind_of Attribute, to
+        assert_equal "to", to.name
+        assert_equal "earth", to.value
+    end
+
+    def testEscapedAttribute
+        tree = Dome "<captain jack='hark\\'ness' />"
+        assert_kind_of Tree, tree
+
+        assert_equal false, tree.root.children.empty?
+        captain = tree.root.children[0]
+        assert_kind_of Element, captain
+        assert_equal "captain", captain.tag
+
+        assert_equal 1, captain.attributes.length
+        jack = captain.attributes[0]
+        assert_kind_of Attribute, jack
+        assert_equal "jack", jack.name
+        assert_equal "hark'ness", jack.value
+    end
+
+    def testCDATA
+        tree = Dome "<daleks><![CDATA[are superiour]]></daleks>"
+        assert_kind_of Tree, tree
+
+        assert_equal false, tree.root.children.empty?
+        daleks = tree.root.children[0]
+        assert_kind_of Element, daleks
+        assert_equal "daleks", daleks.tag
+
+        assert_equal false, daleks.children.empty?
+        cdata = daleks.children[0]
+        assert_kind_of Data, cdata
+        assert_equal "are superiour", cdata.value
+        assert_equal true, cdata.cdata?
     end
 
 end

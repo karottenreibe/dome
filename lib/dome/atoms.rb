@@ -112,8 +112,11 @@ module Dome
         attr_accessor :value
 
         ##
-        # Whether or not the data is enclosed in a CDATA section - Boolean
-        attr_accessor :cdata
+        # Whether or not the data is enclosed in a CDATA section.
+        #
+        def cdata?
+            @cdata
+        end
         
         def initialize value = '', cdata = false
             @value, @cdata = value, cdata
