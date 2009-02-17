@@ -16,6 +16,8 @@
 # It also extends the Document class to provide CSS Selector functionality.
 #
 
+require 'dome/helpers/css_parser'
+
 module Dome
 
     ##

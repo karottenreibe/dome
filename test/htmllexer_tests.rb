@@ -15,7 +15,7 @@
 #
 
 require 'test/unit'
-require 'lib/dome/lexer'
+require 'lib/dome/helpers/lexer'
 
 class HTMLLexerTests < Test::Unit::TestCase
     include Dome

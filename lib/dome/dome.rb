@@ -18,7 +18,7 @@
 #
 
 require 'dome/atoms'
-require 'dome/parser'
+require 'dome/helpers/html_parser'
 
 ##
 # Shortcut for calling +Dome::Dom.new(input).tree+.
@@ -44,7 +44,7 @@ module Dome
         # DOM tree will be located in +tree+.
         #
         def initialize input
-            @parser = Parser.new HTMLLexer.new(input)
+            @parser = HTMLParser.new HTMLLexer.new(input)
             @open, @tree = [], Tree.new
             @cur = @tree.root
             parse!

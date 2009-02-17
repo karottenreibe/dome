@@ -15,7 +15,6 @@
 #
 
 require 'test/unit'
-require 'lib/dome/parser'
 require 'lib/dome/css'
 
 class CSSTests < Test::Unit::TestCase

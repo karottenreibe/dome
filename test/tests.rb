@@ -15,7 +15,7 @@
 #
 
 require 'htmllexer_tests.rb'
-require 'parser_tests.rb'
+require 'htmlparser_tests.rb'
 require 'fail_tests.rb'
 require 'dom_tests.rb'
 require 'css_tests.rb'

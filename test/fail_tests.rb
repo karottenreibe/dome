@@ -15,13 +15,13 @@
 #
 
 require 'test/unit'
-require 'lib/dome/parser'
+require 'lib/dome/helpers/html_parser'
 
 class FailTests < Test::Unit::TestCase
     include Dome
 
     def testMissingEndTag
-        p = Parser.new HTMLLexer.new("<coolness><empty></coolness>")
+        p = HTMLParser.new HTMLLexer.new("<coolness><empty></coolness>")
         ret = p.next
         assert_kind_of Finding, ret
         assert_equal :element_start, ret.type
@@ -44,7 +44,7 @@ class FailTests < Test::Unit::TestCase
     end
 
     def testMissingCDATAEnd
-        p = Parser.new HTMLLexer.new("<coolness><![CDATA[foo</coolness>")
+        p = HTMLParser.new HTMLLexer.new("<coolness><![CDATA[foo</coolness>")
         ret = p.next
         assert_kind_of Finding, ret
         assert_equal :element_start, ret.type
@@ -62,7 +62,7 @@ class FailTests < Test::Unit::TestCase
     end
 
     def testMissingAttributeQuote
-        p = Parser.new HTMLLexer.new("<captain awesome='devon></woodcomb>")
+        p = HTMLParser.new HTMLLexer.new("<captain awesome='devon></woodcomb>")
         ret = p.next
         assert_kind_of Finding, ret
         assert_equal :element_start, ret.type
@@ -78,7 +78,7 @@ class FailTests < Test::Unit::TestCase
     end
 
     def testElementWithoutTag
-        p = Parser.new HTMLLexer.new("</>")
+        p = HTMLParser.new HTMLLexer.new("</>")
         ret = p.next
         assert_kind_of Finding, ret
         assert_equal :tail, ret.type
@@ -89,7 +89,7 @@ class FailTests < Test::Unit::TestCase
     end
 
     def testElementUnfinishedAttribute
-        p = Parser.new HTMLLexer.new("<morgan anna=/>")
+        p = HTMLParser.new HTMLLexer.new("<morgan anna=/>")
         ret = p.next
         assert_kind_of Finding, ret
         assert_equal :element_start, ret.type
@@ -105,7 +105,7 @@ class FailTests < Test::Unit::TestCase
     end
 
     def testMissingAttributeValue
-        p = Parser.new HTMLLexer.new("<anna wu=/>")
+        p = HTMLParser.new HTMLLexer.new("<anna wu=/>")
         ret = p.next
         assert_kind_of Finding, ret
         assert_equal :element_start, ret.type
@@ -121,7 +121,7 @@ class FailTests < Test::Unit::TestCase
     end
 
     def testEscapedNonQuotedAttribute
-        p = Parser.new HTMLLexer.new("<john casey=\"/>")
+        p = HTMLParser.new HTMLLexer.new("<john casey=\"/>")
         ret = p.next
         assert_kind_of Finding, ret
         assert_equal :element_start, ret.type
@@ -137,7 +137,7 @@ class FailTests < Test::Unit::TestCase
     end
 
     def testNotMatchingAttributeQuote
-        p = Parser.new HTMLLexer.new("<the intersect=\"chuck' />")
+        p = HTMLParser.new HTMLLexer.new("<the intersect=\"chuck' />")
         ret = p.next
         assert_kind_of Finding, ret
         assert_equal :element_start, ret.type

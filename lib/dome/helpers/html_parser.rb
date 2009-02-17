@@ -17,7 +17,7 @@
 #
 
 require 'dome/helpers/primitive'
-require 'dome/lexer'
+require 'dome/helpers/lexer'
 
 module Dome
 
@@ -48,7 +48,7 @@ module Dome
     # Parses a string into a Document of Elements and Attributes.
     # Parsing is started by calling +parse+.
     #
-    class Parser
+    class HTMLParser
 
         ##
         # Initializes the Parser with a given +lexer+.
