@@ -16,9 +16,9 @@
 
 require 'test/unit'
 require 'lib/dome/parser'
-require 'lib/dome/xpath'
+require 'lib/dome/css'
 
-class XPathTests < Test::Unit::TestCase
+class CSSTests < Test::Unit::TestCase
     include Dome
 
     def testNothing

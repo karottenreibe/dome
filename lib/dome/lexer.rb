@@ -24,24 +24,15 @@ module Dome
     ##
     # Represents a single Token processed by the Lexer.
     #
-    # The type of the Token is one of the following
-    # possible values:
-    # - :left_bracket
-    # - :right_bracket
-    # - :equal
-    # - :quote
-    # - :escape
-    # - :whitespace
-    # - :text
-    # - :empty_element_end
-    # - :end_element_start
-    # - :cdata_start
-    # - :cdata_end
-    #
     primitive :Token, [:type, :value]
 
     ##
     # Splits a given String into small components that are consumed by the Parser.
+    # Needs to be refined by a subclass by providing the +#delimiters+ and +#meaning+
+    # methods.
+    # +#delimiters+ is expected to return a Regexp that matches all delimiting characters.
+    # +#meaning(token)+ is expected to return a symbol, which represents the token's
+    # meaning.
     #
     class Lexer
 
