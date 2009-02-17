@@ -161,5 +161,29 @@ class ParserTests < Test::Unit::TestCase
         assert_equal true, cdata.cdata?
     end
 
+    def testSubElements
+        tree = Dome "<torchwood><staff>gwen</staff></torchwood>"
+        assert_kind_of Tree, tree
+
+        assert_equal false, tree.root.children.empty?
+        torchwood = tree.root.children[0]
+        assert_kind_of Element, torchwood
+        assert_equal "torchwood", torchwood.tag
+
+        assert_equal false, torchwood.children.empty?
+        staff = torchwood.children[0]
+        assert_kind_of Element, staff
+        assert_equal "staff", staff.tag
+
+        assert_equal false, staff.children.empty?
+        gwen = staff.children[0]
+        assert_kind_of Data, gwen
+        assert_equal "gwen", gwen.value
+        assert_equal false, gwen.cdata?
+    end
+
+    def testMix
+    end
+
 end
 
