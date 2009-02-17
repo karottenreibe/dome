@@ -12,8 +12,8 @@
 # Homepage::    http://dome.rubyforge.org/
 # Git repo::    http://rubyforge.org/scm/?group_id=7589
 #
-# This file contains the XPath related classes and functions.
-# It also extends the Document class to provide XPath functionality.
+# This file contains the CSS Selector related classes and functions.
+# It also extends the Document class to provide CSS Selector functionality.
 #
 
 module Dome
