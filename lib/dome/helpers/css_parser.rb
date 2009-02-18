@@ -92,6 +92,14 @@ module Dome
         # Returns +true+ on success and +false+ otherwise.
         #
         def parse_id_selector
+            return false if not @lexer.get or @lexer.get.type != :id
+            trace = @lexer.trace
+            @lexer.next!
+
+            #TODO: quoted? stuff that is not text?
+            return terminate trace if not @lexer.get or @lexer.type != :text
+            @lexer.next!
+            true
         end
 
         ##
@@ -113,6 +121,11 @@ module Dome
         # Always returns +true+.
         #
         def parse_attr_selector
+            return false if not @lexer.get or @lexer.get.type != :left_bracket
+            trace = @lexer.trace
+            @lexer.next!
+            
+            #TODO
         end
 
         ##
@@ -120,6 +133,39 @@ module Dome
         # Returns +true+ on success and +false+ otherwise.
         #
         def parse_operator
+            trace = @lexer.trace
+            ws = parse_whitespace
+            return terminate trace unless @lexer.get
+
+            op = true
+            case @lexer.get.type
+            when :child then found :op_child, @lexer.get.value
+            when :neighbours then found :op_neighbours, @lexer.get.value
+            when :preceded then found :op_preceded, @lexer.get.value
+            else op = false
+            end
+
+            return false if not ws and not found
+            found :op_ancestor, @lexer.get.value if not found
+
+            @lexer.next!
+            parse_whitespace
+            true
+        end
+
+        ##
+        # Parses any number of whitespace characters.
+        # Returns +true+ if at least one whitespace was found, else +false+.
+        #
+        def parse_whitespace
+            gotit = false
+
+            while @lexer.get and @lexer.get.type == :whitespace
+                @lexer.next!
+                gotit = true
+            end
+
+            gotit
         end
 
         ##
