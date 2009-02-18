@@ -23,7 +23,7 @@ module Dome
 
     ##
     # Parses a string into a Document of Elements and Attributes.
-    # Parsing is started by calling +parse+.
+    # Parsing is started by calling +next+.
     #
     class HTMLParser
 
