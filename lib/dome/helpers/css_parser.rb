@@ -94,7 +94,7 @@ module Dome
         end
 
         ##
-        # Parses attribute, pseudo, id and class selectors.
+        # Parses attribute, pseudo selector, id and class selectors.
         # Always returs +true+.
         #
         def parse_additional_selectors
@@ -150,18 +150,22 @@ module Dome
         # Returns +true+ on success and +false+ otherwise.
         #
         def parse_pseudo_selector
+            allowed = %w{root nth-child nth-last-child nth-of-type nth-last-of-type
+                         first-child last-child first-of-type last-of-type
+                         only-child only-of-type empty}
             return false if not @lexer.get or @lexer.get.type != :pseudo
             trace = @lexer.trace
             @lexer.next!
 
             return terminate trace if not @lexer.get or @lexer.type != :text
             pseudo = @lexer.get
+            return terminate trace unless allowed.include? pseudo
             @lexer.next!
 
             arg = nil
             if @lexer.get and @lexer.get.type == :parenthesis_left
                 @lexer.next!
-                arg = parse_pseudo_arg
+                arg = parse_pseudo_arg pseudo
                 return terminate trace if not arg
             end
 
@@ -170,11 +174,11 @@ module Dome
         end
 
         ##
-        # Parses an argument to a pseudo selector within parenthesis.
+        # Parses an argument to the given +pseudo+ selector within parenthesis.
         # Assumes that the lexer is positioned after the opening parenthesis.
         # Returns the argument as a String on success and +nil+ otherwise.
         #
-        def parse_pseudo_arg
+        def parse_pseudo_arg pseudo
             buf = ''
 
             done = while @lexer.get
@@ -185,7 +189,24 @@ module Dome
 
             return nil unless done
             @lexer.next!
-            buf
+
+            case pseudo
+            when /^nth-/ then parse_nth_arg buf
+            when "not" then parse_not_arg buf
+            else buf
+            end
+        end
+
+        ##
+        # Parses the argument given to +:nth-child()+, +:nth-of-type()+ etc. pseudo selectors.
+        #
+        def parse_nth_arg
+        end
+
+        ##
+        # Parses the argument given to +:not()+ pseudo selector.
+        #
+        def parse_not_arg
         end
 
         ##
