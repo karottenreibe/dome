@@ -67,46 +67,13 @@ module Dome
         # Returns +true+ on success and +false+ otherwise.
         #
         def parse_selector
-            parse_elem_selector and parse_additional_selectors
-        end
-
-        ##
-        # Parses attribute, pseudo, id and class selectors.
-        # Always returs +true+.
-        #
-        def parse_additional_selectors
-            nil while parse_attr_selector or parse_pseudo_selector or
-                parse_id_selector or parse_class_selector
-            true
-        end
-
-        ##
-        # Parses a pseudo selector.
-        # Returns +true+ on success and +false+ otherwise.
-        #
-        def parse_pseudo_selector
-        end
-
-        ##
-        # Parses the id selector +#+.
-        # Returns +true+ on success and +false+ otherwise.
-        #
-        def parse_id_selector
-            return false if not @lexer.get or @lexer.get.type != :id
-            trace = @lexer.trace
-            @lexer.next!
-
-            #TODO: quoted? stuff that is not text?
-            return terminate trace if not @lexer.get or @lexer.type != :text
-            @lexer.next!
-            true
-        end
-
-        ##
-        # Parses the class selector +.+.
-        # Returns +true+ on success and +false+ otherwise.
-        #
-        def parse_class_selector
+            # looks strange, but has to be that way:
+            # first parse an element
+            # then parse any additional selectors, regardless of
+            # whether there actually was an element matched
+            # but do only return true if one of the two matched
+            elem = parse_elem_selector
+            elem or parse_additional_selectors
         end
 
         ##
@@ -114,6 +81,26 @@ module Dome
         # Returns +true+ on success and +false+ otherwise.
         #
         def parse_elem_selector
+            return false if not @lexer.get
+
+            case @lexer.get.type
+            when :text then found :element, @lexer.get.value
+            when :any then found :element, :any
+            else return false
+            end
+
+            @lexer.next!
+            true
+        end
+
+        ##
+        # Parses attribute, pseudo, id and class selectors.
+        # Always returs +true+.
+        #
+        def parse_additional_selectors
+            nil while parse_pseudo_selector or parse_id_selector or
+                parse_class_selector or parse_attr_selector
+            true
         end
 
         ##
@@ -125,7 +112,110 @@ module Dome
             trace = @lexer.trace
             @lexer.next!
             
-            #TODO
+            return terminate trace if not @lexer.get or @lexer.get.type != :text
+            att = @lexer.get.value
+            @lexer.next!
+
+            op = parse_attr_op
+            val = nil
+
+            if op
+                return terminate trace if not @lexer.get or @lexer.get.type != :text
+                val = @lexer.get.value
+                @lexer.next!
+            end
+
+            return terminate trace if not @lexer.get or @lexer.get.type != :right_bracket
+            found :attr, [att,op,val]
+            @lexer.next!
+            true
+        end
+
+        ##
+        # Parses an attribute selecotr's operator.
+        #
+        def parse_attr_op
+            return nil unless @lexer.get
+
+            case @lexer.get.type
+            when :equal, :in_list, :ends_with, :begins_with, :begins_with_dash, :contains
+                @lexer.get.type
+            else
+                nil
+            end
+        end
+
+        ##
+        # Parses a pseudo selector.
+        # Returns +true+ on success and +false+ otherwise.
+        #
+        def parse_pseudo_selector
+            return false if not @lexer.get or @lexer.get.type != :pseudo
+            trace = @lexer.trace
+            @lexer.next!
+
+            return terminate trace if not @lexer.get or @lexer.type != :text
+            pseudo = @lexer.get
+            @lexer.next!
+
+            arg = nil
+            if @lexer.get and @lexer.get.type == :parenthesis_left
+                @lexer.next!
+                arg = parse_pseudo_arg
+                return terminate trace if not arg
+            end
+
+            found :pseudo, [pseudo,arg]
+            true
+        end
+
+        ##
+        # Parses an argument to a pseudo selector within parenthesis.
+        # Assumes that the lexer is positioned after the opening parenthesis.
+        # Returns the argument as a String on success and +nil+ otherwise.
+        #
+        def parse_pseudo_arg
+            buf = ''
+
+            done = while @lexer.get
+                break true if @lexer.type == :parenthesis_right
+                buf << @lexer.get.value
+                @lexer.next!
+            end
+
+            return nil unless done
+            @lexer.next!
+            buf
+        end
+
+        ##
+        # Parses the id selector +#+.
+        # Returns +true+ on success and +false+ otherwise.
+        #
+        def parse_id_selector
+            return false if not @lexer.get or @lexer.get.type != :id
+            trace = @lexer.trace
+            @lexer.next!
+
+            return terminate trace if not @lexer.get or @lexer.type != :text
+            found :attr, ["id",:in_list,@lexer.get.value]
+            @lexer.next!
+            true
+        end
+
+        ##
+        # Parses the class selector +.+.
+        # Returns +true+ on success and +false+ otherwise.
+        #
+        def parse_class_selector
+            return false if not @lexer.get or @lexer.get.type != :class
+            trace = @lexer.trace
+            @lexer.next!
+
+            return terminate trace if not @lexer.get or @lexer.type != :text
+            found :attr, ["class",:in_list,@lexer.get.value]
+            @lexer.next!
+            true
         end
 
         ##
@@ -139,14 +229,14 @@ module Dome
 
             op = true
             case @lexer.get.type
-            when :child then found :op_child, @lexer.get.value
-            when :neighbours then found :op_neighbours, @lexer.get.value
-            when :preceded then found :op_preceded, @lexer.get.value
+            when :child then found :child, @lexer.get.value
+            when :neighbours then found :neighbour, @lexer.get.value
+            when :preceded then found :predecessor, @lexer.get.value
             else op = false
             end
 
             return false if not ws and not found
-            found :op_ancestor, @lexer.get.value if not found
+            found :ancestor, @lexer.get.value if not found
 
             @lexer.next!
             parse_whitespace
@@ -166,6 +256,15 @@ module Dome
             end
 
             gotit
+        end
+
+        ##
+        # Parses any tailing values so an error can be thrown.
+        #
+        def parse_tail
+            buf = ''
+            buf << @lexer.get.value while @lexer.get
+            found :tail, buf unless @buf.empty?
         end
 
         ##
