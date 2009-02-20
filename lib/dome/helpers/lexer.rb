@@ -161,7 +161,7 @@ module Dome
             when '.' then :class
             when '>' then :child
             when '+' then :neighbours
-            when '~' then :preceded
+            when '~' then :follower
             when '#' then :id
             when '=' then :equal
             when '~=' then :in_list

@@ -207,9 +207,10 @@ module Dome
             case arg
             when "odd" then [2,1]
             when "even" then [2,0]
+            when /-?[0-9+]/ then arg.to_i
             else
-                m = /([0-9]+)n\+([0-9]+)/.match arg
-                m ? [m[1],m[2]] : nil
+                m = /(-?[0-9]+)n((\+|-)[0-9]+)/.match arg
+                m ? [ m[1].to_i, m[2].to_i ] : nil
             end
         end
 
@@ -266,12 +267,12 @@ module Dome
             case @lexer.get.type
             when :child then found :child, @lexer.get.value
             when :neighbours then found :neighbour, @lexer.get.value
-            when :preceded then found :predecessor, @lexer.get.value
+            when :follower then found :follower, @lexer.get.value
             else op = false
             end
 
             return false if not ws and not found
-            found :ancestor, @lexer.get.value if not found
+            found :descendant, @lexer.get.value if not found
 
             @lexer.next!
             parse_whitespace
