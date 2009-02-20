@@ -68,102 +68,112 @@ module Dome
 
     end
 
-    class ElementSelector
-        def initialize tag
-            @tag = tag
+    ##
+    # Keeps the various selector classes.
+    # Each selector has a +#walk+ method that expects an Element as its sole
+    # parameter. It will apply the selector to that Element and yield the given
+    # block for each matching element.
+    #
+    module Selectors
+
+        class ElementSelector
+            def initialize tag
+                @tag = tag
+            end
+
+            def walk node
+                yield node if @tag == :any or node.tag == @tag
+            end
         end
 
-        def walk node
-            yield node if child.tag == @tag
-        end
-    end
+        class AttributeSelector
+            def initialize name, op, value
+                @name, @op, @value = name, op, value
+            end
 
-    class AttributeSelector
-        def initialize name, value
-            @name, @value = name, value
-        end
-
-        def walk node
-            yield node if node.attributes.find { |a|
-                a.name == @name and ( @value.nil? or a.value == @value )
-            }
-        end
-    end
-
-    class ChildSelector
-        def walk node
-            node.children.each { |child|
-                yield child
-            }
-        end
-    end
-
-    class DescendantSelector
-        def walk node
-            node.children.each { |child|
-                yield child
-                walk child
-            }
-        end
-    end
-
-    class NeighbourSelector
-        def walk node
-            found = false
-            node.parent.children.each { |child|
-                yield child if found
-                found = true if child == node
-            }
-        end
-    end
-
-    class FollowerSelector
-        def walk node
-            found = false
-            node.children.each { |child|
-                yield child if found
-                found = false if found
-                found = true if child == node
-            }
-        end
-    end
-
-    class RootSelector
-        def walk node
-            yield node if node.root?
-        end
-    end
-
-    class NthChildSelector
-        def initialize args, reverse = false
-            @args, @reverse = args, reverse
+            def walk node
+                yield node if node.attributes.find { |a|
+                    a.name == @name and
+                        case op
+                        when :equal then a.value == @value
+                        when :in_list then a.value.split(/\s/).include? @value
+                        when :contains then a.value.include? @value
+                        when :ends_with then a.value.end_with? @value
+                        when :begins_with then a.value.begin_with? @value
+                        when :begins_with_dash
+                            a.value == @value or a.value.begin_with "#{@value}-"
+                        end
+                }
+            end
         end
 
-        def walk node
-            idx = node.parent.children.index node
-
-            yield node if
-                case args
-                when :odd then idx.odd?
-                when :even then idx.even?
-                when Array
-                    a,b = args
-                    a == 0 ? b == idx : a * ((idx-b)/a) + b == idx
-                end
+        class ChildSelector
+            def walk node
+                node.children.each { |child|
+                    yield child
+                }
+            end
         end
-    end
 
-    class NthOfTypeSelector
-    end
+        class DescendantSelector
+            def walk node
+                node.children.each { |child|
+                    yield child
+                    walk child
+                }
+            end
+        end
 
-    class OnlyChildSelector
-    end
+        class NeighbourSelector
+            def walk node
+                found = false
+                node.parent.children.each { |child|
+                    yield child if found
+                    found = true if child == node
+                }
+            end
+        end
 
-    class OnlyOfTypeSelector
-    end
+        class FollowerSelector
+            def walk node
+                found = false
+                node.children.each { |child|
+                    yield child if found
+                    found = false if found
+                    found = true if child == node
+                }
+            end
+        end
 
-    class EmptySelector
-    end
+        class RootSelector
+            def walk node
+                yield node if node.root?
+            end
+        end
+
+        class NthChildSelector
+            def initialize args, reverse = false
+                @args, @reverse = args, reverse
+            end
+
+            def walk node
+                idx = node.parent.children.index node
+                a,b = @args
+                yield node if (a == 0 and b == idx) or a * ((idx-b)/a) + b == idx
+            end
+        end
+
+        class NthOfTypeSelector
+        end
+
+        class OnlyChildSelector
+        end
+
+        class OnlyOfTypeSelector
+        end
+
+        class EmptySelector
+        end
 
 end
                         
