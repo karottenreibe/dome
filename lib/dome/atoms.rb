@@ -27,12 +27,11 @@ module Dome
     #
     class Tree
         ##
-        # The root pseudo Element.
+        # The root pseudo Node.
         attr_accessor :root
 
         def initialize
-            @root = Element.new
-            @root.tag = nil
+            @root = Root.new
         end
 
         def inspect
@@ -41,9 +40,47 @@ module Dome
     end
 
     ##
+    # The base class for all other classes living in the Tree.
+    #
+    class Node
+
+        ##
+        # The Node's children - Array
+        attr_accessor :children
+
+        ##
+        # The Node's parent - Node
+        attr_accessor :parent
+
+        ##
+        # Whether or not the Node has children.
+        #
+        def empty?
+            @children.empty?
+        end
+
+        ##
+        # Whether or not the Node is the root pseudo Node.
+        #
+        def root?; false; end
+
+    end
+
+    ##
+    # The class of the pseudo root Node.
+    #
+    class Root < Node
+        def root?; true; end
+
+        def inspect
+            @children.inspect
+        end
+    end
+
+    ##
     # Keeps a single Element of a Tree with its +tag+, +attributes+ and +children+.
     #
-    class Element
+    class Element < Node
         ##
         # The Element's tag - String
         attr_accessor :tag
@@ -52,30 +89,8 @@ module Dome
         # The Element's attributes - Array of Attributes
         attr_accessor :attributes
 
-        ##
-        # The Element's children - Array
-        attr_accessor :children
-
-        ##
-        # The Element's parent - Element
-        attr_accessor :parent
-        
         def initialize tag = "", parent = nil, attributes = [], children = []
             @tag, @attributes, @children, @parent = tag, attributes, children, parent
-        end
-
-        ##
-        # Whether or not the Element has children.
-        #
-        def empty?
-            @children.empty?
-        end
-
-        ##
-        # Whether or not the Element is the root pseudo Element.
-        #
-        def root?
-            @tag.nil?
         end
 
         ##
@@ -87,16 +102,13 @@ module Dome
         end
 
         def inspect
-            # first handle root case
-            return "{ #{ @children.inject('') { |memo,c| memo + c.inspect } } }" if self.root?
-
-            ret = "<#{@name}"
+            ret = "<#{ @name }"
             ret += @attributes.inject(' ') { |memo,a| "#{memo} #{a.inspect}" } unless @attributes.empty?
 
             if empty?
                 ret += '/>'
             else
-                ret += ">#{ @children.inject('') { |memo,c| memo + c.inspect } }</#{@name}>"
+                ret += ">#{ @children.inject('') { |memo,c| memo + c.inspect } }</#{ @name }>"
             end
 
             ret
@@ -106,7 +118,7 @@ module Dome
     ##
     # Keeps text data, either normally or as a CDATA section.
     #
-    class Data
+    class Data < Node
         ##
         # The data enclosed in this object - String
         attr_accessor :value
@@ -123,7 +135,7 @@ module Dome
         end
 
         def inspect
-            @cdata ? "<[CDATA[#{@data}]]>" : @data.to_s
+            @cdata ? "<[CDATA[#{ @value }]]>" : @value.to_s
         end
     end
 
@@ -141,7 +153,7 @@ module Dome
     #
     primitive :Attribute, [:name, :value] do
         def inspect
-            @value ? "#{@name}='#{@value}'" : @name
+            @value ? "#{@name}='#{ @value.gsub("'", "\\\\'") }'" : @name
         end
     end
 

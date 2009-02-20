@@ -110,7 +110,7 @@ module Dome
         class ChildSelector
             def walk node
                 node.children.each { |child|
-                    yield child
+                    yield child if child.is_a? Element
                 }
             end
         end
@@ -118,7 +118,7 @@ module Dome
         class DescendantSelector
             def walk node
                 node.children.each { |child|
-                    yield child
+                    yield child if child.is_a? Element
                     walk child
                 }
             end
@@ -128,7 +128,7 @@ module Dome
             def walk node
                 found = false
                 node.parent.children.each { |child|
-                    yield child if found
+                    yield child if found and child.is_a? Element
                     found = true if child == node
                 }
             end
@@ -138,8 +138,10 @@ module Dome
             def walk node
                 found = false
                 node.children.each { |child|
-                    yield child if found
-                    found = false if found
+                    if child.is_a? Element and found
+                        yield child
+                        found = false
+                    end
                     found = true if child == node
                 }
             end
@@ -147,7 +149,7 @@ module Dome
 
         class RootSelector
             def walk node
-                yield node if node.root?
+                yield node if node.parent.root?
             end
         end
 
