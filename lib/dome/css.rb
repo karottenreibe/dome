@@ -74,9 +74,7 @@ module Dome
         end
 
         def walk node
-            node.children.each { |child|
-                yield child if child.tag == @tag
-            }
+            yield node if child.tag == @tag
         end
     end
 
@@ -86,10 +84,8 @@ module Dome
         end
 
         def walk node
-            node.children.each { |child|
-                yield child if child.attributes.find { |a|
-                    a.name == @name and ( @value.nil? or a.value == @value )
-                }
+            yield node if node.attributes.find { |a|
+                a.name == @name and ( @value.nil? or a.value == @value )
             }
         end
     end
@@ -140,19 +136,20 @@ module Dome
 
     class NthChildSelector
         def initialize args, reverse = false
-            @mult, @offset, @reverse = args[0], args[1], reverse
+            @args, @reverse = args, reverse
         end
 
         def walk node
-            group = @reverse ? node.children.reverse : node.children
-            n = 0
-            group.each_with_index { |child,i|
-                if i == @mult * n + @offset
-                    n += 1
-                    yield child
-                    #TODO: really working?
+            idx = node.parent.children.index node
+
+            yield node if
+                case args
+                when :odd then idx.odd?
+                when :even then idx.even?
+                when Array
+                    a,b = args
+                    a == 0 ? b == idx : a * ((idx-b)/a) + b == idx
                 end
-            }
         end
     end
 

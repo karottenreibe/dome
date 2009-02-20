@@ -207,10 +207,10 @@ module Dome
             case arg
             when "odd" then [2,1]
             when "even" then [2,0]
-            when /-?[0-9+]/ then arg.to_i
-            else
-                m = /(-?[0-9]+)n((\+|-)[0-9]+)/.match arg
-                m ? [ m[1].to_i, m[2].to_i ] : nil
+            when /-?[0-9]+/ then [ 0, arg.to_i ]
+            when /n((\+|-)[0-9]+)?/ then [ 1, arg[1..-1].to_i ]
+            when /-?[0-9]+n((\+|-)[0-9]+)?/ then arg.split 'n', -1
+            else nil
             end
         end
 
