@@ -12,7 +12,7 @@
 # Homepage::    http://dome.rubyforge.org/
 # Git repo::    http://rubyforge.org/scm/?group_id=7589
 #
-# This file contains the CSS selector related classes and functions.
+# This file contains the CSS Selector related classes and functions.
 # It also extends the Tree class to provide CSS Selector functionality.
 #
 
@@ -36,18 +36,18 @@ module Dome
     end
 
     ##
-    # Stores a list of CSS3 selectors over a Tree.
-    # Can be used to iterate over all the Elements identified by the selectors
+    # Stores a list of CSS3 Selectors over a Tree.
+    # Can be used to iterate over all the Elements identified by the Selectors
     # and to execute code for each found node.
     #
     class SelectorList
 
         ##
-        # The selectors contained within this list.
+        # The Selectors contained within this list.
         attr_accessor :selectors
 
         ##
-        # Parses the given +string+ into a list of CSS3 selectors.
+        # Parses the given +string+ into a list of CSS3 Selectors.
         #
         def initialize string
             @parser = CSSParser.new CSSLexer.new(string)
@@ -61,7 +61,7 @@ module Dome
         protected
 
         ##
-        # Does the actual work of parsing the input into selectors.
+        # Does the actual work of parsing the input into Selectors.
         #
         def parse
         end
@@ -69,25 +69,52 @@ module Dome
     end
 
     ##
-    # Keeps the various selector classes.
-    # Each selector has a +#walk+ method that expects an Element as its sole
-    # parameter. It will apply the selector to that Element and yield the given
+    # Keeps the various Selector classes.
+    # Each Selector has a +#walk+ method that expects an Element as its sole
+    # parameter. It will apply the Selector to that Element and yield the given
     # block for each matching element.
     #
     module Selectors
 
-        class ElementSelector
-            def initialize tag
-                @tag = tag
+        ##
+        # The base class for all Selectors.
+        # Must be refined by a subclass by implementing the +#walk+ and +#init+
+        # methods.
+        #
+        class Selector
+
+            ##
+            # The list this Selector belongs to.
+            #
+            attr_accessor :list
+
+            ##
+            # Stores the +list+ this Selector belongs to and passes the other
+            # +args+ on to the subclass method +#init+ for further initialization.
+            #
+            def initialize list, *args
+                @list = list
+                init *args
             end
+
+        end
+
+        class ElementSelector
+            attr_accessor :tag
 
             def walk node
                 yield node if @tag == :any or node.tag == @tag
             end
+
+            protected
+
+            def init tag
+                @tag = tag
+            end
         end
 
         class AttributeSelector
-            def initialize name, op, value
+            def init name, op, value
                 @name, @op, @value = name, op, value
             end
 
@@ -154,27 +181,65 @@ module Dome
         end
 
         class NthChildSelector
-            def initialize args, reverse = false
+            def init args, reverse = false
                 @args, @reverse = args, reverse
             end
 
             def walk node
-                idx = node.parent.children.index node
+                nth_walk( @reverse ? node.parent.children.reverse : node.parent.children )
+            end
+
+            protected
+
+            def nth_walk group
+                idx = group.index node
                 a,b = @args
                 yield node if (a == 0 and b == idx) or a * ((idx-b)/a) + b == idx
             end
         end
 
-        class NthOfTypeSelector
+        class NthOfTypeSelector < NthChildSelector
+            def init args, reverse = false, tag
+                @tag = tag
+                super(args, reverse)
+            end
+
+            protected
+
+            def nth_walk group
+                group.filter! { |item| item.is_a? Element and item.tag == @tag }
+                super(group)
+            end
         end
 
         class OnlyChildSelector
+            def walk node
+                yield node if node.parent.children.length == 1
+            end
         end
 
         class OnlyOfTypeSelector
+            def init tag
+                @tag = tag
+            end
+
+            def walk node
+                yield node if node.parent.children.filter { |c|
+                    c.is_a? Element and c.tag == @tag
+                }.length == 1
+            end
         end
 
         class EmptySelector
+            def walk node
+                yield node if node.children.empty?
+            end
+        end
+
+        class OnlyTextSelector
+            def walk node
+                yield node if node.children.filter { |c| not c.is_a? Data }.empty?
+            end
         end
 
     end
