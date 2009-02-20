@@ -81,6 +81,10 @@ module Dome
         # Must be refined by a subclass by implementing the +#walk+ and +#init+
         # methods.
         #
+        # = Selecting Data =
+        # ...is not possible. If you want the data, select the parent element and extract
+        # it yourself. All Selectors will filter out all Data Nodes.
+        #
         class Selector
 
             ##
@@ -103,7 +107,7 @@ module Dome
             attr_accessor :tag
 
             def walk node
-                yield node if @tag == :any or node.tag == @tag
+                yield node if node.is_a? Element and @tag == :any or node.tag == @tag
             end
 
             protected
@@ -119,7 +123,7 @@ module Dome
             end
 
             def walk node
-                yield node if node.attributes.find { |a|
+                yield node if node.is_a? Element and node.attributes.find { |a|
                     a.name == @name and
                         case op
                         when :equal then a.value == @value
@@ -176,7 +180,7 @@ module Dome
 
         class RootSelector
             def walk node
-                yield node if node.parent.root?
+                yield node if node.is_a? Element and node.parent.root?
             end
         end
 
@@ -194,7 +198,8 @@ module Dome
             def nth_walk group
                 idx = group.index node
                 a,b = @args
-                yield node if (a == 0 and b == idx) or a * ((idx-b)/a) + b == idx
+                yield node if node.is_a? Element and
+                    (a == 0 and b == idx) or a * ((idx-b)/a) + b == idx
             end
         end
 
@@ -207,14 +212,16 @@ module Dome
             protected
 
             def nth_walk group
-                group.filter! { |item| item.is_a? Element and item.tag == @tag }
+                group = group.find_all { |item|
+                    item.is_a? Element and item.tag == @tag
+                }
                 super(group)
             end
         end
 
         class OnlyChildSelector
             def walk node
-                yield node if node.parent.children.length == 1
+                yield node if node.is_a? Element and node.parent.children.length == 1
             end
         end
 
@@ -224,7 +231,7 @@ module Dome
             end
 
             def walk node
-                yield node if node.parent.children.filter { |c|
+                yield node if node.is_a? Element and node.parent.children.find_all { |c|
                     c.is_a? Element and c.tag == @tag
                 }.length == 1
             end
@@ -232,13 +239,13 @@ module Dome
 
         class EmptySelector
             def walk node
-                yield node if node.children.empty?
+                yield node if node.is_a? Element and node.children.empty?
             end
         end
 
         class OnlyTextSelector
             def walk node
-                yield node if node.children.filter { |c| not c.is_a? Data }.empty?
+                yield node if node.is_a? Element and node.children.find_all { |c| not c.is_a? Data }.empty?
             end
         end
 
