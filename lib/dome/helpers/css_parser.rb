@@ -19,6 +19,7 @@
 
 require 'dome/helpers/lexer'
 require 'dome/helpers/finding'
+require 'dome/css'
 
 module Dome
 
@@ -198,15 +199,28 @@ module Dome
         end
 
         ##
-        # Parses the argument given to +:nth-child()+, +:nth-of-type()+ etc. pseudo selectors.
+        # Parses the +arg+ument given to +:nth-child()+, +:nth-of-type()+ etc. pseudo selectors.
+        # The returned value on success is an Array +[a,b]+ which represents the argument +an\+b+.
+        # On failure, this method returns +nil+.
         #
-        def parse_nth_arg
+        def parse_nth_arg arg
+            case arg
+            when "odd" then [2,1]
+            when "even" then [2,0]
+            else
+                m = /([0-9]+)n\+([0-9]+)/.match arg
+                m ? [m[1],m[2]] : nil
+            end
         end
 
         ##
-        # Parses the argument given to +:not()+ pseudo selector.
+        # Parses the +arg+ument given to +:not()+ pseudo selector.
+        # On success returns a SelectorList which contains the specified selectors.
+        # On failure returns +nil+.
         #
-        def parse_not_arg
+        def parse_not_arg arg
+            sl = SelectorList.new arg
+            sl.selectors.empty? ? nil : sl
         end
 
         ##
