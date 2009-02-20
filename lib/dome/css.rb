@@ -185,7 +185,7 @@ module Dome
         end
 
         class NthChildSelector
-            def init args, reverse = false
+            def init args, reverse
                 @args, @reverse = args, reverse
             end
 
@@ -204,7 +204,7 @@ module Dome
         end
 
         class NthOfTypeSelector < NthChildSelector
-            def init args, reverse = false, tag
+            def init args, reverse, tag
                 @tag = tag
                 super(args, reverse)
             end
