@@ -52,6 +52,10 @@ module Dome
         # The Node's parent - Node
         attr_accessor :parent
 
+        def initialize
+            @children = []
+        end
+
         ##
         # Whether or not the Node has children.
         #
@@ -89,8 +93,9 @@ module Dome
         # The Element's attributes - Array of Attributes
         attr_accessor :attributes
 
-        def initialize tag = "", parent = nil, attributes = [], children = []
-            @tag, @attributes, @children, @parent = tag, attributes, children, parent
+        def initialize tag = "", parent = nil
+            super()
+            @tag, @attributes, @parent = tag, [], parent
         end
 
         ##

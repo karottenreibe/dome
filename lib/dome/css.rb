@@ -177,5 +177,7 @@ module Dome
         class EmptySelector
         end
 
+    end
+
 end
                         
