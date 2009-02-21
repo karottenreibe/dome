@@ -168,7 +168,7 @@ class HTMLParserTests < Test::Unit::TestCase
     end
 
     def testEscapedAttribute
-        p = HTMLParser.new HTMLLexer.new("<ellie bartowski='gr\\'eat' />")
+        p = HTMLParser.new HTMLLexer.new("<ellie bartowski='gr\\'<>eat' />")
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
@@ -177,7 +177,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :attribute, ret.type
-        assert_equal ["bartowski","gr'eat"], ret.value
+        assert_equal ["bartowski","gr'<>eat"], ret.value
 
         ret = p.next
         assert_kind_of Token, ret

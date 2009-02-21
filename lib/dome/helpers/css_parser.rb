@@ -122,9 +122,21 @@ module Dome
             val = nil
 
             if op
-                return terminate trace if not @lexer.get or @lexer.get.type != :text
-                val = @lexer.get.value
-                @lexer.next!
+                return terminate trace if not @lexer.get
+
+                quote = false
+                if @lexer.get.type == :quote
+                    quote = @lexer.get.value
+                    @lexer.next!
+                end
+                
+                val = parse_value quote
+                return terminate trace unless val
+
+                if quote
+                    return terminate trace if not @lexer.get or @lexer.get.type != :quote or @lexer.get.value != quote
+                    @lexer.next!
+                end
             end
 
             return terminate trace if not @lexer.get or @lexer.get.type != :right_bracket
@@ -132,6 +144,35 @@ module Dome
             @lexer.next!
             true
         end
+
+        ##
+        # Parses a value. If +quote+ is false, it will only parse a single +:text+ Token,
+        # else it will recognize +:escape+ Tokens and parse until a matching +quote+ is
+        # found or all input is consumed.
+        # Return the parsed value on success and +nil+ otherwise
+        #
+        def parse_value quote = false
+            escaped = false
+            buf = ''
+
+            loop do
+                token = @lexer.get
+                break unless token
+
+                if token.type == :text or escaped
+                    buf << token.value
+                    escaped = false
+                elsif quote and token.type == :escape
+                    escaped = true
+                elsif not quote or (token.type == :quote and token.value == quote)
+                    break
+                end
+
+                @lexer.next!
+            end
+
+            buf.empty? ? nil : buf
+       end
 
         ##
         # Parses an attribute selecotr's operator.
