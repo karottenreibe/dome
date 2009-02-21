@@ -159,13 +159,14 @@ module Dome
                 token = @lexer.get
                 break unless token
 
-                if token.type == :text or escaped
+                if quote and token.type == :escape
+                    escaped = true
+                elsif (not quote and token.type != :text) or (quote and not escaped and
+                    token.type == :quote and token.value == quote)
+                    break
+                else
                     buf << token.value
                     escaped = false
-                elsif quote and token.type == :escape
-                    escaped = true
-                elsif not quote or (token.type == :quote and token.value == quote)
-                    break
                 end
 
                 @lexer.next!

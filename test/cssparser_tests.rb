@@ -246,6 +246,36 @@ class CSSParserTests < Test::Unit::TestCase
         f = p.next
         assert_kind_of NilClass, f
     end
+    
+    def testAttrQuoted
+        p = CSSParser.new CSSLexer.new("seven[children='gon\"e']")
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :element, f.type
+        assert_equal "seven", f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :attribute, f.type
+        assert_equal ["children",:equal,"gon\"e"], f.value
+
+        f = p.next
+        assert_kind_of NilClass, f
+
+        p = CSSParser.new CSSLexer.new('seven[children="go\'[]ne"]')
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :element, f.type
+        assert_equal "seven", f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :attribute, f.type
+        assert_equal ["children",:equal,"go'[]ne"], f.value
+
+        f = p.next
+        assert_kind_of NilClass, f
+    end
 
 end
 
