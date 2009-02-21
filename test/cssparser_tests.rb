@@ -127,5 +127,58 @@ class CSSParserTests < Test::Unit::TestCase
         assert_kind_of NilClass, f
     end
 
+    def testNoArgPseudoSelectors
+        p = CSSParser.new CSSLexer.new(
+            ":root:first-child:last-child:first-of-type:last-of-type:only-child" +
+            ":only-of-type:empty:only-text")
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :pseudo, f.type
+        assert_equal ["root",nil], f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :pseudo, f.type
+        assert_equal ["first-child",nil], f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :pseudo, f.type
+        assert_equal ["last-child",nil], f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :pseudo, f.type
+        assert_equal ["first-of-type",nil], f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :pseudo, f.type
+        assert_equal ["last-of-type",nil], f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :pseudo, f.type
+        assert_equal ["only-child",nil], f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :pseudo, f.type
+        assert_equal ["only-of-type",nil], f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :pseudo, f.type
+        assert_equal ["empty",nil], f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :pseudo, f.type
+        assert_equal ["only-text",nil], f.value
+
+        f = p.next
+        assert_kind_of NilClass, f
+    end
+
 end
 

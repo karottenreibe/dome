@@ -74,7 +74,8 @@ module Dome
             # whether there actually was an element matched
             # but do only return true if one of the two matched
             elem = parse_elem_selector
-            elem or parse_additional_selectors
+            add = parse_additional_selectors
+            elem or add
         end
 
         ##
@@ -159,8 +160,8 @@ module Dome
             trace = @lexer.trace
             @lexer.next!
 
-            return terminate trace if not @lexer.get or @lexer.type != :text
-            pseudo = @lexer.get
+            return terminate trace if not @lexer.get or @lexer.get.type != :text
+            pseudo = @lexer.get.value
             return terminate trace unless allowed.include? pseudo
             @lexer.next!
 
@@ -184,7 +185,7 @@ module Dome
             buf = ''
 
             done = while @lexer.get
-                break true if @lexer.type == :parenthesis_right
+                break true if @lexer.get.type == :parenthesis_right
                 buf << @lexer.get.value
                 @lexer.next!
             end
@@ -234,7 +235,7 @@ module Dome
             trace = @lexer.trace
             @lexer.next!
 
-            return terminate trace if not @lexer.get or @lexer.type != :text
+            return terminate trace if not @lexer.get or @lexer.get.type != :text
             found :attribute, ["id",:in_list,@lexer.get.value]
             @lexer.next!
             true
@@ -249,7 +250,7 @@ module Dome
             trace = @lexer.trace
             @lexer.next!
 
-            return terminate trace if not @lexer.get or @lexer.type != :text
+            return terminate trace if not @lexer.get or @lexer.get.type != :text
             found :attribute, ["class",:in_list,@lexer.get.value]
             @lexer.next!
             true
