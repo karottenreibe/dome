@@ -56,7 +56,7 @@ module Dome
         def parse_selectors
             @parse_started = true
             goon = true
-            goon = parse_selector and parse_operator while @lexer.get and goon
+            goon = parse_selector and parse_combinator while @lexer.get and goon
             # in case there was an error and there is still data stuff
             parse_tail
             @cc = nil
@@ -255,10 +255,10 @@ module Dome
         end
 
         ##
-        # Parses a single operator between selectors.
+        # Parses a single combinatortor between selectors.
         # Returns +true+ on success and +false+ otherwise.
         #
-        def parse_operator
+        def parse_combinator
             trace = @lexer.trace
             ws = parse_whitespace
             return terminate trace unless @lexer.get

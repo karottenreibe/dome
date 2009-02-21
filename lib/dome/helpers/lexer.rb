@@ -144,7 +144,7 @@ module Dome
         protected
 
         def delimiters
-            /\[|\]|:|\*|~=|\^=|\$=|\*=|\|=|=|\(|\)|#|\.|>|\+|\s|~|\\|'|"/
+            /\[|\]|:|~=|\^=|\$=|\*=|\|=|\*|=|\(|\)|#|\.|>|\+|\s|~|\\|'|"/
         end
 
         def meaning token
@@ -168,7 +168,7 @@ module Dome
             when '$=' then :ends_with
             when '^=' then :begins_with
             when '*=' then :contains
-            when '|=' then :beginis_with_dash
+            when '|=' then :begins_with_dash
             else :text
             end
         end

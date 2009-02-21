@@ -105,5 +105,143 @@ class CSSLexerTests < Test::Unit::TestCase
         assert_kind_of NilClass, lex.get
     end
 
+    def testWhitespace
+        lex = CSSLexer.new " \t\r\n\f"
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :whitespace, t.type
+        assert_equal " ", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :whitespace, t.type
+        assert_equal "\t", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :whitespace, t.type
+        assert_equal "\r", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :whitespace, t.type
+        assert_equal "\n", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :whitespace, t.type
+        assert_equal "\f", t.value
+
+        lex.next!
+        assert_kind_of NilClass, lex.get
+    end
+
+    def testPseudo
+        lex = CSSLexer.new ":"
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :pseudo, t.type
+        assert_equal ":", t.value
+
+        lex.next!
+        assert_kind_of NilClass, lex.get
+    end
+
+    def testClassID
+        lex = CSSLexer.new ".#"
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :class, t.type
+        assert_equal ".", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :id, t.type
+        assert_equal "#", t.value
+
+        lex.next!
+        assert_kind_of NilClass, lex.get
+    end
+
+    def testCombinators
+        lex = CSSLexer.new "+~>"
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :neighbours, t.type
+        assert_equal "+", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :follower, t.type
+        assert_equal "~", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :child, t.type
+        assert_equal ">", t.value
+
+        lex.next!
+        assert_kind_of NilClass, lex.get
+    end
+
+    def testAny
+        lex = CSSLexer.new "*"
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :any, t.type
+        assert_equal "*", t.value
+
+        lex.next!
+        assert_kind_of NilClass, lex.get
+    end
+
+    def testAttrOperaotrs
+        lex = CSSLexer.new "~=*==^=$=|="
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :in_list, t.type
+        assert_equal "~=", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :contains, t.type
+        assert_equal "*=", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :equal, t.type
+        assert_equal "=", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :begins_with, t.type
+        assert_equal "^=", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :ends_with, t.type
+        assert_equal "$=", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :begins_with_dash, t.type
+        assert_equal "|=", t.value
+
+        lex.next!
+        assert_kind_of NilClass, lex.get
+    end
+
 end
 
