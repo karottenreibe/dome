@@ -180,5 +180,72 @@ class CSSParserTests < Test::Unit::TestCase
         assert_kind_of NilClass, f
     end
 
+    def testIDClassSelectors
+        p = CSSParser.new CSSLexer.new(".awesome#girl")
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :attribute, f.type
+        assert_equal ["class",:in_list,"awesome"], f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :attribute, f.type
+        assert_equal ["id",:equal,"girl"], f.value
+
+        f = p.next
+        assert_kind_of NilClass, f
+    end
+
+    def testCombinators
+        p = CSSParser.new CSSLexer.new("one two + three > four ~ five")
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :element, f.type
+        assert_equal "one", f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :descendant, f.type
+        assert_equal nil, f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :element, f.type
+        assert_equal "two", f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :neighbour, f.type
+        assert_equal nil, f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :element, f.type
+        assert_equal "three", f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :child, f.type
+        assert_equal nil, f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :element, f.type
+        assert_equal "four", f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :follower, f.type
+        assert_equal nil, f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :element, f.type
+        assert_equal "five", f.value
+
+        f = p.next
+        assert_kind_of NilClass, f
+    end
+
 end
 

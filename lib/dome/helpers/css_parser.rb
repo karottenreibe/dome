@@ -236,7 +236,7 @@ module Dome
             @lexer.next!
 
             return terminate trace if not @lexer.get or @lexer.get.type != :text
-            found :attribute, ["id",:in_list,@lexer.get.value]
+            found :attribute, ["id",:equal,@lexer.get.value]
             @lexer.next!
             true
         end
@@ -267,16 +267,16 @@ module Dome
 
             op = true
             case @lexer.get.type
-            when :child then found :child, @lexer.get.value
-            when :neighbours then found :neighbour, @lexer.get.value
-            when :follower then found :follower, @lexer.get.value
+            when :child then found :child, nil
+            when :neighbours then found :neighbour, nil
+            when :follower then found :follower, nil
             else op = false
             end
 
             return false if not ws and not op
-            found :descendant, @lexer.get.value if not op
+            found :descendant, nil if not op
 
-            @lexer.next!
+            @lexer.next! if op
             parse_whitespace
             true
         end
