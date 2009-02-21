@@ -133,6 +133,7 @@ module Dome
                         when :begins_with then a.value.begin_with? @value
                         when :begins_with_dash
                             a.value == @value or a.value.begin_with "#{@value}-"
+                        else true
                         end
                 }
             end
