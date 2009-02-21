@@ -15,9 +15,9 @@
 #
 
 require 'test/unit'
-require 'lib/dome/css'
+require 'lib/dome/helpers/lexer'
 
-class CSSTests < Test::Unit::TestCase
+class CSSLexerTests < Test::Unit::TestCase
     include Dome
 
     def testNothing
