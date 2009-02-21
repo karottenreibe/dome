@@ -138,9 +138,10 @@ module Dome
         def parse_attr_op
             return nil unless @lexer.get
 
-            case @lexer.get.type
+            case type = @lexer.get.type
             when :equal, :in_list, :ends_with, :begins_with, :begins_with_dash, :contains
-                @lexer.get.type
+                @lexer.next!
+                type
             else
                 nil
             end

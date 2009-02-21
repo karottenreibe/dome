@@ -47,5 +47,21 @@ class CSSParserTests < Test::Unit::TestCase
         assert_kind_of NilClass, f
     end
 
+    def testAttrEqual
+        p = CSSParser.new CSSLexer.new("the[mob=dead]")
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :element, f.type
+        assert_equal "the", f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :attribute, f.type
+        assert_equal ["mob",:equal,"dead"], f.value
+
+        f = p.next
+        assert_kind_of NilClass, f
+    end
+
 end
 
