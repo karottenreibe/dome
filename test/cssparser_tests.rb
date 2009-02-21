@@ -197,7 +197,7 @@ class CSSParserTests < Test::Unit::TestCase
     end
 
     def testCombinators
-        p = CSSParser.new CSSLexer.new("one two + three > four ~ five")
+        p = CSSParser.new CSSLexer.new("one two + three>four   ~   five")
         f = p.next
         assert_kind_of Token, f
         assert_equal :element, f.type
