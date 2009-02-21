@@ -202,15 +202,17 @@ class CSSLexerTests < Test::Unit::TestCase
         assert_kind_of NilClass, lex.get
     end
 
-    def testText
+    def testTextAndRestNil
         lex = CSSLexer.new "something-anything"
         t = lex.get
         assert_kind_of Token, t
         assert_equal :text, t.type
         assert_equal "something-anything", t.value
 
-        lex.next!
-        assert_kind_of NilClass, lex.get
+        5.times {
+            lex.next!
+            assert_kind_of NilClass, lex.get
+        }
     end
 
     def testAttrOperaotrs

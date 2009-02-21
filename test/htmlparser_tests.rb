@@ -312,10 +312,7 @@ class HTMLParserTests < Test::Unit::TestCase
         assert_equal :tail, ret.type
         assert_equal "demorgan", ret.value
 
-        assert_kind_of NilClass, p.next
-        assert_kind_of NilClass, p.next
-        assert_kind_of NilClass, p.next
-        assert_kind_of NilClass, p.next
+        5.times { assert_kind_of NilClass, p.next }
     end
 
 end

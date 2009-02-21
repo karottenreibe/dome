@@ -127,7 +127,7 @@ module Dome
             end
 
             return terminate trace if not @lexer.get or @lexer.get.type != :right_bracket
-            found :attr, [att,op,val]
+            found :attribute, [att,op,val]
             @lexer.next!
             true
         end
@@ -234,7 +234,7 @@ module Dome
             @lexer.next!
 
             return terminate trace if not @lexer.get or @lexer.type != :text
-            found :attr, ["id",:in_list,@lexer.get.value]
+            found :attribute, ["id",:in_list,@lexer.get.value]
             @lexer.next!
             true
         end
@@ -249,7 +249,7 @@ module Dome
             @lexer.next!
 
             return terminate trace if not @lexer.get or @lexer.type != :text
-            found :attr, ["class",:in_list,@lexer.get.value]
+            found :attribute, ["class",:in_list,@lexer.get.value]
             @lexer.next!
             true
         end
@@ -271,8 +271,8 @@ module Dome
             else op = false
             end
 
-            return false if not ws and not found
-            found :descendant, @lexer.get.value if not found
+            return false if not ws and not op
+            found :descendant, @lexer.get.value if not op
 
             @lexer.next!
             parse_whitespace
@@ -300,7 +300,7 @@ module Dome
         def parse_tail
             buf = ''
             buf << @lexer.get.value while @lexer.get
-            found :tail, buf unless @buf.empty?
+            found :tail, buf unless buf.empty?
         end
 
         ##

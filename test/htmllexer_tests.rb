@@ -281,5 +281,18 @@ class HTMLLexerTests < Test::Unit::TestCase
         assert_equal "foo", t.value
     end
 
+    def testRestNil
+        lex = HTMLLexer.new "<![CDATA["
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :cdata_start, t.type
+        assert_equal "<![CDATA[", t.value
+
+        5.times {
+            lex.next!
+            assert_kind_of NilClass, lex.get
+        }
+    end
+
 end
 

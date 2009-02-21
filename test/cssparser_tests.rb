@@ -25,6 +25,26 @@ class CSSParserTests < Test::Unit::TestCase
         f = p.next
         assert_kind_of Token, f
         assert_equal :element, f.type
+        assert_equal "batman", f.value
+
+        f = p.next
+        assert_kind_of NilClass, f
+    end
+
+    def testAttr
+        p = CSSParser.new CSSLexer.new("the[joker]")
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :element, f.type
+        assert_equal "the", f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :attribute, f.type
+        assert_equal ["joker",nil,nil], f.value
+
+        f = p.next
+        assert_kind_of NilClass, f
     end
 
 end
