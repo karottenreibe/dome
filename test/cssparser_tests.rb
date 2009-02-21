@@ -20,7 +20,11 @@ require 'lib/dome/css'
 class CSSParserTests < Test::Unit::TestCase
     include Dome
 
-    def testNothing
+    def testElement
+        p = CSSParser.new CSSLexer.new("batman")
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :element, f.type
     end
 
 end

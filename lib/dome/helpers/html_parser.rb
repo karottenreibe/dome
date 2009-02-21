@@ -17,7 +17,7 @@
 #
 
 require 'dome/helpers/lexer'
-require 'dome/helpers/finding'
+require 'dome/helpers/token'
 
 module Dome
 
@@ -35,8 +35,8 @@ module Dome
         end
 
         ##
-        # Starts/continues parsing until the next Finding can be constructed.
-        # Returns that Finding (or +nil+ if there are no more).
+        # Starts/continues parsing until the next Token can be constructed.
+        # Returns that Token (or +nil+ if there are no more).
         #
         def next
             return callcc { |@ret| parse_doc } unless @parse_started
@@ -264,7 +264,7 @@ module Dome
         # back into the parsing process.
         #
         def found type, value
-            callcc { |@cc| @ret.call Finding.new(type, value) }
+            callcc { |@cc| @ret.call Token.new(type, value) }
         end
 
         ##

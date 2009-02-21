@@ -23,12 +23,12 @@ class HTMLParserTests < Test::Unit::TestCase
     def testEmptyElem
         p = HTMLParser.new HTMLLexer.new("<foo/>")
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_start, ret.type
         assert_equal "foo", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_end, ret.type
         assert_equal "foo", ret.value
 
@@ -39,17 +39,17 @@ class HTMLParserTests < Test::Unit::TestCase
     def testData
         p = HTMLParser.new HTMLLexer.new("<bar>data</bar>")
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_start, ret.type
         assert_equal "bar", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :data, ret.type
         assert_equal "data", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_end, ret.type
         assert_equal "bar", ret.value
 
@@ -60,17 +60,17 @@ class HTMLParserTests < Test::Unit::TestCase
     def testEmptyAttribute
         p = HTMLParser.new HTMLLexer.new("<bacon lulu />")
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_start, ret.type
         assert_equal "bacon", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :attribute, ret.type
         assert_equal ["lulu",nil], ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_end, ret.type
         assert_equal "bacon", ret.value
 
@@ -81,17 +81,17 @@ class HTMLParserTests < Test::Unit::TestCase
     def testUnquotedAttribute
         p = HTMLParser.new HTMLLexer.new("<bacon lulu=22 />")
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_start, ret.type
         assert_equal "bacon", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :attribute, ret.type
         assert_equal ["lulu","22"], ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_end, ret.type
         assert_equal "bacon", ret.value
 
@@ -102,17 +102,17 @@ class HTMLParserTests < Test::Unit::TestCase
     def testQuotedAttribute
         p = HTMLParser.new HTMLLexer.new("<bacon lala='heckle' />")
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_start, ret.type
         assert_equal "bacon", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :attribute, ret.type
         assert_equal ["lala","heckle"], ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_end, ret.type
         assert_equal "bacon", ret.value
 
@@ -123,17 +123,17 @@ class HTMLParserTests < Test::Unit::TestCase
     def testQuotedAttribute2
         p = HTMLParser.new HTMLLexer.new('<bacon lala="heckle" />')
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_start, ret.type
         assert_equal "bacon", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :attribute, ret.type
         assert_equal ["lala","heckle"], ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_end, ret.type
         assert_equal "bacon", ret.value
 
@@ -144,22 +144,22 @@ class HTMLParserTests < Test::Unit::TestCase
     def testNoSpaceAttributes
         p = HTMLParser.new HTMLLexer.new("<lester friend='jeff'boss='mike' />")
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_start, ret.type
         assert_equal "lester", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :attribute, ret.type
         assert_equal ["friend","jeff"], ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :attribute, ret.type
         assert_equal ["boss","mike"], ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_end, ret.type
         assert_equal "lester", ret.value
 
@@ -170,17 +170,17 @@ class HTMLParserTests < Test::Unit::TestCase
     def testEscapedAttribute
         p = HTMLParser.new HTMLLexer.new("<ellie bartowski='gr\\'eat' />")
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_start, ret.type
         assert_equal "ellie", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :attribute, ret.type
         assert_equal ["bartowski","gr'eat"], ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_end, ret.type
         assert_equal "ellie", ret.value
 
@@ -191,22 +191,22 @@ class HTMLParserTests < Test::Unit::TestCase
     def testCDATA
         p = HTMLParser.new HTMLLexer.new("<random>you<![CDATA[<stuff><<>>\"'''fool]]></random>")
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_start, ret.type
         assert_equal "random", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :data, ret.type
         assert_equal "you", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :cdata, ret.type
         assert_equal "<stuff><<>>\"'''fool", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_end, ret.type
         assert_equal "random", ret.value
     end
@@ -214,27 +214,27 @@ class HTMLParserTests < Test::Unit::TestCase
     def testSubElements
         p = HTMLParser.new HTMLLexer.new("<extreme><being>mostly</being></extreme>")
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_start, ret.type
         assert_equal "extreme", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_start, ret.type
         assert_equal "being", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :data, ret.type
         assert_equal "mostly", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_end, ret.type
         assert_equal "being", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_end, ret.type
         assert_equal "extreme", ret.value
     end
@@ -242,47 +242,47 @@ class HTMLParserTests < Test::Unit::TestCase
     def testMix
         p = HTMLParser.new HTMLLexer.new("<holographic>and shiny<bees>always look like</bees><![CDATA[being]]><like /></holographic>")
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_start, ret.type
         assert_equal "holographic", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :data, ret.type
         assert_equal "and shiny", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_start, ret.type
         assert_equal "bees", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :data, ret.type
         assert_equal "always look like", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_end, ret.type
         assert_equal "bees", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :cdata, ret.type
         assert_equal "being", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_start, ret.type
         assert_equal "like", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_end, ret.type
         assert_equal "like", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_end, ret.type
         assert_equal "holographic", ret.value
     end
@@ -290,17 +290,17 @@ class HTMLParserTests < Test::Unit::TestCase
     def testTail
         p = HTMLParser.new HTMLLexer.new("<chuck></chuck>bartowski")
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_start, ret.type
         assert_equal "chuck", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :element_end, ret.type
         assert_equal "chuck", ret.value
 
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :tail, ret.type
         assert_equal "bartowski", ret.value
     end
@@ -308,7 +308,7 @@ class HTMLParserTests < Test::Unit::TestCase
     def testRestNil
         p = HTMLParser.new HTMLLexer.new("demorgan")
         ret = p.next
-        assert_kind_of Finding, ret
+        assert_kind_of Token, ret
         assert_equal :tail, ret.type
         assert_equal "demorgan", ret.value
 

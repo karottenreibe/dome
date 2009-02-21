@@ -17,14 +17,9 @@
 # of tokens for the Parser.
 #
 
-require 'dome/helpers/primitive'
+require 'dome/helpers/token'
 
 module Dome
-
-    ##
-    # Represents a single Token processed by the Lexer.
-    #
-    primitive :Token, [:type, :value]
 
     ##
     # Splits a given String into small components that are consumed by the Parser.

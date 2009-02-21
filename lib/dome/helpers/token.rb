@@ -13,8 +13,8 @@
 # Homepage::    http://dome.rubyforge.org/
 # Git repo::    http://rubyforge.org/scm/?group_id=7589
 #
-# Contains the Finding class that is used by both, the HTMLParser and the
-# CSSParser classes.
+# Contains the Token class that is used by the HTMLParser, the CSSParser and the
+# two Lexer classes.
 #
 
 require 'dome/helpers/primitive'
@@ -24,7 +24,7 @@ module Dome
     ##
     # Keeps a Finding of a Parser.
     #
-    primitive :Finding, [:type, :value]
+    primitive :Token, [:type, :value]
 
 end
 
