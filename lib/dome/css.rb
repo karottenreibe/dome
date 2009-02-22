@@ -70,24 +70,24 @@ module Dome
             while token = @parser.next
                 case token.type
                 when :element
-                    @selectors << ElementSelector.new self, t.value
+                    @selectors << ElementSelector.new(t.value)
                     last_elem = t.value
                 when :attribute
-                    @selectors << AttributeSelector.new *t.value
+                    @selectors << AttributeSelector.new(*t.value)
                 when :pseudo
                     case t.value[0]
-                    when "not" then NotSelector.new t.value[1]
+                    when "not" then NotSelector.new(t.value[1])
                     when "root" then RootSelector.new
 
-                    when "nth-child" then NthChildSelector.new t.value[1], false
-                    when "nth-last-child" then NthChildSelector.new t.value[1], true
-                    when "first-child" then NthChildSelector.new [0,1], false
-                    when "last-child" then NthChildSelector.new [0,1], true
+                    when "nth-child" then NthChildSelector.new(t.value[1], false)
+                    when "nth-last-child" then NthChildSelector.new(t.value[1], true)
+                    when "first-child" then NthChildSelector.new([0,1], false)
+                    when "last-child" then NthChildSelector.new([0,1], true)
 
-                    when "nth-of-type" then NthOfTypeSelector.new t.value[1], false, last_elem
-                    when "nth-last-of-type" then NthOfTypeSelector.new t.value[1], true, last_elem
-                    when "first-of-type" then NthOfTypeSelector.new [0,1], false, last_elem
-                    when "last-of-type" then NthOfTypeSelector.new [0,1], true, last_elem
+                    when "nth-of-type" then NthOfTypeSelector.new(t.value[1], false, last_elem)
+                    when "nth-last-of-type" then NthOfTypeSelector.new(t.value[1], true, last_elem)
+                    when "first-of-type" then NthOfTypeSelector.new([0,1], false, last_elem)
+                    when "last-of-type" then NthOfTypeSelector.new([0,1], true, last_elem)
 
                     when "only-child" then OnlyChildSelector.new
                     when "only-of-type" then OnlyOfTypeSelector.new
@@ -95,16 +95,16 @@ module Dome
                     when "only-text" then OnlyTextSelector.new
                     end
                 when :child
-                    @selectors << ChildSelector.new t.value
+                    @selectors << ChildSelector.new
                     last_elem = :any
                 when :descendant
-                    @selectors << DescendantSelector.new t.value
+                    @selectors << DescendantSelector.new
                     last_elem = :any
                 when :follower
-                    @selectors << FollowerSelector.new t.value
+                    @selectors << FollowerSelector.new
                     last_elem = :any
                 when :neighbour
-                    @selectors << NeighbourSelector.new t.value
+                    @selectors << NeighbourSelector.new
                     last_elem = :any
                 when :tail
                     @selectors = []
