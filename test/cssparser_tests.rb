@@ -294,5 +294,18 @@ class CSSParserTests < Test::Unit::TestCase
         end
     end
 
+    def testRestNil
+        p = CSSParser.new CSSLexer.new("sand")
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :element, f.type
+        assert_equal "sand", f.value
+
+        5.times {
+            f = p.next
+            assert_kind_of NilClass, f
+        }
+    end
+
 end
 
