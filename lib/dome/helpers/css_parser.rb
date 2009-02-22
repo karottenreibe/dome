@@ -208,7 +208,7 @@ module Dome
             @lexer.next!
 
             arg = nil
-            if @lexer.get and @lexer.get.type == :parenthesis_left
+            if @lexer.get and @lexer.get.type == :left_parenthesis
                 @lexer.next!
                 arg = parse_pseudo_arg pseudo
                 return terminate trace if not arg
@@ -227,7 +227,7 @@ module Dome
             buf = ''
 
             done = while @lexer.get
-                break true if @lexer.get.type == :parenthesis_right
+                break true if @lexer.get.type == :right_parenthesis
                 buf << @lexer.get.value
                 @lexer.next!
             end
@@ -236,8 +236,8 @@ module Dome
             @lexer.next!
 
             case pseudo
-            when /^nth-/ then parse_nth_arg buf
             when "not" then parse_not_arg buf
+            when /^nth-/ then parse_nth_arg buf
             else buf
             end
         end
@@ -251,9 +251,10 @@ module Dome
             case arg
             when "odd" then [2,1]
             when "even" then [2,0]
-            when /-?[0-9]+/ then [ 0, arg.to_i ]
-            when /n((\+|-)[0-9]+)?/ then [ 1, arg[1..-1].to_i ]
-            when /-?[0-9]+n((\+|-)[0-9]+)?/ then arg.split 'n', -1
+            when /^-?[0-9]+$/ then [ 0, arg.to_i ]
+            when /^n((\+|-)[0-9]+)?$/ then [ 1, arg[1..-1].to_i ]
+            when /^-n((\+|-)[0-9]+)?$/ then [ -1, arg[2..-1].to_i ]
+            when /^-?[0-9]+n((\+|-)[0-9]+)?$/ then arg.split('n', -1).collect { |x| x.to_i }
             else nil
             end
         end

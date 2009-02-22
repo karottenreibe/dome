@@ -277,5 +277,22 @@ class CSSParserTests < Test::Unit::TestCase
         assert_kind_of NilClass, f
     end
 
+    def testNthPseudo
+        %w{child last-child of-type last-of-type}.each do |word|
+            %w{2n+1 2n n+1 1 -2n+1 4n-1 -n-2 n-5 -3 -n}.zip(
+                [[2,1],[2,0],[1,1],[0,1],[-2,1],[4,-1],[-1,-2],[1,-5],[0,-3],[-1,0]]
+                ).each do |(arg,response)|
+                p = CSSParser.new CSSLexer.new(":nth-#{word}(#{arg})")
+                f = p.next
+                assert_kind_of Token, f
+                assert_equal :pseudo, f.type
+                assert_equal ["nth-#{word}",response], f.value
+
+                f = p.next
+                assert_kind_of NilClass, f
+            end
+        end
+    end
+
 end
 
