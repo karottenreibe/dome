@@ -26,12 +26,21 @@ module Dome
     #
     class Tree
         def / path
+            ret = []
+            SelectorList.new(path).each { |node| ret << node }
+            ret
         end
 
         def % path
+            callcc { |cc|
+                SelectorList.new(path).each { |node| cc.call node }
+            }
         end
 
         def each path
+            ret = []
+            SelectorList.new(path).each { |node| yield node }
+            ret
         end
     end
 
@@ -72,6 +81,8 @@ module Dome
 
                 nodes = new_nodes
             end
+
+            nodes.each { |node| block.call node }
         end
 
         protected
