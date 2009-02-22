@@ -197,8 +197,6 @@ module Dome
     module Selectors
 
         class ElementSelector 
-            attr_accessor :tag
-
             def initialize tag
                 @tag = tag
             end

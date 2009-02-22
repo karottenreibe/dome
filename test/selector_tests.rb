@@ -25,7 +25,18 @@ class SelectorTests < Test::Unit::TestCase
         sl = SelectorList.new("clone").selectors
         assert_equal 1, sl.length
         assert_kind_of ElementSelector, sl[0]
-        assert_equal "clone", sl[0].tag
+        assert_equal "clone", sl[0].instance_variable_get(:@tag)
+    end
+
+    def testAttribute
+        sl = SelectorList.new("bad[wolf]").selectors
+        assert_equal 2, sl.length
+        assert_kind_of ElementSelector, sl[0]
+        assert_equal "bad", sl[0].instance_variable_get(:@tag)
+        assert_kind_of AttributeSelector, sl[1]
+        assert_equal "wolf", sl[1].instance_variable_get(:@name)
+        assert_equal nil, sl[1].instance_variable_get(:@op)
+        assert_equal nil, sl[1].instance_variable_get(:@value)
     end
 
 end
