@@ -105,6 +105,7 @@ module Dome
 
         ##
         # Selects all Elements matching +path+.
+        # Alias: +all+
         #
         def / path
             @selected = @tree/path
@@ -112,10 +113,14 @@ module Dome
 
         ##
         # Selects the first Element matching +path+.
+        # Alias: +first+
         #
         def % path
             @selected = @tree%path
         end
+
+        alias_method :all, :/
+        alias_method :first, :%
 
         ##
         # Extracts data from the last selected Elements and stores them in the
@@ -128,10 +133,18 @@ module Dome
         # and +storage+ being a symbol which signifies the attribute to store the
         # extracted data in.
         #
-        def extract hash
+        def store hash
             raise "nothing selected so far" unless @selected
 
-            hash.each do |k,v|
+            @selected.each do |elem|
+                hash.each do |k,v|
+                    @result[v] =
+                        case key
+                        when Symbol then elem.send k
+                        when /^@./ then elem[k[1..-1]]
+                        else raise "invalid selector #{k.inspect} given to Extractor#store"
+                        end
+                end
             end
         end
 
