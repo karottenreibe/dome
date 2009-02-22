@@ -49,7 +49,7 @@ module Dome
         ##
         # Parses the given +string+ into a list of CSS3 Selectors.
         #
-        def initialize string
+        def initializeialize string
             @selectors = []
             @parser = CSSParser.new CSSLexer.new(string)
             parse
@@ -65,6 +65,51 @@ module Dome
         # Does the actual work of parsing the input into Selectors.
         #
         def parse
+            last_elem = :any
+
+            while token = @parser.next
+                case token.type
+                when :element
+                    @selectors << ElementSelector.new self, t.value
+                    last_elem = t.value
+                when :attribute
+                    @selectors << AttributeSelector.new *t.value
+                when :pseudo
+                    case t.value[0]
+                    when "not" then NotSelector.new t.value[1]
+                    when "root" then RootSelector.new
+
+                    when "nth-child" then NthChildSelector.new t.value[1], false
+                    when "nth-last-child" then NthChildSelector.new t.value[1], true
+                    when "first-child" then NthChildSelector.new [0,1], false
+                    when "last-child" then NthChildSelector.new [0,1], true
+
+                    when "nth-of-type" then NthOfTypeSelector.new t.value[1], false, last_elem
+                    when "nth-last-of-type" then NthOfTypeSelector.new t.value[1], true, last_elem
+                    when "first-of-type" then NthOfTypeSelector.new [0,1], false, last_elem
+                    when "last-of-type" then NthOfTypeSelector.new [0,1], true, last_elem
+
+                    when "only-child" then OnlyChildSelector.new
+                    when "only-of-type" then OnlyOfTypeSelector.new
+                    when "empty" then EmptySelector.new
+                    when "only-text" then OnlyTextSelector.new
+                    end
+                when :child
+                    @selectors << ChildSelector.new t.value
+                    last_elem = :any
+                when :descendant
+                    @selectors << DescendantSelector.new t.value
+                    last_elem = :any
+                when :follower
+                    @selectors << FollowerSelector.new t.value
+                    last_elem = :any
+                when :neighbour
+                    @selectors << NeighbourSelector.new t.value
+                    last_elem = :any
+                when :tail
+                    @selectors = []
+                end
+            end
         end
 
     end
@@ -77,49 +122,20 @@ module Dome
     #
     module Selectors
 
-        ##
-        # The base class for all Selectors.
-        # Must be refined by a subclass by implementing the +#walk+ and +#init+
-        # methods.
-        #
-        # = Selecting Data =
-        # ...is not possible. If you want the data, select the parent element and extract
-        # it yourself. All Selectors will filter out all Data Nodes.
-        #
-        class Selector
-
-            ##
-            # The list this Selector belongs to.
-            #
-            attr_accessor :list
-
-            ##
-            # Stores the +list+ this Selector belongs to and passes the other
-            # +args+ on to the subclass method +#init+ for further initialization.
-            #
-            def initialize list, *args
-                @list = list
-                init *args
-            end
-
-        end
-
-        class ElementSelector < Selector 
+        class ElementSelector 
             attr_accessor :tag
+
+            def initialize tag
+                @tag = tag
+            end
 
             def walk node
                 yield node if node.is_a? Element and @tag == :any or node.tag == @tag
             end
-
-            protected
-
-            def init tag
-                @tag = tag
-            end
         end
 
-        class AttributeSelector < Selector
-            def init name, op, value
+        class AttributeSelector
+            def initialize name, op, value
                 @name, @op, @value = name, op, value
             end
 
@@ -140,7 +156,7 @@ module Dome
             end
         end
 
-        class ChildSelector < Selector
+        class ChildSelector
             def walk node
                 node.children.each { |child|
                     yield child if child.is_a? Element
@@ -148,7 +164,7 @@ module Dome
             end
         end
 
-        class DescendantSelector < Selector
+        class DescendantSelector
             def walk node
                 node.children.each { |child|
                     yield child if child.is_a? Element
@@ -157,7 +173,7 @@ module Dome
             end
         end
 
-        class NeighbourSelector < Selector
+        class NeighbourSelector
             def walk node
                 found = false
                 node.parent.children.each { |child|
@@ -167,7 +183,7 @@ module Dome
             end
         end
 
-        class FollowerSelector < Selector
+        class FollowerSelector
             def walk node
                 found = false
                 node.children.each { |child|
@@ -180,14 +196,14 @@ module Dome
             end
         end
 
-        class RootSelector < Selector
+        class RootSelector
             def walk node
                 yield node if node.is_a? Element and node.parent.root?
             end
         end
 
-        class NthChildSelector < Selector
-            def init args, reverse
+        class NthChildSelector
+            def initialize args, reverse
                 @args, @reverse = args, reverse
             end
 
@@ -206,7 +222,7 @@ module Dome
         end
 
         class NthOfTypeSelector < NthChildSelector
-            def init args, reverse, tag
+            def initialize args, reverse, tag
                 @tag = tag
                 super(args, reverse)
             end
@@ -215,37 +231,37 @@ module Dome
 
             def nth_walk group
                 group = group.find_all { |item|
-                    item.is_a? Element and item.tag == @tag
+                    item.is_a? Element and (@tag == :any or item.tag == @tag)
                 }
                 super(group)
             end
         end
 
-        class OnlyChildSelector < Selector
+        class OnlyChildSelector
             def walk node
                 yield node if node.is_a? Element and node.parent.children.length == 1
             end
         end
 
-        class OnlyOfTypeSelector < Selector
-            def init tag
+        class OnlyOfTypeSelector
+            def initialize tag
                 @tag = tag
             end
 
             def walk node
                 yield node if node.is_a? Element and node.parent.children.find_all { |c|
-                    c.is_a? Element and c.tag == @tag
+                    c.is_a? Element and (@tag == :any or c.tag == @tag)
                 }.length == 1
             end
         end
 
-        class EmptySelector < Selector
+        class EmptySelector
             def walk node
                 yield node if node.is_a? Element and node.children.empty?
             end
         end
 
-        class OnlyTextSelector < Selector
+        class OnlyTextSelector
             def walk node
                 yield node if node.is_a? Element and node.children.find_all { |c| not c.is_a? Data }.empty?
             end
