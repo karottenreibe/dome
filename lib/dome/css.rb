@@ -55,8 +55,23 @@ module Dome
             parse
         end
 
-        def each &block
+        ##
+        # Executes the given +block+ for each node in the +tree+ that matches this
+        # SelectorList.
+        #
+        def each tree, &block
             raise "SelectorList#each needs a block" unless block_given?
+
+            nodes = tree.flatten
+            @selectors.each do |sel|
+                new_nodes = []
+
+                nodes.each { |node|
+                    sel.walk node { |ret| new_nodes << ret }
+                }
+
+                nodes = new_nodes
+            end
         end
 
         protected

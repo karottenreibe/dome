@@ -34,8 +34,31 @@ module Dome
             @root = Root.new
         end
 
+        ##
+        # Returns a list of all Elements in this Tree.
+        # The pseudo root Element is not included.
+        #
+        def flatten
+            ret = []
+            @root.children.each { |node| ret += flatten_rec node }
+            ret
+        end
+
         def inspect
             "#<Dome::Tree #{@root.inspect}"
+        end
+
+        protected
+
+        ##
+        # Does the actual work for +#flatten+.
+        # Flattens a given +node+ and all it's descendants.
+        #
+        def flatten_rec node
+            return [] unless node.is_a? Element
+            ret = [node]
+            node.children.each { |child| ret += flatten_rec child }
+            ret
         end
     end
 
