@@ -315,9 +315,7 @@ module Dome
 
             op = true
             case @lexer.get.type
-            when :child then found :child, nil
-            when :neighbours then found :neighbour, nil
-            when :follower then found :follower, nil
+            when :child, :neighbour, :follower then found @lexer.get.type, nil
             else op = false
             end
 

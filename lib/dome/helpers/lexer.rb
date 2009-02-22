@@ -155,7 +155,7 @@ module Dome
             when '*' then :any
             when '.' then :class
             when '>' then :child
-            when '+' then :neighbours
+            when '+' then :neighbour
             when '~' then :follower
             when '#' then :id
             when '=' then :equal

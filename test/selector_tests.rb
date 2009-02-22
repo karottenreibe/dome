@@ -59,5 +59,24 @@ class SelectorTests < Test::Unit::TestCase
         end
     end
 
+    def testCombinators
+        sl = SelectorList.new("one two > three  +  four~five").selectors
+        assert_equal 9, sl.length
+        assert_kind_of ElementSelector, sl[0]
+        assert_equal "one", sl[0].instance_variable_get(:@tag)
+        assert_kind_of DescendantSelector, sl[1]
+        assert_kind_of ElementSelector, sl[2]
+        assert_equal "two", sl[2].instance_variable_get(:@tag)
+        assert_kind_of ChildSelector, sl[3]
+        assert_kind_of ElementSelector, sl[4]
+        assert_equal "three", sl[4].instance_variable_get(:@tag)
+        assert_kind_of NeighbourSelector, sl[5]
+        assert_kind_of ElementSelector, sl[6]
+        assert_equal "four", sl[6].instance_variable_get(:@tag)
+        assert_kind_of FollowerSelector, sl[7]
+        assert_kind_of ElementSelector, sl[8]
+        assert_equal "five", sl[8].instance_variable_get(:@tag)
+    end
+
 end
 
