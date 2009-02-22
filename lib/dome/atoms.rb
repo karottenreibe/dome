@@ -129,6 +129,35 @@ module Dome
             @attributes[key]
         end
 
+        ##
+        # Retrieves the HTML representation of this Element and all its descendants.
+        # Actually just an alias for +#inspect+.
+        #
+        def outer_html
+            this.inspect
+        end
+
+        ##
+        # Retrieves the HTML representation of all the descendants of this Element.
+        #
+        def inner_html
+            @children.inject('') { |memo,c| memo + c.inspect }
+        end
+
+        ##
+        # Retrieves the text representation of all the Data Nodes that reside under this
+        # Element in the Tree.
+        #
+        def inner_text
+            @children.inject('') do |memo,c|
+                memo +
+                    case c
+                    when Element then c.inner_text
+                    else c.value
+                    end
+            end
+        end
+
         def inspect
             ret = "<#{ @name }"
             ret += @attributes.inject(' ') { |memo,a| "#{memo} #{a.inspect}" } unless @attributes.empty?
