@@ -25,23 +25,116 @@ module Dome
     # Enhances the Tree class with Hpricot-like functionality for using XPath.
     #
     class Tree
+
+        ##
+        # Extracts all Elements matching the given CSS3 +path+.
+        #
         def / path
             ret = []
             SelectorList.new(path).each { |node| ret << node }
             ret
         end
 
+        ##
+        # Extracts the first Element matching the given CSS3 +path+.
+        #
         def % path
             callcc { |cc|
                 SelectorList.new(path).each { |node| cc.call node }
             }
         end
 
+        ##
+        # Executes the given block for each Element matching the given CSS3 +path+.
+        #
         def each path
+            raise "Tree#each expects a block" unless block_given?
             ret = []
             SelectorList.new(path).each { |node| yield node }
             ret
         end
+
+        ##
+        # Extracts data from the Tree by evaluating the given +block+ on an
+        # Extractor object.
+        #
+        def extract &block
+            raise "Tree#extract expects a block" unless block_given?
+            ex = Extractor.new self
+            ex.instance_exec ex, &block
+            ex.result
+        end
+    end
+
+    ##
+    # Used to extract information from a Tree.
+    # Best used with the +Tree#extract+ method.
+    #
+    class Extractor
+
+        ##
+        # Keeps an Extractor Result.
+        #
+        class Result
+
+            ##
+            # Adds an +attr_accessor+ for +sym+ and stores +data+ in it.
+            #
+            def []= sym, data
+                eval "def self.#{sym}; @#{sym}; end"
+                eval "def self.#{sym}= x; @#{sym} = x; end"
+
+                sym = "#{sym}=".to_sym
+                self.send sym, data
+            end
+
+        end
+
+        ##
+        # The result the extraction produced
+        #
+        attr_reader :result
+
+        ##
+        # +tree+ must be the Tree on which the Extractor should operate.
+        #
+        def initialize tree
+            @tree = tree
+            @result = Result.new
+        end
+
+        ##
+        # Selects all Elements matching +path+.
+        #
+        def / path
+            @selected = @tree/path
+        end
+
+        ##
+        # Selects the first Element matching +path+.
+        #
+        def % path
+            @selected = @tree%path
+        end
+
+        ##
+        # Extracts data from the last selected Elements and stores them in the
+        # result attribute.
+        # The given +hash+ must be of form +selector=>storage+, with +selector+
+        # being any of:
+        # - +"@attribute"+ to select an attribute value
+        # - +:inner_text+ to select the +inner_text+ of the Element
+        # - +:inner_html+ to select the +inner_html+ of the Element
+        # and +storage+ being a symbol which signifies the attribute to store the
+        # extracted data in.
+        #
+        def extract hash
+            raise "nothing selected so far" unless @selected
+
+            hash.each do |k,v|
+            end
+        end
+
     end
 
     ##
@@ -69,7 +162,7 @@ module Dome
         # SelectorList.
         #
         def each tree, &block
-            raise "SelectorList#each needs a block" unless block_given?
+            raise "SelectorList#each expects a block" unless block_given?
 
             nodes = tree.flatten
             @selectors.each do |sel|
