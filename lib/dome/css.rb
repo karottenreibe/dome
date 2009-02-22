@@ -50,6 +50,7 @@ module Dome
         # Parses the given +string+ into a list of CSS3 Selectors.
         #
         def initialize string
+            @selectors = []
             @parser = CSSParser.new CSSLexer.new(string)
             parse
         end
@@ -103,7 +104,7 @@ module Dome
 
         end
 
-        class ElementSelector
+        class ElementSelector < Selector 
             attr_accessor :tag
 
             def walk node
@@ -117,7 +118,7 @@ module Dome
             end
         end
 
-        class AttributeSelector
+        class AttributeSelector < Selector
             def init name, op, value
                 @name, @op, @value = name, op, value
             end
@@ -139,7 +140,7 @@ module Dome
             end
         end
 
-        class ChildSelector
+        class ChildSelector < Selector
             def walk node
                 node.children.each { |child|
                     yield child if child.is_a? Element
@@ -147,7 +148,7 @@ module Dome
             end
         end
 
-        class DescendantSelector
+        class DescendantSelector < Selector
             def walk node
                 node.children.each { |child|
                     yield child if child.is_a? Element
@@ -156,7 +157,7 @@ module Dome
             end
         end
 
-        class NeighbourSelector
+        class NeighbourSelector < Selector
             def walk node
                 found = false
                 node.parent.children.each { |child|
@@ -166,7 +167,7 @@ module Dome
             end
         end
 
-        class FollowerSelector
+        class FollowerSelector < Selector
             def walk node
                 found = false
                 node.children.each { |child|
@@ -179,13 +180,13 @@ module Dome
             end
         end
 
-        class RootSelector
+        class RootSelector < Selector
             def walk node
                 yield node if node.is_a? Element and node.parent.root?
             end
         end
 
-        class NthChildSelector
+        class NthChildSelector < Selector
             def init args, reverse
                 @args, @reverse = args, reverse
             end
@@ -220,13 +221,13 @@ module Dome
             end
         end
 
-        class OnlyChildSelector
+        class OnlyChildSelector < Selector
             def walk node
                 yield node if node.is_a? Element and node.parent.children.length == 1
             end
         end
 
-        class OnlyOfTypeSelector
+        class OnlyOfTypeSelector < Selector
             def init tag
                 @tag = tag
             end
@@ -238,13 +239,13 @@ module Dome
             end
         end
 
-        class EmptySelector
+        class EmptySelector < Selector
             def walk node
                 yield node if node.is_a? Element and node.children.empty?
             end
         end
 
-        class OnlyTextSelector
+        class OnlyTextSelector < Selector
             def walk node
                 yield node if node.is_a? Element and node.children.find_all { |c| not c.is_a? Data }.empty?
             end
@@ -253,4 +254,4 @@ module Dome
     end
 
 end
-                        
+

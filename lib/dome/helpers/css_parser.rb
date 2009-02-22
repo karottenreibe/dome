@@ -197,7 +197,7 @@ module Dome
         def parse_pseudo_selector
             allowed = %w{root nth-child nth-last-child nth-of-type nth-last-of-type
                          first-child last-child first-of-type last-of-type
-                         only-child only-of-type empty only-text}
+                         only-child only-of-type empty only-text not}
             return false if not @lexer.get or @lexer.get.type != :pseudo
             trace = @lexer.trace
             @lexer.next!
@@ -266,7 +266,12 @@ module Dome
         #
         def parse_not_arg arg
             sl = SelectorList.new arg
-            sl.selectors.empty? ? nil : sl
+            return nil if sl.selectors.empty? or
+                sl.selectors.any? { |s|
+                    [ChildSelector, DescendantSelector, NeighbourSelector,
+                        FollowerSelector].any? { |klass| sl.is_a? klass }
+                }
+            sl
         end
 
         ##

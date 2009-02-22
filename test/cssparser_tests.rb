@@ -19,6 +19,7 @@ require 'lib/dome/css'
 
 class CSSParserTests < Test::Unit::TestCase
     include Dome
+    include Selectors
 
     def testElement
         p = CSSParser.new CSSLexer.new("batman")
@@ -278,10 +279,10 @@ class CSSParserTests < Test::Unit::TestCase
     end
 
     def testNthPseudo
+        args = %w{2n+1 2n n+1 1 -2n+1 4n-1 -n-2 n-5 -3 -n}
+        resps = [[2,1],[2,0],[1,1],[0,1],[-2,1],[4,-1],[-1,-2],[1,-5],[0,-3],[-1,0]]
         %w{child last-child of-type last-of-type}.each do |word|
-            %w{2n+1 2n n+1 1 -2n+1 4n-1 -n-2 n-5 -3 -n}.zip(
-                [[2,1],[2,0],[1,1],[0,1],[-2,1],[4,-1],[-1,-2],[1,-5],[0,-3],[-1,0]]
-                ).each do |(arg,response)|
+            args.zip(resps).each do |(arg,response)|
                 p = CSSParser.new CSSLexer.new(":nth-#{word}(#{arg})")
                 f = p.next
                 assert_kind_of Token, f
@@ -305,6 +306,30 @@ class CSSParserTests < Test::Unit::TestCase
             f = p.next
             assert_kind_of NilClass, f
         }
+    end
+
+    def testNot
+        return
+        args = ["element[attr]","not valid>stuff + you  ~  know",":root",":nth-child(2n+1)"]
+        klasses = [[ElementSelector,AttributeSelector],nil,[RootSelector],[NthChildSelector]]
+
+        args.zip(klasses).each do |(arg,kls)|
+            p = CSSParser.new CSSLexer.new(":not(#{arg})")
+            f = p.next
+            assert_kind_of Token, f
+            assert_equal :not, f.type
+
+            if kls.nil?
+                assert_kind_of NilClass, f.value
+            else
+                kls.each_with_index { |k,i|
+                    assert_kind_of k, f.value[i]
+                }
+            end
+
+            f = p.next
+            assert_kind_of NilClass, f
+        end
     end
 
 end
