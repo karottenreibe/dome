@@ -19,8 +19,13 @@ require 'lib/dome/css'
 
 class SelectorTests < Test::Unit::TestCase
     include Dome
+    include Selectors
 
-    def testNothing
+    def testElement
+        sl = SelectorList.new("clone").selectors
+        assert_equal 1, sl.length
+        assert_kind_of ElementSelector, sl[0]
+        assert_equal "clone", sl[0].tag
     end
 
 end

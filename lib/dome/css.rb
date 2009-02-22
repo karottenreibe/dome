@@ -160,7 +160,7 @@ module Dome
                         case key
                         when :inner_text, :inner_html, :outer_html then elem.send k
                         when /^@./ then elem[k[1..-1]]
-                        when /^\$[0-9]+(\.\.\.?[0-9]+)?$/ scrape_data eval(k[1..-1])
+                        when /^\$[0-9]+(\.\.\.?[0-9]+)?$/ then scrape_data eval(k[1..-1])
                         else raise "invalid selector #{k.inspect} given to Extractor#store"
                         end
                 end
@@ -184,102 +184,6 @@ module Dome
                 end
             }
             ret
-        end
-
-    end
-
-    ##
-    # Stores a list of CSS3 Selectors over a Tree.
-    # Can be used to iterate over all the Elements identified by the Selectors
-    # and to execute code for each found node.
-    #
-    class SelectorList
-
-        ##
-        # The Selectors contained within this list.
-        attr_accessor :selectors
-
-        ##
-        # Parses the given +string+ into a list of CSS3 Selectors.
-        #
-        def initializeialize string
-            @selectors = []
-            @parser = CSSParser.new CSSLexer.new(string)
-            parse
-        end
-
-        ##
-        # Executes the given +block+ for each node in the +tree+ that matches this
-        # SelectorList.
-        #
-        def each tree, &block
-            raise "SelectorList#each expects a block" unless block_given?
-
-            nodes = tree.flatten
-            @selectors.each do |sel|
-                new_nodes = []
-
-                nodes.each { |node|
-                    sel.walk node { |ret| new_nodes << ret }
-                }
-
-                nodes = new_nodes
-            end
-
-            nodes.each { |node| block.call node }
-        end
-
-        protected
-
-        ##
-        # Does the actual work of parsing the input into Selectors.
-        #
-        def parse
-            last_elem = :any
-
-            while token = @parser.next
-                case token.type
-                when :element
-                    @selectors << ElementSelector.new(t.value)
-                    last_elem = t.value
-                when :attribute
-                    @selectors << AttributeSelector.new(*t.value)
-                when :pseudo
-                    case t.value[0]
-                    when "not" then NotSelector.new(t.value[1])
-                    when "root" then RootSelector.new
-
-                    when "nth-child" then NthChildSelector.new(t.value[1], false)
-                    when "nth-last-child" then NthChildSelector.new(t.value[1], true)
-                    when "first-child" then NthChildSelector.new([0,1], false)
-                    when "last-child" then NthChildSelector.new([0,1], true)
-
-                    when "nth-of-type" then NthOfTypeSelector.new(t.value[1], false, last_elem)
-                    when "nth-last-of-type" then NthOfTypeSelector.new(t.value[1], true, last_elem)
-                    when "first-of-type" then NthOfTypeSelector.new([0,1], false, last_elem)
-                    when "last-of-type" then NthOfTypeSelector.new([0,1], true, last_elem)
-
-                    when "only-child" then OnlyChildSelector.new
-                    when "only-of-type" then OnlyOfTypeSelector.new
-                    when "empty" then EmptySelector.new
-                    when "only-text" then OnlyTextSelector.new
-                    end
-                when :child
-                    @selectors << ChildSelector.new
-                    last_elem = :any
-                when :descendant
-                    @selectors << DescendantSelector.new
-                    last_elem = :any
-                when :follower
-                    @selectors << FollowerSelector.new
-                    last_elem = :any
-                when :neighbour
-                    @selectors << NeighbourSelector.new
-                    last_elem = :any
-                when :tail
-                    @selectors = []
-                end
-            end
         end
 
     end
@@ -434,6 +338,104 @@ module Dome
         class OnlyTextSelector
             def walk node
                 yield node if node.is_a? Element and node.children.find_all { |c| not c.is_a? Data }.empty?
+            end
+        end
+
+    end
+
+    ##
+    # Stores a list of CSS3 Selectors over a Tree.
+    # Can be used to iterate over all the Elements identified by the Selectors
+    # and to execute code for each found node.
+    #
+    class SelectorList
+
+        include Dome::Selectors
+
+        ##
+        # The Selectors contained within this list.
+        attr_accessor :selectors
+
+        ##
+        # Parses the given +string+ into a list of CSS3 Selectors.
+        #
+        def initialize string
+            @selectors = []
+            @parser = CSSParser.new CSSLexer.new(string)
+            parse
+        end
+
+        ##
+        # Executes the given +block+ for each node in the +tree+ that matches this
+        # SelectorList.
+        #
+        def each tree, &block
+            raise "SelectorList#each expects a block" unless block_given?
+
+            nodes = tree.flatten
+            @selectors.each do |sel|
+                new_nodes = []
+
+                nodes.each { |node|
+                    sel.walk node { |ret| new_nodes << ret }
+                }
+
+                nodes = new_nodes
+            end
+
+            nodes.each { |node| block.call node }
+        end
+
+        protected
+
+        ##
+        # Does the actual work of parsing the input into Selectors.
+        #
+        def parse
+            last_elem = :any
+
+            while t = @parser.next
+                case t.type
+                when :element
+                    @selectors << ElementSelector.new(t.value)
+                    last_elem = t.value
+                when :attribute
+                    @selectors << AttributeSelector.new(*t.value)
+                when :pseudo
+                    case t.value[0]
+                    when "not" then NotSelector.new(t.value[1])
+                    when "root" then RootSelector.new
+
+                    when "nth-child" then NthChildSelector.new(t.value[1], false)
+                    when "nth-last-child" then NthChildSelector.new(t.value[1], true)
+                    when "first-child" then NthChildSelector.new([0,1], false)
+                    when "last-child" then NthChildSelector.new([0,1], true)
+
+                    when "nth-of-type" then NthOfTypeSelector.new(t.value[1], false, last_elem)
+                    when "nth-last-of-type" then NthOfTypeSelector.new(t.value[1], true, last_elem)
+                    when "first-of-type" then NthOfTypeSelector.new([0,1], false, last_elem)
+                    when "last-of-type" then NthOfTypeSelector.new([0,1], true, last_elem)
+
+                    when "only-child" then OnlyChildSelector.new
+                    when "only-of-type" then OnlyOfTypeSelector.new
+                    when "empty" then EmptySelector.new
+                    when "only-text" then OnlyTextSelector.new
+                    end
+                when :child
+                    @selectors << ChildSelector.new
+                    last_elem = :any
+                when :descendant
+                    @selectors << DescendantSelector.new
+                    last_elem = :any
+                when :follower
+                    @selectors << FollowerSelector.new
+                    last_elem = :any
+                when :neighbour
+                    @selectors << NeighbourSelector.new
+                    last_elem = :any
+                when :tail
+                    @selectors = []
+                end
             end
         end
 
