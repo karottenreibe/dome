@@ -37,6 +37,26 @@ class SelectorTests < Test::Unit::TestCase
         assert_equal "wolf", sl[1].instance_variable_get(:@name)
         assert_equal nil, sl[1].instance_variable_get(:@op)
         assert_equal nil, sl[1].instance_variable_get(:@value)
+
+        sl = SelectorList.new("bad[wolf=TARDIS]").selectors
+        assert_equal 2, sl.length
+        assert_kind_of ElementSelector, sl[0]
+        assert_equal "bad", sl[0].instance_variable_get(:@tag)
+        assert_kind_of AttributeSelector, sl[1]
+        assert_equal "wolf", sl[1].instance_variable_get(:@name)
+        assert_equal :equal, sl[1].instance_variable_get(:@op)
+        assert_equal "TARDIS", sl[1].instance_variable_get(:@value)
+
+        %w{^= $= *= |= ~=}.zip(%w{begins_with ends_with contains begins_with_dash in_list}).each do |(arg,op)|
+            sl = SelectorList.new("doctor[TARDIS#{arg}'Time and Relative Dimensions in Space']").selectors
+            assert_equal 2, sl.length
+            assert_kind_of ElementSelector, sl[0]
+            assert_equal "doctor", sl[0].instance_variable_get(:@tag)
+            assert_kind_of AttributeSelector, sl[1]
+            assert_equal "TARDIS", sl[1].instance_variable_get(:@name)
+            assert_equal op.to_sym, sl[1].instance_variable_get(:@op)
+            assert_equal "Time and Relative Dimensions in Space", sl[1].instance_variable_get(:@value)
+        end
     end
 
 end
