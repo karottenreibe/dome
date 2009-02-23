@@ -90,5 +90,22 @@ class SelectorTests < Test::Unit::TestCase
         end
     end
 
+    def testNoArgNthPseudos
+        %w{:first-child :last-child :first-of-type :last-of-type}.zip(
+            [NthChildSelector, NthChildSelector, NthOfTypeSelector, NthOfTypeSelector],
+            [false, true, false, true],
+            [nil, nil, "buddy", "buddy"]
+        ).each do |(sel,klass,reverse, tag)|
+            sl = SelectorList.new("buddy#{sel}").selectors
+            assert_equal 2, sl.length
+            assert_kind_of ElementSelector, sl[0]
+            assert_equal "buddy", sl[0].instance_variable_get(:@tag)
+            assert_kind_of klass, sl[1]
+            assert_equal [0,1], sl[1].instance_variable_get(:@args)
+            assert_equal reverse, sl[1].instance_variable_get(:@reverse)
+            assert_equal tag, sl[1].instance_variable_get(:@tag)
+        end
+    end
+
 end
 
