@@ -78,5 +78,17 @@ class SelectorTests < Test::Unit::TestCase
         assert_equal "five", sl[8].instance_variable_get(:@tag)
     end
 
+    def testNoArgPseudos
+        %w{:root :only-child :only-of-type :empty :only-text}.zip(
+            [RootSelector, OnlyChildSelector, OnlyOfTypeSelector, EmptySelector, OnlyTextSelector]
+        ).each do |(sel,klass)|
+            sl = SelectorList.new("phony#{sel}").selectors
+            assert_equal 2, sl.length
+            assert_kind_of ElementSelector, sl[0]
+            assert_equal "phony", sl[0].instance_variable_get(:@tag)
+            assert_kind_of klass, sl[1]
+        end
+    end
+
 end
 
