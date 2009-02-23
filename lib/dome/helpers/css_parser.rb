@@ -265,13 +265,7 @@ module Dome
         # On failure returns +nil+.
         #
         def parse_not_arg arg
-            sl = SelectorList.new arg
-            return nil if sl.selectors.empty? or
-                sl.selectors.any? { |s|
-                    [ChildSelector, DescendantSelector, NeighbourSelector,
-                        FollowerSelector].any? { |klass| sl.is_a? klass }
-                }
-            sl
+            SelectorList.new arg
         end
 
         ##

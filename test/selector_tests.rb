@@ -138,5 +138,8 @@ class SelectorTests < Test::Unit::TestCase
         assert_equal "guy", sl[1].instance_variable_get(:@value)
     end
 
+    def testNot
+    end
+
 end
 
