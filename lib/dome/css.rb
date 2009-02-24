@@ -207,6 +207,15 @@ module Dome
             end
         end
 
+        class NotSelector
+            def initialize slist
+                @slist = slist
+            end
+
+            def walk node
+            end
+        end
+
     end
 
     ##
@@ -232,14 +241,42 @@ module Dome
         end
 
         ##
-        # Executes the given +block+ for each node in the +tree+ that matches this
-        # SelectorList.
+        # Executes the given +block+ for each node in the Tree given in +obj+ - or constructed
+        # from +obj+ in case +obj+ is an Element - that matches this SelectorList.
         #
-        def each tree, &block
+        def each obj, &block
+            raise "SelectorList#each expects either a Tree or an Element as first argument" unless
+                [Tree, Element].include? obj.class
             raise "SelectorList#each expects a block" unless block_given?
+            return if @selectors.empty?
 
-            nodes = tree.flatten
-            @selectors.each do |sel|
+            if obj.is_a? Element
+                t = Tree.new
+                t.root.children << obj
+                obj = t
+            end
+
+            nodes = nil
+            sels = nil
+            case @selectors[0]
+            when RootSelector
+                if obj.is_a? Tree then nodes = obj.root.children
+                else nodes = [obj]
+                end
+
+                sels = @selectors[1..-1]
+            else
+                if obj.is_a? Tree then nodes = obj.flatten
+                else
+                    t = Tree.new
+                    t.root.children << obj
+                    nodes = t.flatten
+                end
+
+                sels = @selectors
+            end
+
+            sels.each do |sel|
                 new_nodes = []
 
                 nodes.each { |node|

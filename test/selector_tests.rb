@@ -142,8 +142,19 @@ class SelectorTests < Test::Unit::TestCase
         sl = SelectorList.new(":not(in > the[mood=for]:not(root))").selectors
         assert_equal 1, sl.length
         assert_kind_of NotSelector, sl[0]
-        assert_equal "class", sl[0].instance_variable_get(:@name)
-        assert_equal :in_list, sl[0].instance_variable_get(:@op)
+
+        inner = sl[0].instance_variable_get :@slist
+        assert_kind_of SelectorList, inner
+
+        sli = inner.selectors
+        assert_equal 5, sli.length
+        assert_kind_of ElementSelector, sli[0]
+        assert_equal "in", sli[0].instance_variable_get(:@tag)
+
+        assert_kind_of ChildSelector, sli[1]
+
+        assert_kind_of ElementSelector, sli[2]
+        assert_equal "in", sli[2].instance_variable_get(:@tag)
     end
 
 end
