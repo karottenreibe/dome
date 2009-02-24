@@ -225,9 +225,17 @@ module Dome
         #
         def parse_pseudo_arg pseudo
             buf = ''
+            leftys = 0
 
             done = while @lexer.get
-                break true if @lexer.get.type == :right_parenthesis
+                if @lexer.get.type == :right_parenthesis
+                    if leftys == 0 then break true
+                    else leftys -= 1
+                    end
+                end
+
+                leftys += 1 if @lexer.get.type == :left_parenthesis
+
                 buf << @lexer.get.value
                 @lexer.next!
             end

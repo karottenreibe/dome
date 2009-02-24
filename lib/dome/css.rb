@@ -213,6 +213,9 @@ module Dome
             end
 
             def walk node
+                yield node unless callcc do |cc|
+                    @slist.each(node) { cc.call true }
+                end
             end
         end
 

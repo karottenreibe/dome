@@ -139,7 +139,7 @@ class SelectorTests < Test::Unit::TestCase
     end
 
     def testNot
-        sl = SelectorList.new(":not(in > the[mood=for]:not(root))").selectors
+        sl = SelectorList.new(":not(in > the[mood=for]:not(:root))").selectors
         assert_equal 1, sl.length
         assert_kind_of NotSelector, sl[0]
 
@@ -154,7 +154,21 @@ class SelectorTests < Test::Unit::TestCase
         assert_kind_of ChildSelector, sli[1]
 
         assert_kind_of ElementSelector, sli[2]
-        assert_equal "in", sli[2].instance_variable_get(:@tag)
+        assert_equal "the", sli[2].instance_variable_get(:@tag)
+
+        assert_kind_of AttributeSelector, sli[3]
+        assert_equal "mood", sli[3].instance_variable_get(:@name)
+        assert_equal :equal, sli[3].instance_variable_get(:@op)
+        assert_equal "for", sli[3].instance_variable_get(:@value)
+
+        assert_kind_of NotSelector, sli[4]
+
+        inner = sli[4].instance_variable_get :@slist
+        assert_kind_of SelectorList, inner
+
+        sli = inner.selectors
+        assert_equal 1, sli.length
+        assert_kind_of RootSelector, sli[0]
     end
 
 end
