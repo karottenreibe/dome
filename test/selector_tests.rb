@@ -139,6 +139,11 @@ class SelectorTests < Test::Unit::TestCase
     end
 
     def testNot
+        sl = SelectorList.new(":not(in > the[mood=for]:not(root))").selectors
+        assert_equal 1, sl.length
+        assert_kind_of NotSelector, sl[0]
+        assert_equal "class", sl[0].instance_variable_get(:@name)
+        assert_equal :in_list, sl[0].instance_variable_get(:@op)
     end
 
 end
