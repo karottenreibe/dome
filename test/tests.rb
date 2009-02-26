@@ -21,4 +21,6 @@ require 'dom_tests.rb'
 require 'csslexer_tests.rb'
 require 'cssparser_tests.rb'
 require 'selector_tests.rb'
+require 'selecting_tests.rb'
+require 'scraping_tests.rb'
 

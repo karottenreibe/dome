@@ -15,12 +15,37 @@
 #
 
 require 'test/unit'
+require 'lib/dome'
 require 'lib/dome/css'
 
 class SelectorTests < Test::Unit::TestCase
     include Dome
+    include Selectors
 
-    def testNothing
+    def setup
+        @tree = Dome <<EOI
+<root>
+    <level1 class=coldplay>
+        <level2>
+            <data id=sleep><![CDATA[blubber]]>blubber</data>
+            <nothing class="fu baz">goo!</nothing>
+        </level2>
+        <empty />
+        <data id=1>foo</data>
+        <data id=2>bar</data>
+    </level1>
+    <level1>not  empty  !</level1>
+</root>
+EOI
+    end
+
+    def testElement
+        one = @tree/"level2"
+        two = @tree%"level2"
+
+        assert_equal [two], one
+        assert_kind_of Element, two
+        assert_equal "level2", two.instance_variable_get(:@tag)
     end
 
 end

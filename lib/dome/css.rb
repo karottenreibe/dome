@@ -31,7 +31,7 @@ module Dome
         #
         def / path
             ret = []
-            SelectorList.new(path).each { |node| ret << node }
+            SelectorList.new(path).each(self) { |node| ret << node }
             ret
         end
 
@@ -40,7 +40,7 @@ module Dome
         #
         def % path
             callcc { |cc|
-                SelectorList.new(path).each { |node| cc.call node }
+                SelectorList.new(path).each(self) { |node| cc.call node }
             }
         end
 
@@ -50,7 +50,7 @@ module Dome
         def each path
             raise "Tree#each expects a block" unless block_given?
             ret = []
-            SelectorList.new(path).each { |node| yield node }
+            SelectorList.new(path).each(self) { |node| yield node }
             ret
         end
 
@@ -283,13 +283,14 @@ module Dome
                 new_nodes = []
 
                 nodes.each { |node|
-                    sel.walk node { |ret| new_nodes << ret }
+                    sel.walk(node) { |ret| new_nodes << ret }
                 }
 
                 nodes = new_nodes
             end
 
             nodes.each { |node| block.call node }
+            nil
         end
 
         protected
