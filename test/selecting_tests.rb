@@ -72,7 +72,6 @@ EOI
 
     def testCombinators
         (%w{> + ~} << " ").each do |op|
-            p op
             one = @tree/"*#{op}empty"
             two = @tree%"*#{op}empty"
             assert_equal [two], one

@@ -119,9 +119,8 @@ module Dome
                 new_nodes = []
 
                 nodes.each { |node|
-                    sel.walk(node) { |ret| new_nodes << ret }
+                    sel.walk(node) { |ret| new_nodes << ret unless new_nodes.include? ret }
                 }
-                p new_nodes.collect { |n| n.tag }
 
                 nodes = new_nodes
             end
