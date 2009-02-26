@@ -47,12 +47,12 @@ module Dome
             def walk node
                 yield node if node.is_a? Element and node.attributes.find { |a|
                     a.name == @name and
-                        case op
+                        case @op
                         when :equal then a.value == @value
                         when :in_list then a.value.split(/\s/).include? @value
                         when :contains then a.value.include? @value
                         when :ends_with then a.value.end_with? @value
-                        when :begins_with then a.value.begin_with? @value
+                        when :begins_with then a.value.start_with? @value
                         when :begins_with_dash
                             a.value == @value or a.value.begin_with "#{@value}-"
                         else true

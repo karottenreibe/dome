@@ -26,7 +26,7 @@ class SelectingTests < Test::Unit::TestCase
         @tree = Dome <<EOI
 <root>
     <level1 class=coldplay>
-        <level2>
+        <level2 value='home'>
             <data id=sleep><![CDATA[blubber]]>blubber</data>
             <nothing class="fu baz">goo!</nothing>
         </level2>
@@ -46,6 +46,17 @@ EOI
         assert_equal [two], one
         assert_kind_of Element, two
         assert_equal "level2", two.instance_variable_get(:@tag)
+    end
+
+    def testAttributeSelector
+        %w{= ~= *= ^= $= |=}.each do |sel|
+            one = @tree/"[value#{sel}home]"
+            two = @tree%"[value#{sel}home]"
+            assert_equal one, [two]
+
+            assert_kind_of Element, two
+            assert_equal "level2", two.tag
+        end
     end
 
 end
