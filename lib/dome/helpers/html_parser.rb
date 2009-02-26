@@ -201,10 +201,13 @@ module Dome
             end
                 
             value = parse_text quote
-            return terminate trace if not value or
-                ( quote and ( not @lexer.get or @lexer.get.type != :quote or
-                     @lexer.get.value != quote ) )
-            @lexer.next!
+            return terminate trace if not value
+
+            if quote
+                return terminate trace if not @lexer.get or @lexer.get.type != :quote or
+                     @lexer.get.value != quote
+                @lexer.next!
+            end
 
             value
         end

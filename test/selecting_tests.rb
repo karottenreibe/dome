@@ -18,7 +18,7 @@ require 'test/unit'
 require 'lib/dome'
 require 'lib/dome/css'
 
-class SelectorTests < Test::Unit::TestCase
+class SelectingTests < Test::Unit::TestCase
     include Dome
     include Selectors
 
