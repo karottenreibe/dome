@@ -54,7 +54,7 @@ EOI
         %w{= ~= *= ^= $= |=}.each do |sel|
             one = @tree/"[value#{sel}home]"
             two = @tree%"[value#{sel}home]"
-            assert_equal one, [two]
+            assert_equal [two], one
 
             assert_kind_of Element, two
             assert_equal "level2", two.tag
@@ -64,7 +64,7 @@ EOI
     def testStarSelector
         one = @tree/"level11 *"
         two = @tree%"level11 *"
-        assert_equal one, [two]
+        assert_equal [two], one
 
         assert_kind_of Element, two
         assert_equal "only", two.tag
@@ -72,11 +72,11 @@ EOI
 
     def testCombinators
         (%w{> + ~} << " ").each do |op|
+            p op
             one = @tree/"*#{op}empty"
             two = @tree%"*#{op}empty"
-            assert_equal one, [two]
+            assert_equal [two], one
 
-            p op
             assert_kind_of Element, two
             assert_equal "empty", two.tag
         end

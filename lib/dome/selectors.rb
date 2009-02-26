@@ -70,34 +70,33 @@ module Dome
         end
 
         class DescendantSelector
-            def walk node
+            def walk node, &block
                 node.children.each { |child|
                     yield child if child.is_a? Element
-                    walk child if child.is_a? Element
+                    walk child, &block if child.is_a? Element
                 }
             end
         end
 
         class NeighbourSelector
             def walk node
-                found = false
-                node.parent.children.each { |child|
-                    yield child if found and child.is_a? Element
-                    found = true if child == node
-                }
+                idx = node.parent.children.index(node) + 1
+
+                idx.upto(node.parent.children.length-1) do |i|
+                    child = node.parent.children[i]
+                    yield child if child.is_a? Element
+                end
             end
         end
 
         class FollowerSelector
             def walk node
-                found = false
-                node.children.each { |child|
-                    if child.is_a? Element and found
-                        yield child
-                        found = false
-                    end
-                    found = true if child == node
-                }
+                idx = node.parent.children.index(node) + 1
+
+                idx.upto(node.parent.children.length-1) do |i|
+                    child = node.parent.children[i]
+                    return yield(child) if child.is_a? Element
+                end
             end
         end
 

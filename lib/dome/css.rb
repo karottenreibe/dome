@@ -121,6 +121,7 @@ module Dome
                 nodes.each { |node|
                     sel.walk(node) { |ret| new_nodes << ret }
                 }
+                p new_nodes.collect { |n| n.tag }
 
                 nodes = new_nodes
             end
