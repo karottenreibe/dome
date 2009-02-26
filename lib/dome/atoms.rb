@@ -26,6 +26,7 @@ module Dome
     # accessor.
     #
     class Tree
+
         ##
         # The root pseudo Node.
         attr_accessor :root
@@ -60,6 +61,7 @@ module Dome
             node.children.each { |child| ret += flatten_rec child }
             ret
         end
+
     end
 
     ##
@@ -108,6 +110,7 @@ module Dome
     # Keeps a single Element of a Tree with its +tag+, +attributes+ and +children+.
     #
     class Element < Node
+
         ##
         # The Element's tag - String
         attr_accessor :tag
@@ -159,13 +162,13 @@ module Dome
         end
 
         def inspect
-            ret = "<#{ @name }"
+            ret = "<#{@tag}"
             ret += @attributes.inject(' ') { |memo,a| "#{memo} #{a.inspect}" } unless @attributes.empty?
 
             if empty?
                 ret += '/>'
             else
-                ret += ">#{ @children.inject('') { |memo,c| memo + c.inspect } }</#{ @name }>"
+                ret += ">#{ @children.inject('') { |memo,c| "#{memo} #{c.inspect}" } } </#{@tag}>"
             end
 
             ret
@@ -176,6 +179,7 @@ module Dome
     # Keeps text data, either normally or as a CDATA section.
     #
     class Data < Node
+
         ##
         # The data enclosed in this object - String
         attr_accessor :value
@@ -192,8 +196,9 @@ module Dome
         end
 
         def inspect
-            @cdata ? "<[CDATA[#{ @value }]]>" : @value.to_s
+            @cdata ? "<![CDATA[#{ @value }]]>".inspect : @value.inspect
         end
+
     end
 
     ##

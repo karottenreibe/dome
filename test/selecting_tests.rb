@@ -34,18 +34,20 @@ class SelectingTests < Test::Unit::TestCase
         <data id=1>foo</data>
         <data id=2>bar</data>
     </level1>
-    <level1>not  empty  !</level1>
+    <level11>
+        <only>child</only>
+    </level11>
 </root>
 EOI
     end
 
-    def testElement
+    def testElementSelector
         one = @tree/"level2"
         two = @tree%"level2"
 
         assert_equal [two], one
         assert_kind_of Element, two
-        assert_equal "level2", two.instance_variable_get(:@tag)
+        assert_equal "level2", two.tag
     end
 
     def testAttributeSelector
@@ -56,6 +58,27 @@ EOI
 
             assert_kind_of Element, two
             assert_equal "level2", two.tag
+        end
+    end
+
+    def testStarSelector
+        one = @tree/"level11 *"
+        two = @tree%"level11 *"
+        assert_equal one, [two]
+
+        assert_kind_of Element, two
+        assert_equal "only", two.tag
+    end
+
+    def testCombinators
+        (%w{> + ~} << " ").each do |op|
+            one = @tree/"*#{op}empty"
+            two = @tree%"*#{op}empty"
+            assert_equal one, [two]
+
+            p op
+            assert_kind_of Element, two
+            assert_equal "empty", two.tag
         end
     end
 
