@@ -68,6 +68,28 @@ EOI
 
         assert_kind_of Element, two
         assert_equal "only", two.tag
+
+        one = @tree/"*"
+        assert_equal 9, one.length
+
+        assert_kind_of Element, one[0]
+        assert_equal "root", one[0].tag
+        assert_kind_of Element, one[1]
+        assert_equal "level1", one[1].tag
+        assert_kind_of Element, one[2]
+        assert_equal "level2", one[2].tag
+        assert_kind_of Element, one[3]
+        assert_equal "data", one[3].tag
+        assert_kind_of Element, one[4]
+        assert_equal "empty", one[4].tag
+        assert_kind_of Element, one[5]
+        assert_equal "data", one[5].tag
+        assert_kind_of Element, one[6]
+        assert_equal "data", one[6].tag
+        assert_kind_of Element, one[7]
+        assert_equal "level1", one[7].tag
+        assert_kind_of Element, one[8]
+        assert_equal "only", one[8].tag
     end
 
     def testCombinators
@@ -79,6 +101,15 @@ EOI
             assert_kind_of Element, two
             assert_equal "empty", two.tag
         end
+    end
+
+    def testStarSelector
+        one = @tree/"level11 *"
+        two = @tree%"level11 *"
+        assert_equal [two], one
+
+        assert_kind_of Element, two
+        assert_equal "only", two.tag
     end
 
 end
