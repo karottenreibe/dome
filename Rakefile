@@ -149,7 +149,7 @@ end
 #...............................
 
 task :push => [:test] do
-    sh "git push origin master"
+    sh "git push"
 end
 
 # aliases and groupings
