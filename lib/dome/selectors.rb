@@ -73,7 +73,7 @@ module Dome
             def walk node
                 node.children.each { |child|
                     yield child if child.is_a? Element
-                    walk child
+                    walk child if child.is_a? Element
                 }
             end
         end
