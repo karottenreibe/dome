@@ -127,9 +127,26 @@ module Dome
         ##
         # Retrieves the attribute specified by +key+ from the attributes hash, or +nil+ if
         # no such attribute was specified.
+        # The +key+ must be convertible to a String.
         #
         def [] key
-            @attributes[key]
+            key = key.to_s
+            att = @attributes.find { |a| a.name == key }
+            att ? att.value : nil
+        end
+
+        ##
+        # Sets the attribute specified by +key+ to the given +value+ and creates such an Attribute
+        # if it does not yet exist.
+        # The +key+ must be convertible to a String.
+        #
+        def []= key, value
+            key = key.to_s
+            idx = @attributes.index { |a| a.name == key }
+
+            if idx then @attributes[idx].value = value
+            else @attributes << Attribute.new(key, value)
+            end
         end
 
         ##

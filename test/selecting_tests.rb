@@ -35,7 +35,7 @@ class SelectingTests < Test::Unit::TestCase
         <data id=2>bar</data>
     </level1>
     <level11>
-        <only>child</only>
+        <only id=foo>child</only>
     </level11>
 </root>
 EOI
@@ -70,7 +70,7 @@ EOI
         assert_equal "only", two.tag
 
         one = @tree/"*"
-        assert_equal 9, one.length
+        assert_equal 10, one.length
 
         assert_kind_of Element, one[0]
         assert_equal "root", one[0].tag
@@ -81,15 +81,17 @@ EOI
         assert_kind_of Element, one[3]
         assert_equal "data", one[3].tag
         assert_kind_of Element, one[4]
-        assert_equal "empty", one[4].tag
+        assert_equal "nothing", one[4].tag
         assert_kind_of Element, one[5]
-        assert_equal "data", one[5].tag
+        assert_equal "empty", one[5].tag
         assert_kind_of Element, one[6]
         assert_equal "data", one[6].tag
         assert_kind_of Element, one[7]
-        assert_equal "level1", one[7].tag
+        assert_equal "data", one[7].tag
         assert_kind_of Element, one[8]
-        assert_equal "only", one[8].tag
+        assert_equal "level11", one[8].tag
+        assert_kind_of Element, one[9]
+        assert_equal "only", one[9].tag
     end
 
     def testCombinators
@@ -103,13 +105,22 @@ EOI
         end
     end
 
-    def testStarSelector
-        one = @tree/"level11 *"
-        two = @tree%"level11 *"
+    def testIDClassSelectors
+        one = @tree/".coldplay"
+        two = @tree%".coldplay"
+        assert_equal [two], one
+
+        assert_kind_of Element, two
+        assert_equal "level1", two.tag
+        assert_equal "coldplay", two[:class]
+
+        one = @tree/"#foo"
+        two = @tree%"#foo"
         assert_equal [two], one
 
         assert_kind_of Element, two
         assert_equal "only", two.tag
+        assert_equal "foo", two[:id]
     end
 
 end
