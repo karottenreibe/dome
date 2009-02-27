@@ -206,4 +206,23 @@ EOI
         end
     end
 
+    def OnlyChildSelector
+        one = @tree/":only-child"
+        two = @tree%":only-child"
+        assert_equal [two], one
+
+        assert_kind_of Element, two
+        assert_equal "only", two.tag
+    end
+
+    def OnlyOfTypeSelector
+        one = @tree/"data:only-of-type"
+        two = @tree%"data:only-of-type"
+        assert_equal [two], one
+
+        assert_kind_of Element, two
+        assert_equal "data", two.tag
+        assert_equal "sleep", two[:id]
+    end
+
 end
