@@ -254,4 +254,22 @@ EOI
         assert_equal "only", two.tag
     end
 
+    def testNot
+        one = @tree/":not(level1) > data"
+        two = @tree%":not(level1) > data"
+        assert_equal [two], one
+
+        assert_kind_of Element, two
+        assert_equal "data", two.tag
+        assert_equal "sleep", two[:id]
+
+        one = @tree/":not(:root) > * > data"
+        two = @tree%":not(:root) > * > data"
+        assert_equal [two], one
+
+        assert_kind_of Element, two
+        assert_equal "data", two.tag
+        assert_equal "sleep", two[:id]
+    end
+
 end
