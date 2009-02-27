@@ -112,14 +112,14 @@ module Dome
             end
 
             def walk node, &block
-                nth_walk( @reverse ? node.parent.children.reverse : node.parent.children,
-                     node, &block )
+                group = node.parent.children.find_all { |n| n.is_a? Element }
+                nth_walk( @reverse ? group.reverse : group, node, &block )
             end
 
             protected
 
             def nth_walk group, node
-                idx = group.index node
+                idx = group.index(node)+1
                 a,b = @args
                 yield node if node.is_a? Element and
                     (a == 0 and b == idx) or (a != 0 and a * ((idx-b)/a) + b == idx)
@@ -178,7 +178,7 @@ module Dome
             end
 
             def walk node
-                yield node unless callcc do |cc|
+                yield node if node.is_a? Element and not callcc do |cc|
                     @slist.each(node) { cc.call true }
                 end
             end

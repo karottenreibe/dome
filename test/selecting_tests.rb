@@ -133,11 +133,71 @@ EOI
     end
 
     def testFirstLastChildSelectors
+        one = @tree/":first-child"
+        assert_equal 5, one.length
+        assert_equal "root", one[0].tag
+        assert_equal "level1", one[1].tag
+        assert_equal "level2", one[2].tag
+        assert_equal "data", one[3].tag
+        assert_equal "sleep", one[3][:id]
+        assert_equal "only", one[4].tag
+        
+        one = @tree/":last-child"
+        assert_equal 5, one.length
+        assert_equal "root", one[0].tag
+        assert_equal "nothing", one[1].tag
+        assert_equal "data", one[2].tag
+        assert_equal "2", one[2][:id]
+        assert_equal "level11", one[3].tag
+        assert_equal "only", one[4].tag
+        
         %w{first-child last-child}.zip(
             %w{sleep 2}
         ).each do |(op,id)|
             one = @tree/"data:#{op}"
             two = @tree%"data:#{op}"
+            assert_equal [two], one
+
+            assert_kind_of Element, two
+            assert_equal "data", two.tag
+            assert_equal id, two[:id]
+        end
+    end
+
+    def testFirstLastOfTypeSelectors
+        one = @tree/":first-of-type"
+        assert_equal 9, one.length
+        assert_equal "root", one[0].tag
+        assert_equal "level1", one[1].tag
+        assert_equal "level2", one[2].tag
+        assert_equal "data", one[3].tag
+        assert_equal "sleep", one[3][:id]
+        assert_equal "nothing", one[4].tag
+        assert_equal "empty", one[5].tag
+        assert_equal "data", one[6].tag
+        assert_equal "1", one[6][:id]
+        assert_equal "level11", one[7].tag
+        assert_equal "only", one[8].tag
+        
+        one = @tree/":last-of-type"
+        assert_equal 9, one.length
+        assert_equal "root", one[0].tag
+        assert_equal "level1", one[1].tag
+        assert_equal "level2", one[2].tag
+        assert_equal "data", one[3].tag
+        assert_equal "sleep", one[3][:id]
+        assert_equal "nothing", one[4].tag
+        assert_equal "empty", one[5].tag
+        assert_equal "data", one[6].tag
+        assert_equal "2", one[6][:id]
+        assert_equal "level11", one[7].tag
+        assert_equal "only", one[8].tag
+        
+        %w{first-of-type last-of-type}.zip(
+            %w{1 2}
+        ).each do |(op,id)|
+            one = @tree/"level1 > data:#{op}"
+            two = @tree%"level1>data:#{op}"
             assert_equal [two], one
 
             assert_kind_of Element, two

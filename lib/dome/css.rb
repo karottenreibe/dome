@@ -115,6 +115,8 @@ module Dome
                 sels = @selectors
             end
 
+            nodes = nodes.find_all { |n| n.is_a? Element }
+
             sels.each do |sel|
                 new_nodes = []
 
