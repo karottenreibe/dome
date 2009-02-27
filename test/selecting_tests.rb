@@ -132,16 +132,17 @@ EOI
         assert_equal "root", two.tag
     end
 
-    def testNthNoArgSelectors
+    def testFirstLastChildSelectors
         %w{first-child last-child}.zip(
             %w{sleep 2}
         ).each do |(op,id)|
-            one = @tree/":#{op}"
-            two = @tree%":#{op}"
+            one = @tree/"data:#{op}"
+            two = @tree%"data:#{op}"
             assert_equal [two], one
 
             assert_kind_of Element, two
-            assert_equal id, two.tag
+            assert_equal "data", two.tag
+            assert_equal id, two[:id]
         end
     end
 
