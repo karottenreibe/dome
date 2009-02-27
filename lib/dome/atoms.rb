@@ -40,26 +40,13 @@ module Dome
         # The pseudo root Element is not included.
         #
         def flatten
-            ret = []
-            @root.children.each { |node| ret += flatten_rec node }
-            ret
+            @root.children.collect { |r|
+                r.is_a?(Element) ? r.flatten : []
+            }.flatten
         end
 
         def inspect
             "#<Dome::Tree #{@root.inspect}"
-        end
-
-        protected
-
-        ##
-        # Does the actual work for +#flatten+.
-        # Flattens a given +node+ and all it's descendants.
-        #
-        def flatten_rec node
-            return [] unless node.is_a? Element
-            ret = [node]
-            node.children.each { |child| ret += flatten_rec child }
-            ret
         end
 
     end
@@ -92,7 +79,7 @@ module Dome
         # Whether or not the Node is the root pseudo Node.
         #
         def root?
-            is_a Root
+            is_a? Root
         end
 
     end
@@ -147,6 +134,15 @@ module Dome
             if idx then @attributes[idx].value = value
             else @attributes << Attribute.new(key, value)
             end
+        end
+
+        ##
+        # Returns an Array containing this Element and all its in/direct children.
+        #
+        def flatten
+            @children.collect { |c|
+                c.is_a?(Element) ? c.flatten : []
+            }.flatten.unshift(self)
         end
 
         ##

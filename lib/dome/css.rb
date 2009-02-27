@@ -89,35 +89,9 @@ module Dome
             raise "SelectorList#each expects a block" unless block_given?
             return if @selectors.empty?
 
-            if obj.is_a? Element
-                t = Tree.new
-                t.root.children << obj
-                obj = t
-            end
+            nodes = obj.flatten.find_all { |n| n.is_a? Element }
 
-            nodes = nil
-            sels = nil
-            case @selectors[0]
-            when RootSelector
-                if obj.is_a? Tree then nodes = obj.root.children.find_all { |n| n.is_a? Element }
-                else nodes = [obj]
-                end
-
-                sels = @selectors[1..-1]
-            else
-                if obj.is_a? Tree then nodes = obj.flatten
-                else
-                    t = Tree.new
-                    t.root.children << obj
-                    nodes = t.flatten
-                end
-
-                sels = @selectors
-            end
-
-            nodes = nodes.find_all { |n| n.is_a? Element }
-
-            sels.each do |sel|
+            @selectors.each do |sel|
                 new_nodes = []
 
                 nodes.each { |node|
