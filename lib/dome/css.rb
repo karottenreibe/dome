@@ -99,7 +99,7 @@ module Dome
             sels = nil
             case @selectors[0]
             when RootSelector
-                if obj.is_a? Tree then nodes = obj.root.children
+                if obj.is_a? Tree then nodes = obj.root.children.find_all { |n| n.is_a? Element }
                 else nodes = [obj]
                 end
 

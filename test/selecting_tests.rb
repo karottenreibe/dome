@@ -123,4 +123,13 @@ EOI
         assert_equal "foo", two[:id]
     end
 
+    def testRootSelector
+        one = @tree/":root"
+        two = @tree%":root"
+        assert_equal [two], one
+
+        assert_kind_of Element, two
+        assert_equal "root", two.tag
+    end
+
 end
