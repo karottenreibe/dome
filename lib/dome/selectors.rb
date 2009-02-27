@@ -135,9 +135,12 @@ module Dome
             protected
 
             def nth_walk group, node, &block
+                return if @tag != :any and  @tag != node.tag
+
                 group = group.find_all { |item|
-                    item.is_a? Element and (@tag == :any or item.tag == @tag)
+                    item.tag == ( @tag == :any ? node.tag : @tag )
                 }
+
                 super(group, node, &block)
             end
         end
