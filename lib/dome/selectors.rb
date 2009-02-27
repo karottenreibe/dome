@@ -111,17 +111,18 @@ module Dome
                 @args, @reverse = args, reverse
             end
 
-            def walk node
-                nth_walk( @reverse ? node.parent.children.reverse : node.parent.children )
+            def walk node, &block
+                nth_walk( @reverse ? node.parent.children.reverse : node.parent.children,
+                     node, &block )
             end
 
             protected
 
-            def nth_walk group
+            def nth_walk group, node
                 idx = group.index node
                 a,b = @args
                 yield node if node.is_a? Element and
-                    (a == 0 and b == idx) or a * ((idx-b)/a) + b == idx
+                    (a == 0 and b == idx) or (a != 0 and a * ((idx-b)/a) + b == idx)
             end
         end
 
@@ -133,11 +134,11 @@ module Dome
 
             protected
 
-            def nth_walk group
+            def nth_walk group, node, &block
                 group = group.find_all { |item|
                     item.is_a? Element and (@tag == :any or item.tag == @tag)
                 }
-                super(group)
+                super(group, node, &block)
             end
         end
 
