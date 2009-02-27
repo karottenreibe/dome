@@ -41,7 +41,7 @@ module Dome
         #
         def flatten
             @root.children.collect { |r|
-                r.is_a?(Element) ? r.flatten : []
+                r.respond_to?(:flatten) ? r.flatten : []
             }.flatten
         end
 
@@ -141,7 +141,7 @@ module Dome
         #
         def flatten
             @children.collect { |c|
-                c.is_a?(Element) ? c.flatten : []
+                c.respond_to?(:flatten) ? c.flatten : []
             }.flatten.unshift(self)
         end
 
