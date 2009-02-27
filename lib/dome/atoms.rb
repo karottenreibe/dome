@@ -91,7 +91,9 @@ module Dome
         ##
         # Whether or not the Node is the root pseudo Node.
         #
-        def root?; false; end
+        def root?
+            is_a Root
+        end
 
     end
 
@@ -99,8 +101,6 @@ module Dome
     # The class of the pseudo root Node.
     #
     class Root < Node
-        def root?; true; end
-
         def inspect
             @children.inspect
         end
