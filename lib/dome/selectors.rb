@@ -171,7 +171,8 @@ module Dome
 
         class OnlyTextSelector
             def walk node
-                yield node if node.is_a? Element and  node.children.all? { |c| c.is_a? Data }
+                yield node if node.is_a? Element and not node.empty? and
+                    node.children.all? { |c| c.is_a? Data }
             end
         end
 

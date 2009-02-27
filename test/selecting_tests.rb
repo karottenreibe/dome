@@ -225,4 +225,33 @@ EOI
         assert_equal "sleep", two[:id]
     end
 
+    def testEmptySelector
+        one = @tree/":empty"
+        two = @tree%":empty"
+        assert_equal [two], one
+
+        assert_kind_of Element, two
+        assert_equal "empty", two.tag
+    end
+
+    def testOnlyTextSelector
+        one = @tree/":only-text"
+        assert_equal 5, one.length
+        assert_equal "data", one[0].tag
+        assert_equal "sleep", one[0][:id]
+        assert_equal "nothing", one[1].tag
+        assert_equal "data", one[2].tag
+        assert_equal "1", one[2][:id]
+        assert_equal "data", one[3].tag
+        assert_equal "2", one[3][:id]
+        assert_equal "only", one[4].tag
+
+        one = @tree/"level11 :only-text"
+        two = @tree%"level11 :only-text"
+        assert_equal [two], one
+
+        assert_kind_of Element, two
+        assert_equal "only", two.tag
+    end
+
 end
