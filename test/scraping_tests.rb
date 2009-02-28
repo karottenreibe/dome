@@ -88,5 +88,30 @@ EOI
         assert_equal [1,64,2,65], res
     end
 
+    def testInnerOuterScraping
+        %w{inner_html inner_text outer_html}.zip(
+            [ ["1","64","2","65"],
+              ["1","64","2","65"],
+              ["<data>1</data>","<data>64</data>","<data>2</data>","<data>65</data>"]
+            ]
+        ).each { |(sel,data)|
+            p sel
+            res = @tree.scrape do
+                all "special ~ data"
+                scrape sel.to_sym => :elems
+
+                all "special ~ * ~ data"
+                scrape sel.to_sym => :elems
+            end
+
+            assert_kind_of Hash, res
+            assert_equal [:elems], res.keys
+            assert_kind_of Array, res[:elems]
+            res[:elems].each { |elem| assert_kind_of String, elem }
+            p res[:elems]
+            assert_equal data, res[:elems].collect { |x| x.to_i }
+        }
+    end
+
 end
 

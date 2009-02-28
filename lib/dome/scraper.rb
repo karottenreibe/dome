@@ -101,10 +101,14 @@ module Dome
                     @result[storage] <<
                         case selector
                         when :element then elem
-                        when :inner_text, :inner_html, :outer_html then elem.send k
-                        when /^@./ then elem[k[1..-1]]
-                        when /^\$[0-9]+(\.\.\.?[0-9]+)?$/ then scrape_data eval(k[1..-1])
-                        else raise "invalid selector #{k.inspect} given to Scraper#scrape"
+                        when :inner_text, :inner_html, :outer_html then elem.send selector
+                        when /^@./ then elem[selector[1..-1]]
+                        when /^\$[0-9]+(\.\.\.?[0-9]+)?$/
+                            m = /(.*)(\.\.\.?)(.*)/.match selector
+                            first,last = m[1].to_i, m[3].to_i
+                            last -= 1 if m[2] == "..."
+                            scrape_data first..last
+                        else raise "invalid selector #{selector.inspect} given to Scraper#scrape"
                         end
                 end
             end
