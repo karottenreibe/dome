@@ -81,15 +81,18 @@ module Dome
 
         ##
         # Executes the given +block+ for each node in the Tree given in +obj+ - or constructed
-        # from +obj+ in case +obj+ is an Element - that matches this SelectorList.
+        # from +obj+ in case +obj+ is an Element or an Array of Elements - that matches this
+        # SelectorList.
         #
         def each obj, &block
-            raise "SelectorList#each expects either a Tree or an Element as first argument" unless
-                [Tree, Element].include? obj.class
+            raise "SelectorList#each expects any of [Tree, Element, Array of Elements] as first argument" unless
+                [Tree, Element].include? obj.class or ( obj.is_a? Array and obj.all? { |n| n.is_a? Element } )
             raise "SelectorList#each expects a block" unless block_given?
             return if @selectors.empty?
 
-            nodes = obj.flatten.find_all { |n| n.is_a? Element }
+            nodes = obj.is_a?(Tree) ?
+                obj.flatten.find_all { |n| n.is_a? Element } :
+                [obj].flatten
 
             @selectors.each do |sel|
                 new_nodes = []

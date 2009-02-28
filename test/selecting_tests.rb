@@ -275,6 +275,13 @@ EOI
         two = (@tree/":empty") + (@tree/":only-text")
         assert_equal one.length, two.length
         one.each { |e| assert_equal true, two.include?(e) }
+
+        one = @tree/":not([id]):not([class]):not([value]):not(:empty):not(:root)"
+        two = @tree%":not([id]):not([class]):not([value]):not(:empty):not(:root)"
+        assert_equal [two], one
+
+        assert_kind_of Element, two
+        assert_equal "level11", two.tag
     end
 
 end
