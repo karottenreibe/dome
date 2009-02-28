@@ -82,12 +82,22 @@ module Dome
             is_a? Root
         end
 
+        def to_s
+            outer_html
+        end
+
     end
 
     ##
     # The class of the pseudo root Node.
     #
     class Root < Node
+        def inner_html
+            @children.inject("") { |memo,c| memo + c.outer_html }
+        end
+
+        alias_method :outer_html, :inner_html
+
         def inspect
             @children.inspect
         end
@@ -150,14 +160,14 @@ module Dome
         # Actually just an alias for +#inspect+.
         #
         def outer_html
-            this.inspect
+            empty? ? inspect : start_tag + inner_html + end_tag
         end
 
         ##
         # Retrieves the HTML representation of all the descendants of this Element.
         #
         def inner_html
-            @children.inject('') { |memo,c| memo + c.inspect }
+            @children.inject('') { |memo,c| memo + c.outer_html }
         end
 
         ##
@@ -174,18 +184,30 @@ module Dome
             end
         end
 
-        def inspect
+        ##
+        # Returns a String representation of the start tag of the Element.
+        #
+        def start_tag
             ret = "<#{@tag}"
             ret += @attributes.inject(' ') { |memo,a| "#{memo} #{a.inspect}" } unless @attributes.empty?
-
-            if empty?
-                ret += '/>'
-            else
-                ret += ">#{ @children.inject('') { |memo,c| "#{memo} #{c.inspect}" } } </#{@tag}>"
-            end
-
-            ret
+            ret + ">"
         end
+
+        ##
+        # Returns a String representation of the end tag of the Element.
+        #
+        def end_tag
+            "</#{@tag}>"
+        end
+
+        def inspect
+            start_tag + (
+                empty? ?
+                '/>' :
+                "#{ @children.inject('') { |memo,c| "#{memo} #{c.inspect}" } } #{end_tag}"
+            )
+        end
+
     end
 
     ##
@@ -209,8 +231,14 @@ module Dome
         end
 
         def inspect
+            inner_html.inspect
+        end
+
+        def inner_html
             @cdata ? "<![CDATA[#{ @value }]]>".inspect : @value.inspect
         end
+
+        alias_method :outer_html, :inner_html
 
     end
 
