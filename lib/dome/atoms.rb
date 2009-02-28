@@ -235,7 +235,7 @@ module Dome
         end
 
         def inner_html
-            @cdata ? "<![CDATA[#{ @value }]]>".inspect : @value.inspect
+            @cdata ? "<![CDATA[#{ @value }]]>" : @value
         end
 
         alias_method :outer_html, :inner_html

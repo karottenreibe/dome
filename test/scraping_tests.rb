@@ -95,7 +95,6 @@ EOI
               ["<data>1</data>","<data>64</data>","<data>2</data>","<data>65</data>"]
             ]
         ).each { |(sel,data)|
-            p sel
             res = @tree.scrape do
                 all "special ~ data"
                 scrape sel.to_sym => :elems
@@ -108,8 +107,7 @@ EOI
             assert_equal [:elems], res.keys
             assert_kind_of Array, res[:elems]
             res[:elems].each { |elem| assert_kind_of String, elem }
-            p res[:elems]
-            assert_equal data, res[:elems].collect { |x| x.to_i }
+            assert_equal data, res[:elems]
         }
     end
 
