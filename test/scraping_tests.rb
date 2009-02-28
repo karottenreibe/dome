@@ -88,6 +88,18 @@ EOI
         assert_equal [1,64,2,65], res
     end
 
+    def testAttributeScraping
+        res = @tree.scrape do
+            all "special"
+            scrape "@value" => :values
+        end
+
+        assert_kind_of Hash, res
+        assert_equal [:values], res.keys
+        assert_kind_of Array, res[:values]
+        assert_equal ["CIA", "FBI"], res[:values]
+    end
+
     def testInnerOuterScraping
         %w{inner_html inner_text outer_html}.zip(
             [ ["1","64","2","65"],
