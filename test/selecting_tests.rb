@@ -94,15 +94,43 @@ EOI
         assert_equal "only", one[9].tag
     end
 
+    def testDescendant
+        one = @tree/"root data"
+        assert_equal 3, one.length
+        one.each { |x| assert_equal "data", x.tag }
+        assert_equal ["sleep","1","2"], one.collect { |x| x[:id] }
+    end
+
     def testCombinators
-        (%w{> + ~ \ }).each do |op|
+        %w{\  > + ~}.each { |op|
             one = @tree/"*#{op}empty"
             two = @tree%"*#{op}empty"
             assert_equal [two], one
 
             assert_kind_of Element, two
             assert_equal "empty", two.tag
-        end
+        }
+    end
+
+    def testChild
+        one = @tree/"level1 > data"
+        assert_equal 2, one.length
+        one.each { |x| assert_equal "data", x.tag }
+        assert_equal ["1","2"], one.collect { |x| x[:id] }
+    end
+
+    def testNeighbour
+        one = @tree/"empty + data"
+        assert_equal 2, one.length
+        one.each { |x| assert_equal "data", x.tag }
+        assert_equal ["1","2"], one.collect { |x| x[:id] }
+    end
+
+    def testDescendant
+        one = @tree/"empty ~ data"
+        assert_equal 1, one.length
+        assert_equal "data", one[0].tag
+        assert_equal "1", one[0][:id]
     end
 
     def testIDClassSelectors
