@@ -55,7 +55,7 @@ module Dome
         def parse_doc
             @parse_started = true
             goon = true
-            goon = parse_element while @lexer.get and goon
+            goon = parse_whitespace and parse_element while @lexer.get and goon
             # in case there was an error and there is still data stuff
             parse_tail
             @cc = nil
