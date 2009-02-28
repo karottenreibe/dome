@@ -55,9 +55,7 @@ module Dome
         def parse_doc
             @parse_started = true
             goon = true
-            goon = parse_whitespace and parse_element while @lexer.get and goon
-            # in case there was an error and there is still data stuff
-            parse_tail
+            goon = parse_element or parse_cdata or parse_data while @lexer.get and goon
             @cc = nil
             @ret.call nil
         end
@@ -106,7 +104,7 @@ module Dome
         # Parses all the children of an Element.
         #
         def parse_children
-            nil while parse_cdata or parse_data or parse_element
+            nil while parse_element or parse_cdata or parse_data
         end
 
         ##
@@ -248,20 +246,6 @@ module Dome
             end
 
             buf.empty? ? nil : buf
-        end
-
-        ##
-        # Parses any remaining input into a data section.
-        #
-        def parse_tail
-            buf = ''
-
-            while token = @lexer.get
-                buf << token.value
-                @lexer.next!
-            end
-
-            found :tail, buf unless buf.empty?
         end
 
         ##

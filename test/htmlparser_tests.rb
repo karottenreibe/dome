@@ -301,7 +301,7 @@ class HTMLParserTests < Test::Unit::TestCase
 
         ret = p.next
         assert_kind_of Token, ret
-        assert_equal :tail, ret.type
+        assert_equal :data, ret.type
         assert_equal "bartowski", ret.value
     end
 
@@ -309,7 +309,7 @@ class HTMLParserTests < Test::Unit::TestCase
         p = HTMLParser.new HTMLLexer.new("demorgan")
         ret = p.next
         assert_kind_of Token, ret
-        assert_equal :tail, ret.type
+        assert_equal :data, ret.type
         assert_equal "demorgan", ret.value
 
         5.times { assert_kind_of NilClass, p.next }

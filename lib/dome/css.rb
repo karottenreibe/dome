@@ -93,7 +93,6 @@ module Dome
             nodes = obj.is_a?(Tree) ?
                 obj.flatten.find_all { |n| n.is_a? Element } :
                 [obj].flatten
-            p nodes.collect { |x| x.tag }
 
             @selectors.each do |sel|
                 new_nodes = []
