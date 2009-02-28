@@ -69,9 +69,6 @@ EOI
     end
 
     def testElementScraping
-        p (@tree/"special ~ * ~ *").collect { |x| x.tag }
-        return
-
         res = @tree.scrape do
             all "special ~ data"
             scrape :element => :elems
