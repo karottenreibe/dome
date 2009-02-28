@@ -69,7 +69,7 @@ module Dome
                     @cur.attributes << Attribute.new(finding.value[0], finding.value[1])
                 when :cdata
                     @cur.children << Data.new(finding.value, true)
-                when :data
+                when :data, :tail
                     @cur.children << Data.new(finding.value)
                 end
             end
