@@ -15,7 +15,7 @@
 # This file contains the CSS Scraper related classes and functions.
 #
 
-require 'dome/helpers/css'
+require 'dome/css'
 
 module Dome
 
@@ -30,7 +30,7 @@ module Dome
         #
         def scrape &block
             raise "Tree#extract expects a block" unless block_given?
-            ex = Extractor.new self
+            ex = Scraper.new self
             ex.instance_exec ex, &block
             ex.result
         end
@@ -43,49 +43,16 @@ module Dome
     class Scraper
 
         ##
-        # Keeps a Scraper Result.
-        # The data in the Result can be accessed either via the Hash-like method
-        # +#[]+ or directly via the associated +attr_accessor+.
-        #
-        class Result
-
-            ##
-            # Stores +data+ in the Result under +sym+.
-            #
-            def []= sym, data
-                define sym
-                sym = "#{sym}=".to_sym
-                self.send sym, data
-            end
-
-            ##
-            # Retrieves the data associated with +sym+.
-            #
-            def [] sym
-                self.send sym
-            end
-
-            ##
-            # Adds an +attr_accessor+ for +sym+.
-            #
-            def define sym
-                eval "def self.#{sym}; @#{sym}; end"
-                eval "def self.#{sym}= x; @#{sym} = x; end"
-            end
-
-        end
-
-        ##
         # The result the extraction produced
         #
         attr_reader :result
 
         ##
-        # +tree+ must be the Tree on which the Extractor should operate.
+        # +tree+ must be the Tree on which the Scraper should operate.
         #
         def initialize tree
             @tree = tree
-            @result = Result.new
+            @result = Hash.new
         end
 
         ##
@@ -112,26 +79,32 @@ module Dome
         # result attribute.
         # The given +hash+ must be of form +selector=>storage+, with +selector+
         # being any of:
+        # - +:element+ to select the whole element
         # - +"@attribute"+ to select an attribute value
         # - +"$index"+ or +"$range"+ to select the Data descendant(s) with the given +index+
         #   or within the given +range+. Both are zero-based.
         # - +:inner_text+ to select the +inner_text+ of the Element
         # - +:inner_html+ to select the +inner_html+ of the Element
         # - +:outer_html+ to select the +outer_html+ of the Element
-        # and +storage+ being a symbol which signifies the attribute to store the
+        # and +storage+ being a symbol which signifies where in the result hash to store the
         # extracted data in.
+        # All the +storage+ places are guaranteed to be initialized with an Array, even if nothing
+        # was selected.
         #
         def scrape hash
             raise "nothing selected so far" unless @selected
 
-            @selected.each do |elem|
-                hash.each do |k,v|
-                    @result[v] =
-                        case key
+            hash.each do |selector,storage|
+                @result[storage] ||= []
+
+                @selected.each do |elem|
+                    @result[storage] <<
+                        case selector
+                        when :element then elem
                         when :inner_text, :inner_html, :outer_html then elem.send k
                         when /^@./ then elem[k[1..-1]]
                         when /^\$[0-9]+(\.\.\.?[0-9]+)?$/ then scrape_data eval(k[1..-1])
-                        else raise "invalid selector #{k.inspect} given to Extractor#store"
+                        else raise "invalid selector #{k.inspect} given to Scraper#scrape"
                         end
                 end
             end

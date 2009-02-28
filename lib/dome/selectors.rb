@@ -35,7 +35,7 @@ module Dome
             end
 
             def walk node
-                yield node if node.is_a? Element and @tag == :any or node.tag == @tag
+                yield node if node.is_a? Element and (@tag == :any or node.tag == @tag)
             end
         end
 
