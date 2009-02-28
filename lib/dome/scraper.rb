@@ -82,7 +82,7 @@ module Dome
         # - +:element+ to select the whole element
         # - +"@attribute"+ to select an attribute value
         # - +"$index"+ or +"$range"+ to select the Data descendant(s) with the given +index+
-        #   or within the given +range+. Both are zero-based.
+        #   or within the given +range+. Both are 1-based.
         # - +:inner_text+ to select the +inner_text+ of the Element
         # - +:inner_html+ to select the +inner_html+ of the Element
         # - +:outer_html+ to select the +outer_html+ of the Element
@@ -103,11 +103,14 @@ module Dome
                         when :element then elem
                         when :inner_text, :inner_html, :outer_html then elem.send selector
                         when /^@./ then elem[selector[1..-1]]
+                        when /^\$[0-9]+$/
+                            i = selector[1..-1].to_i
+                            scrape_data elem, i..i
                         when /^\$[0-9]+(\.\.\.?[0-9]+)?$/
-                            m = /(.*)(\.\.\.?)(.*)/.match selector
-                            first,last = m[1].to_i, m[3].to_i
-                            last -= 1 if m[2] == "..."
-                            scrape_data first..last
+                            m = /\.\.\.?/.match selector
+                            first,last = m.pre_match[1..-1].to_i, m.post_match.to_i
+                            last -= 1 if m[0] == "..."
+                            scrape_data elem, first..last
                         else raise "invalid selector #{selector.inspect} given to Scraper#scrape"
                         end
                 end
@@ -118,19 +121,18 @@ module Dome
 
         ##
         # Scrapes the +idx+'th Data Node under the given +element+.
-        # Returns either the Data Node or an Integer signifying how many
-        # Data Nodes still need to be searched.
+        # Returns the found Data Nodes' values joined together into a single String.
         #
         def scrape_data element, range
-            idx = 0
+            idx = 1
             ret = []
-            @children.each { |child|
+            element.children.each { |child|
                 if child.is_a? Data
-                    ret << child if range.include? idx
+                    ret << child.value if range.include? idx
                     idx += 1
                 end
             }
-            ret
+            ret.join
         end
 
     end

@@ -31,7 +31,7 @@ class SelectorTests < Test::Unit::TestCase
         <data>2</data>
         <data>3</data>
         <data>4</data>
-        <data>5</data>
+        <data>5<x/>6<x/>7<x/>8<x/>9<x/>10</data>
     </storage>
     <storage>
         <data>11</data>
@@ -98,6 +98,35 @@ EOI
         assert_equal [:values], res.keys
         assert_kind_of Array, res[:values]
         assert_equal ["CIA", "FBI"], res[:values]
+    end
+
+    def testDataScraping
+        res = @tree.scrape do
+            all "root > storage:first-child data:last-of-type"
+            scrape "$2" => :val
+        end
+
+        assert_kind_of Hash, res
+        assert_equal [:val], res.keys
+        assert_kind_of Array, res[:val]
+        assert_equal ["6"], res[:val]
+
+        res = @tree.scrape do
+            all "root > storage:first-child data:last-of-type"
+            scrape "$2..4" => :val
+        end
+
+        assert_kind_of Hash, res
+        assert_equal [:val], res.keys
+        assert_kind_of Array, res[:val]
+        assert_equal ["678"], res[:val]
+
+        res2 = @tree.scrape do
+            all "root > storage:first-child data:last-of-type"
+            scrape "$2...5" => :val
+        end
+
+        assert_equal res, res2
     end
 
     def testInnerOuterScraping
