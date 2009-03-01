@@ -23,7 +23,7 @@ class ParserTests < Test::Unit::TestCase
     def testEmptyElem
         tree = Dome "<doctor />"
         assert_kind_of Tree, tree
-        assert_equal false, tree.root.children.empty?
+        assert_equal 1, tree.root.children.length
         assert_kind_of Element, tree.root.children[0]
         assert_equal "doctor", tree.root.children[0].tag
     end
@@ -222,6 +222,14 @@ class ParserTests < Test::Unit::TestCase
         assert_kind_of Data, proclamation
         assert_equal "proclamation", proclamation.value
         assert_equal false, proclamation.cdata?
+    end
+
+    def testEmptyElem
+        tree = Dome "<!----->"
+        assert_kind_of Tree, tree
+        assert_equal 1, tree.root.children.length
+        assert_kind_of Comment, tree.root.children[0]
+        assert_equal "-", tree.root.children[0].text
     end
 
 end
