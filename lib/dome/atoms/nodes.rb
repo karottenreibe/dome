@@ -211,6 +211,32 @@ module Dome
     end
 
     ##
+    # Keeps a single HTML Comment.
+    #
+    class Comment < Node
+
+        ##
+        # The text stored inside the Comment.
+        #
+        attr_accessor :text
+
+        def initialize text
+            @text = text
+        end
+
+        def inner_html
+            "<!--#{@text}-->"
+        end
+
+        alias_method :outer_html, :inner_html
+        alias_method :to_s, :inner_html
+
+        def inspect
+            inner_html.inspect
+        end
+    end
+
+    ##
     # Keeps text data, either normally or as a CDATA section.
     #
     class Data < Node
@@ -255,7 +281,16 @@ module Dome
     # And we'd like to let the user decide how to handle this.
     #
     class Attribute < Node
+
+        ##
+        # The name that identifies the Attribute.
+        #
         attr_accessor :name
+
+        ##
+        # The value associated with the Attribute's name.
+        # May be +nil+, if no value was specified.
+        #
         attr_accessor :value
 
         ##
