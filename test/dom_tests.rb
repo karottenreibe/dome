@@ -56,7 +56,7 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, the.attributes.empty?
         doctor = the.attributes[0]
         assert_kind_of Attribute, doctor
-        assert_equal "doctor", doctor.name
+        assert_equal :doctor, doctor.name
         assert_equal nil, doctor.value
     end
 
@@ -72,7 +72,7 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, martha.attributes.empty?
         jones = martha.attributes[0]
         assert_kind_of Attribute, jones
-        assert_equal "jones", jones.name
+        assert_equal :jones, jones.name
         assert_equal "brilliant", jones.value
     end
 
@@ -88,7 +88,7 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, rose.attributes.empty?
         tyler = rose.attributes[0]
         assert_kind_of Attribute, tyler
-        assert_equal "tyler", tyler.name
+        assert_equal :tyler, tyler.name
         assert_equal "marvellous", tyler.value
     end
 
@@ -104,7 +104,7 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, rose.attributes.empty?
         tyler = rose.attributes[0]
         assert_kind_of Attribute, tyler
-        assert_equal "tyler", tyler.name
+        assert_equal :tyler, tyler.name
         assert_equal "marvellous", tyler.value
     end
 
@@ -120,12 +120,12 @@ class ParserTests < Test::Unit::TestCase
         assert_equal 2, rose.attributes.length
         tyler = rose.attributes[0]
         assert_kind_of Attribute, tyler
-        assert_equal "tyler", tyler.name
+        assert_equal :tyler, tyler.name
         assert_equal "back", tyler.value
 
         to = rose.attributes[1]
         assert_kind_of Attribute, to
-        assert_equal "to", to.name
+        assert_equal :to, to.name
         assert_equal "earth", to.value
     end
 
@@ -141,7 +141,7 @@ class ParserTests < Test::Unit::TestCase
         assert_equal 1, captain.attributes.length
         jack = captain.attributes[0]
         assert_kind_of Attribute, jack
-        assert_equal "jack", jack.name
+        assert_equal :jack, jack.name
         assert_equal "hark'ness", jack.value
     end
 

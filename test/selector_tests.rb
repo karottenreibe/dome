@@ -34,7 +34,7 @@ class SelectorTests < Test::Unit::TestCase
         assert_kind_of ElementSelector, sl[0]
         assert_equal "bad", sl[0].instance_variable_get(:@tag)
         assert_kind_of AttributeSelector, sl[1]
-        assert_equal "wolf", sl[1].instance_variable_get(:@name)
+        assert_equal :wolf, sl[1].instance_variable_get(:@name)
         assert_equal nil, sl[1].instance_variable_get(:@op)
         assert_equal nil, sl[1].instance_variable_get(:@value)
 
@@ -43,7 +43,7 @@ class SelectorTests < Test::Unit::TestCase
         assert_kind_of ElementSelector, sl[0]
         assert_equal "bad", sl[0].instance_variable_get(:@tag)
         assert_kind_of AttributeSelector, sl[1]
-        assert_equal "wolf", sl[1].instance_variable_get(:@name)
+        assert_equal :wolf, sl[1].instance_variable_get(:@name)
         assert_equal :equal, sl[1].instance_variable_get(:@op)
         assert_equal "TARDIS", sl[1].instance_variable_get(:@value)
 
@@ -53,7 +53,7 @@ class SelectorTests < Test::Unit::TestCase
             assert_kind_of ElementSelector, sl[0]
             assert_equal "doctor", sl[0].instance_variable_get(:@tag)
             assert_kind_of AttributeSelector, sl[1]
-            assert_equal "TARDIS", sl[1].instance_variable_get(:@name)
+            assert_equal :TARDIS, sl[1].instance_variable_get(:@name)
             assert_equal op.to_sym, sl[1].instance_variable_get(:@op)
             assert_equal "Time and Relative Dimensions in Space", sl[1].instance_variable_get(:@value)
         end
@@ -128,12 +128,12 @@ class SelectorTests < Test::Unit::TestCase
         sl = SelectorList.new(".buddy#guy").selectors
         assert_equal 2, sl.length
         assert_kind_of AttributeSelector, sl[0]
-        assert_equal "class", sl[0].instance_variable_get(:@name)
+        assert_equal :class, sl[0].instance_variable_get(:@name)
         assert_equal :in_list, sl[0].instance_variable_get(:@op)
         assert_equal "buddy", sl[0].instance_variable_get(:@value)
 
         assert_kind_of AttributeSelector, sl[1]
-        assert_equal "id", sl[1].instance_variable_get(:@name)
+        assert_equal :id, sl[1].instance_variable_get(:@name)
         assert_equal :equal, sl[1].instance_variable_get(:@op)
         assert_equal "guy", sl[1].instance_variable_get(:@value)
     end
@@ -157,7 +157,7 @@ class SelectorTests < Test::Unit::TestCase
         assert_equal "the", sli[2].instance_variable_get(:@tag)
 
         assert_kind_of AttributeSelector, sli[3]
-        assert_equal "mood", sli[3].instance_variable_get(:@name)
+        assert_equal :mood, sli[3].instance_variable_get(:@name)
         assert_equal :equal, sli[3].instance_variable_get(:@op)
         assert_equal "for", sli[3].instance_variable_get(:@value)
 

@@ -124,10 +124,10 @@ module Dome
         ##
         # Retrieves the first attribute, whose name is +key+, from the attributes hash, or +nil+ if
         # no such attribute was specified.
-        # The +key+ must be convertible to a String.
+        # The +key+ must be convertible to a Symbol.
         #
         def [] key
-            key = key.to_s
+            key = key.to_sym
             att = @attributes.find { |a| a.name == key }
             att ? att.value : nil
         end
@@ -135,10 +135,10 @@ module Dome
         ##
         # Sets the attribute specified by +key+ to the given +value+ and creates such an Attribute
         # if it does not yet exist.
-        # The +key+ must be convertible to a String.
+        # The +key+ must be convertible to a Symbol.
         #
         def []= key, value
-            key = key.to_s
+            key = key.to_sym
             idx = @attributes.index { |a| a.name == key }
 
             if idx then @attributes[idx].value = value
@@ -258,12 +258,16 @@ module Dome
         attr_accessor :name
         attr_accessor :value
 
+        ##
+        # Initializes the Attribute's +name+ and +value+.
+        # +name+ must be convertible to a Symbol.
+        #
         def initialize name, value
-            @name, @value = name, value
+            @name, @value = name.to_sym, value
         end
 
         def inspect
-            @value ? "#{@name}='#{ @value.gsub("'", "\\\\'") }'" : @name
+            @value ? "#{@name}='#{ @value.gsub("'", "\\\\'") }'" : @name.to_s
         end
 
         alias_method :to_s, :inspect

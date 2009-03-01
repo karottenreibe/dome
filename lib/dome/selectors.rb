@@ -41,7 +41,7 @@ module Dome
 
         class AttributeSelector
             def initialize name, op, value
-                @name, @op, @value = name, op, value
+                @name, @op, @value = name.to_sym, op, value
             end
 
             def walk node

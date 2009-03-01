@@ -66,7 +66,7 @@ module Dome
                 when :element_end, :missing_end
                     close
                 when :attribute
-                    @cur.attributes << Attribute.new(finding.value[0], finding.value[1])
+                    @cur.attributes << Attribute.new(finding.value[0].to_sym, finding.value[1])
                 when :cdata
                     @cur.children << Data.new(finding.value, true)
                 when :data, :tail
