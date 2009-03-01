@@ -62,6 +62,16 @@ module Dome
         end
 
         ##
+        # Parses all the children of an Element.
+        # Always returns +true+.
+        #
+        def parse_children
+            worked = false
+            worked = true while parse_element or parse_comment or parse_cdata or parse_data
+            worked
+        end
+
+        ##
         # Parses an element section.
         # Returns +true+ on success and +false+ otherwise.
         #
@@ -102,13 +112,22 @@ module Dome
         end
 
         ##
-        # Parses all the children of an Element.
-        # Always returns +true+.
+        # Parses an HTML comment.
+        # Returns +true+ on success and +false+ otherwise.
         #
-        def parse_children
-            worked = false
-            worked = true while parse_element or parse_cdata or parse_data
-            worked
+        def parse_comment
+            return false unless @lexer.get and @lexer.get.type == :comment_start
+            @lexer.next!
+
+            buf = ''
+            while token = @lexer.get
+                break if token.type == :comment_end
+                buf << token.value
+                @lexer.next!
+            end
+
+            found :comment, buf
+            true
         end
 
         ##
