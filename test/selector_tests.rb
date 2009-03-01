@@ -22,14 +22,14 @@ class SelectorTests < Test::Unit::TestCase
     include Selectors
 
     def testElement
-        sl = SelectorList.new("clone").selectors
+        sl = Selector.new("clone").selectors
         assert_equal 1, sl.length
         assert_kind_of ElementSelector, sl[0]
         assert_equal "clone", sl[0].instance_variable_get(:@tag)
     end
 
     def testAttribute
-        sl = SelectorList.new("bad[wolf]").selectors
+        sl = Selector.new("bad[wolf]").selectors
         assert_equal 2, sl.length
         assert_kind_of ElementSelector, sl[0]
         assert_equal "bad", sl[0].instance_variable_get(:@tag)
@@ -38,7 +38,7 @@ class SelectorTests < Test::Unit::TestCase
         assert_equal nil, sl[1].instance_variable_get(:@op)
         assert_equal nil, sl[1].instance_variable_get(:@value)
 
-        sl = SelectorList.new("bad[wolf=TARDIS]").selectors
+        sl = Selector.new("bad[wolf=TARDIS]").selectors
         assert_equal 2, sl.length
         assert_kind_of ElementSelector, sl[0]
         assert_equal "bad", sl[0].instance_variable_get(:@tag)
@@ -48,7 +48,7 @@ class SelectorTests < Test::Unit::TestCase
         assert_equal "TARDIS", sl[1].instance_variable_get(:@value)
 
         %w{^= $= *= |= ~=}.zip(%w{begins_with ends_with contains begins_with_dash in_list}).each do |(arg,op)|
-            sl = SelectorList.new("doctor[TARDIS#{arg}'Time and Relative Dimensions in Space']").selectors
+            sl = Selector.new("doctor[TARDIS#{arg}'Time and Relative Dimensions in Space']").selectors
             assert_equal 2, sl.length
             assert_kind_of ElementSelector, sl[0]
             assert_equal "doctor", sl[0].instance_variable_get(:@tag)
@@ -60,7 +60,7 @@ class SelectorTests < Test::Unit::TestCase
     end
 
     def testCombinators
-        sl = SelectorList.new("one two > three  +  four~five").selectors
+        sl = Selector.new("one two > three  +  four~five").selectors
         assert_equal 9, sl.length
         assert_kind_of ElementSelector, sl[0]
         assert_equal "one", sl[0].instance_variable_get(:@tag)
@@ -82,7 +82,7 @@ class SelectorTests < Test::Unit::TestCase
         %w{:root :only-child :only-of-type :empty :only-text}.zip(
             [RootSelector, OnlyChildSelector, OnlyOfTypeSelector, EmptySelector, OnlyTextSelector]
         ).each do |(sel,klass)|
-            sl = SelectorList.new("phony#{sel}").selectors
+            sl = Selector.new("phony#{sel}").selectors
             assert_equal 2, sl.length
             assert_kind_of ElementSelector, sl[0]
             assert_equal "phony", sl[0].instance_variable_get(:@tag)
@@ -96,7 +96,7 @@ class SelectorTests < Test::Unit::TestCase
             [false, true, false, true],
             [nil, nil, "buddy", "buddy"]
         ).each do |(sel,klass,reverse, tag)|
-            sl = SelectorList.new("buddy#{sel}").selectors
+            sl = Selector.new("buddy#{sel}").selectors
             assert_equal 2, sl.length
             assert_kind_of ElementSelector, sl[0]
             assert_equal "buddy", sl[0].instance_variable_get(:@tag)
@@ -113,7 +113,7 @@ class SelectorTests < Test::Unit::TestCase
             [false, true, false, true],
             [nil, nil, "guy", "guy"]
         ).each do |(sel,klass,reverse, tag)|
-            sl = SelectorList.new("guy#{sel}(2n+3)").selectors
+            sl = Selector.new("guy#{sel}(2n+3)").selectors
             assert_equal 2, sl.length
             assert_kind_of ElementSelector, sl[0]
             assert_equal "guy", sl[0].instance_variable_get(:@tag)
@@ -125,7 +125,7 @@ class SelectorTests < Test::Unit::TestCase
     end
 
     def testIDClassSelectors
-        sl = SelectorList.new(".buddy#guy").selectors
+        sl = Selector.new(".buddy#guy").selectors
         assert_equal 2, sl.length
         assert_kind_of AttributeSelector, sl[0]
         assert_equal :class, sl[0].instance_variable_get(:@name)
@@ -139,12 +139,12 @@ class SelectorTests < Test::Unit::TestCase
     end
 
     def testNot
-        sl = SelectorList.new(":not(in > the[mood=for]:not(:root))").selectors
+        sl = Selector.new(":not(in > the[mood=for]:not(:root))").selectors
         assert_equal 1, sl.length
         assert_kind_of NotSelector, sl[0]
 
         inner = sl[0].instance_variable_get :@slist
-        assert_kind_of SelectorList, inner
+        assert_kind_of Selector, inner
 
         sli = inner.selectors
         assert_equal 5, sli.length
@@ -164,7 +164,7 @@ class SelectorTests < Test::Unit::TestCase
         assert_kind_of NotSelector, sli[4]
 
         inner = sli[4].instance_variable_get :@slist
-        assert_kind_of SelectorList, inner
+        assert_kind_of Selector, inner
 
         sli = inner.selectors
         assert_equal 1, sli.length

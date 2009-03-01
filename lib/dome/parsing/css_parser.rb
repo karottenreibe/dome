@@ -24,7 +24,7 @@ require 'dome/css'
 module Dome
 
     ##
-    # Parses a string into a SelectorList. Parsing is started by calling +next+.
+    # Parses a string into a Selector. Parsing is started by calling +next+.
     #
     class CSSParser
 
@@ -269,11 +269,11 @@ module Dome
 
         ##
         # Parses the +arg+ument given to +:not()+ pseudo selector.
-        # On success returns a SelectorList which contains the specified selectors.
+        # On success returns a Selector which contains the specified selectors.
         # On failure returns +nil+.
         #
         def parse_not_arg arg
-            SelectorList.new arg
+            Selector.new arg
         end
 
         ##

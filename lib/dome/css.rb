@@ -32,7 +32,7 @@ module Dome
         #
         def / path
             ret = []
-            SelectorList.new(path).each(self) { |node| ret << node }
+            Selector.new(path).each(self) { |node| ret << node }
             ret
         end
 
@@ -41,7 +41,7 @@ module Dome
         #
         def % path
             callcc { |cc|
-                SelectorList.new(path).each(self) { |node| cc.call node }
+                Selector.new(path).each(self) { |node| cc.call node }
             }
         end
 
@@ -51,7 +51,7 @@ module Dome
         def each path
             raise "Tree#each expects a block" unless block_given?
             ret = []
-            SelectorList.new(path).each(self) { |node| yield node }
+            Selector.new(path).each(self) { |node| yield node }
             ret
         end
 
@@ -62,7 +62,7 @@ module Dome
     # Can be used to iterate over all the Elements identified by the Selectors
     # and to execute code for each found node.
     #
-    class SelectorList
+    class Selector
 
         include Dome::Selectors
 
@@ -82,12 +82,12 @@ module Dome
         ##
         # Executes the given +block+ for each node in the Tree given in +obj+ - or constructed
         # from +obj+ in case +obj+ is an Element or an Array of Elements - that matches this
-        # SelectorList.
+        # Selector.
         #
         def each obj, &block
-            raise "SelectorList#each expects any of [Tree, Element, Array of Elements] as first argument" unless
+            raise "Selector#each expects any of [Tree, Element, Array of Elements] as first argument" unless
                 [Tree, Element].include? obj.class or ( obj.is_a? Array and obj.all? { |n| n.is_a? Element } )
-            raise "SelectorList#each expects a block" unless block_given?
+            raise "Selector#each expects a block" unless block_given?
             return if @selectors.empty?
 
             nodes = sels = nil
