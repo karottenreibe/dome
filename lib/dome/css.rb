@@ -80,7 +80,7 @@ module Dome
         end
 
         ##
-        # Executes the given +block+ for each node in the Tree given in +obj+ - or constructed
+        # Executes the given +block+ for each Node in the Tree given in +obj+ - or constructed
         # from +obj+ in case +obj+ is an Element or an Array of Elements - that matches this
         # Selector.
         #
@@ -116,6 +116,47 @@ module Dome
             end
 
             nodes.each { |node| block.call node }
+            nil
+        end
+
+        ##
+        # Returns the first Node in the Tree given in +obj+ - or constructed from +obj+ in case +obj+
+        # is an Element or an Array of Elements - that matches this Selector -- or +nil+ if none is found.
+        #
+        def first obj
+            raise "Selector#each expects any of [Tree, Element, Array of Elements] as first argument" unless
+                [Tree, Element].include? obj.class or ( obj.is_a? Array and obj.all? { |n| n.is_a? Element } )
+            raise "Selector#each expects a block" unless block_given?
+            return if @selectors.empty?
+
+            nodes = sels = nil
+            if obj.is_a? Tree
+                if @selectors[0].is_a? RootSelector
+                    nodes = obj.root.children.find_all { |r| r.is_a? Element }
+                    sels = @selectors[1..-1]
+                else
+                    nodes = obj.flatten
+                    sels = @selectors
+                end
+            else
+                nodes = [obj].flatten
+                sels = @selectors
+            end
+ 
+            levels = [nodes]
+          
+            while not levels.empty?
+                return levels[-1][0] if levels.length == sels.length+1
+
+                # if the last level is empty, we're done there
+                levels.delete_at -1 if levels[-1].empty?
+                # generate a new level from the first node in the last level
+                node = levels[-1].delete_at 0
+                lvl = []
+                sels[levels.length-1].walk(node) { |ret| lvl << ret }
+                levels << lvl unless lvl.empty?
+            end
+
             nil
         end
 
