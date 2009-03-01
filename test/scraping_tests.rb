@@ -15,8 +15,7 @@
 #
 
 require 'test/unit'
-require 'lib/dome'
-require 'lib/dome/scraper'
+require 'dome'
 
 class SelectorTests < Test::Unit::TestCase
     include Dome

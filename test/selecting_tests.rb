@@ -15,8 +15,7 @@
 #
 
 require 'test/unit'
-require 'lib/dome'
-require 'lib/dome/css'
+require 'dome'
 
 class SelectingTests < Test::Unit::TestCase
     include Dome

@@ -16,9 +16,6 @@
 # It also extends the Tree class to provide CSS Selector functionality.
 #
 
-require 'dome/helpers/lexer'
-require 'dome/helpers/css_parser'
-
 module Dome
 
     ##

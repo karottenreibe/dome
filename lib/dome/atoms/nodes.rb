@@ -16,7 +16,7 @@
 # Contains the atomic objects that compose a DOM tree.
 #
 
-require 'dome/helpers/primitive'
+require 'dome/atoms/primitive'
 
 module Dome
 

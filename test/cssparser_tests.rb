@@ -15,7 +15,7 @@
 #
 
 require 'test/unit'
-require 'lib/dome/css'
+require 'dome/css'
 
 class CSSParserTests < Test::Unit::TestCase
     include Dome

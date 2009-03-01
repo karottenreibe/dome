@@ -17,7 +17,7 @@
 # two Lexer classes.
 #
 
-require 'dome/helpers/primitive'
+require 'dome/atoms/primitive'
 
 module Dome
 

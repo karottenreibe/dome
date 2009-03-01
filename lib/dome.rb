@@ -17,4 +17,6 @@
 #
 
 require 'dome/dome'
+require 'dome/css'
+require 'dome/scraper'
 

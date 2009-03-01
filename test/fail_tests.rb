@@ -15,7 +15,7 @@
 #
 
 require 'test/unit'
-require 'lib/dome/helpers/html_parser'
+require 'dome/parsing/html_parser'
 
 class FailTests < Test::Unit::TestCase
     include Dome

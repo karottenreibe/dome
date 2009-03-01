@@ -17,8 +17,9 @@
 # of the HTML document.
 #
 
-require 'dome/atoms'
-require 'dome/helpers/html_parser'
+require 'dome/parsing/html_lexer'
+require 'dome/parsing/html_parser'
+require 'dome/atoms/nodes'
 
 ##
 # Shortcut for calling +Dome::Dom.new(input).tree+.

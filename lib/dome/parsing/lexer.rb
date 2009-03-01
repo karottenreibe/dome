@@ -17,7 +17,7 @@
 # of tokens for the Parser.
 #
 
-require 'dome/helpers/token'
+require 'dome/atoms/token'
 
 module Dome
 
@@ -109,64 +109,6 @@ module Dome
             end
         end
 
-    end
-
-    class HTMLLexer < Lexer
-        protected
-
-        def delimiters
-            /<!\[CDATA\[|<\/|=|\\|\s|\/>|>|<|\]\]>|'|"/
-        end
-
-        def meaning token
-            case token
-            when '<' then :left_bracket
-            when '>' then :right_bracket
-            when '=' then :equal
-            when '\\' then :escape
-            when '"', "'" then :quote
-            when /\s/ then :whitespace
-            when '/>' then :empty_element_end
-            when '</' then :end_element_start
-            when '<![CDATA[' then :cdata_start
-            when ']]>' then :cdata_end
-            else :text
-            end
-        end
-    end
-
-    class CSSLexer < Lexer
-        protected
-
-        def delimiters
-            /\[|\]|:|~=|\^=|\$=|\*=|\|=|\*|=|\(|\)|#|\.|>|\+|\s|~|\\|'|"/
-        end
-
-        def meaning token
-            case token
-            when '[' then :left_bracket
-            when ']' then :right_bracket
-            when '(' then :left_parenthesis
-            when ')' then :right_parenthesis
-            when '\\' then :escape
-            when '"', "'" then :quote
-            when /\s/ then :whitespace
-            when ':' then :pseudo
-            when '*' then :any
-            when '.' then :class
-            when '>' then :child
-            when '+' then :neighbour
-            when '~' then :follower
-            when '#' then :id
-            when '=' then :equal
-            when '~=' then :in_list
-            when '$=' then :ends_with
-            when '^=' then :begins_with
-            when '*=' then :contains
-            when '|=' then :begins_with_dash
-            else :text
-            end
-        end
     end
 
 end

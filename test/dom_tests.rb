@@ -15,7 +15,7 @@
 #
 
 require 'test/unit'
-require 'lib/dome'
+require 'dome'
 
 class ParserTests < Test::Unit::TestCase
     include Dome

@@ -17,8 +17,8 @@
 # CSS Selectors.
 #
 
-require 'dome/helpers/lexer'
-require 'dome/helpers/token'
+require 'dome/parsing/css_lexer'
+require 'dome/atoms/token'
 require 'dome/css'
 
 module Dome
