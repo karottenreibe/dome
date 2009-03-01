@@ -15,7 +15,7 @@
 #
 
 require 'test/unit'
-require 'dome/parsing/lexer'
+require 'dome/parsing/html_lexer'
 
 class HTMLLexerTests < Test::Unit::TestCase
     include Dome
@@ -292,6 +292,29 @@ class HTMLLexerTests < Test::Unit::TestCase
             lex.next!
             assert_kind_of NilClass, lex.get
         }
+    end
+
+    def testComment
+        lex = HTMLLexer.new "<!------>"
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :comment_start, t.type
+        assert_equal "<!--", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :text, t.type
+        assert_equal "--", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :comment_end, t.type
+        assert_equal "-->", t.value
+
+        lex.next!
+        assert_kind_of NilClass, lex.get
     end
 
 end

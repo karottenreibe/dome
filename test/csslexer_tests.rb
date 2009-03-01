@@ -15,7 +15,7 @@
 #
 
 require 'test/unit'
-require 'dome/parsing/lexer'
+require 'dome/parsing/css_lexer'
 
 class CSSLexerTests < Test::Unit::TestCase
     include Dome
