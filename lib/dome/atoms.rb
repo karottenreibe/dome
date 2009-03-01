@@ -122,7 +122,7 @@ module Dome
         end
 
         ##
-        # Retrieves the attribute specified by +key+ from the attributes hash, or +nil+ if
+        # Retrieves the first attribute, whose name is +key+, from the attributes hash, or +nil+ if
         # no such attribute was specified.
         # The +key+ must be convertible to a String.
         #
@@ -254,10 +254,22 @@ module Dome
     #
     # And we'd like to let the user decide how to handle this.
     #
-    primitive :Attribute, [:name, :value] do
+    class Attribute < Node
+        attr_accessor :name
+        attr_accessor :value
+
+        def initialize name, value
+            @name, @value = name, value
+        end
+
         def inspect
             @value ? "#{@name}='#{ @value.gsub("'", "\\\\'") }'" : @name
         end
+
+        alias_method :to_s, :inspect
+        alias_method :inner_html, :inspect
+        alias_method :outer_html, :inspect
+
     end
 
 end
