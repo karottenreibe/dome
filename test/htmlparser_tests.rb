@@ -315,5 +315,16 @@ class HTMLParserTests < Test::Unit::TestCase
         5.times { assert_kind_of NilClass, p.next }
     end
 
+    def testComment
+        p = HTMLParser.new HTMLLexer.new("<!------->")
+        ret = p.next
+        assert_kind_of Token, ret
+        assert_equal :comment, ret.type
+        assert_equal "---", ret.value
+
+        ret = p.next
+        assert_kind_of NilClass, ret
+    end
+
 end
 

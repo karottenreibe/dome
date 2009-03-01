@@ -127,6 +127,7 @@ module Dome
             end
 
             found :comment, buf
+            @lexer.next!
             true
         end
 
