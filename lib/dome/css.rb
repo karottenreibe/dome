@@ -96,7 +96,7 @@ module Dome
                     nodes = obj.root.children.find_all { |r| r.is_a? Element }
                     sels = @selectors[1..-1]
                 else
-                    nodes = obj.flatten.find_all { |n| n.is_a? Element }
+                    nodes = obj.flatten
                     sels = @selectors
                 end
             else
