@@ -57,21 +57,23 @@ module Dome
         # Does the actual parsing by using the +@parser+ to create the +@tree+.
         #
         def parse!
-            while finding = @parser.next
-                case finding.type
+            while token = @parser.next
+                case token.type
                 when :element_start
-                    @open << finding.value
-                    elem = Element.new finding.value, @cur
+                    @open << token.value
+                    elem = Element.new token.value, @cur
                     @cur.children << elem
                     @cur = elem
                 when :element_end, :missing_end
                     close
                 when :attribute
-                    @cur.attributes << Attribute.new(finding.value[0].to_sym, finding.value[1])
+                    @cur.attributes << Attribute.new(token.value[0].to_sym, token.value[1])
                 when :cdata
-                    @cur.children << Data.new(finding.value, true)
+                    @cur.children << Data.new(token.value, true)
                 when :data, :tail
-                    @cur.children << Data.new(finding.value)
+                    @cur.children << Data.new(token.value)
+                when :comment
+                    @cur.children << Comment.new(token.value)
                 end
             end
 
