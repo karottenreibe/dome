@@ -37,13 +37,14 @@ module Dome
         end
 
         class AttributeSelector
-            def initialize name, op, value
-                @name, @op, @value = name.to_sym, op, value
+            def initialize ns, name, op, value
+                @ns, @name, @op, @value = ns, name.to_sym, op, value
             end
 
             def walk node
                 yield node if node.is_a? Element and node.attributes.find { |a|
                     a.name == @name and
+                        (@ns == :any or a.namespace == @ns) and
                         case @op
                         when :equal then a.value == @value
                         when :in_list then a.value.split(/\s/).include? @value

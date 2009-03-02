@@ -153,8 +153,20 @@ module Dome
             @lexer.next!
             
             return terminate "attribute selector", trace if not @lexer.get or @lexer.get.type != :text
+            ns = :any
             att = @lexer.get.value
             @lexer.next!
+
+            if @lexer.get and @lexer.get.type == :namespace
+                @lexer.next!
+                return terminate "attribute selector", trace if not @lexer.get or
+                    @lexer.get.type != :text or @lexer.get.type != :any
+                ns = att
+                att = @lexer.get.type == :text ?
+                    @lexer.get.value :
+                    :any
+                @lexer.next!
+            end
 
             op = parse_attr_op
             val = nil
@@ -178,7 +190,7 @@ module Dome
             end
 
             return terminate "attribute selector", trace if not @lexer.get or @lexer.get.type != :right_bracket
-            found :attribute, [att,op,val]
+            found :attribute, [ns,att,op,val]
             @lexer.next!
             true
         end
@@ -331,7 +343,7 @@ module Dome
             @lexer.next!
 
             return terminate "id selector", trace if not @lexer.get or @lexer.get.type != :text
-            found :attribute, ["id",:equal,@lexer.get.value]
+            found :attribute, [:any,"id",:equal,@lexer.get.value]
             @lexer.next!
             true
         end
@@ -346,7 +358,7 @@ module Dome
             @lexer.next!
 
             return terminate "class selector", trace if not @lexer.get or @lexer.get.type != :text
-            found :attribute, ["class",:in_list,@lexer.get.value]
+            found :attribute, [:any,"class",:in_list,@lexer.get.value]
             @lexer.next!
             true
         end

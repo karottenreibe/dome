@@ -42,7 +42,7 @@ class CSSParserTests < Test::Unit::TestCase
         f = p.next
         assert_kind_of Token, f
         assert_equal :attribute, f.type
-        assert_equal ["joker",nil,nil], f.value
+        assert_equal [:any,"joker",nil,nil], f.value
 
         f = p.next
         assert_kind_of NilClass, f
@@ -58,7 +58,7 @@ class CSSParserTests < Test::Unit::TestCase
         f = p.next
         assert_kind_of Token, f
         assert_equal :attribute, f.type
-        assert_equal ["wayne",:in_list,"awesome"], f.value
+        assert_equal [:any,"wayne",:in_list,"awesome"], f.value
 
         f = p.next
         assert_kind_of NilClass, f
@@ -74,7 +74,7 @@ class CSSParserTests < Test::Unit::TestCase
         f = p.next
         assert_kind_of Token, f
         assert_equal :attribute, f.type
-        assert_equal ["knight",:contains,"twoface"], f.value
+        assert_equal [:any,"knight",:contains,"twoface"], f.value
 
         f = p.next
         assert_kind_of NilClass, f
@@ -90,7 +90,7 @@ class CSSParserTests < Test::Unit::TestCase
         f = p.next
         assert_kind_of Token, f
         assert_equal :attribute, f.type
-        assert_equal ["bruce",:matches,"hero"], f.value
+        assert_equal [:any,"bruce",:matches,"hero"], f.value
 
         f = p.next
         assert_kind_of NilClass, f
@@ -106,7 +106,7 @@ class CSSParserTests < Test::Unit::TestCase
         f = p.next
         assert_kind_of Token, f
         assert_equal :attribute, f.type
-        assert_equal ["story",:begins_with,"gordon"], f.value
+        assert_equal [:any,"story",:begins_with,"gordon"], f.value
 
         f = p.next
         assert_kind_of NilClass, f
@@ -122,7 +122,7 @@ class CSSParserTests < Test::Unit::TestCase
         f = p.next
         assert_kind_of Token, f
         assert_equal :attribute, f.type
-        assert_equal ["film",:ends_with,"batpod"], f.value
+        assert_equal [:any,"film",:ends_with,"batpod"], f.value
 
         f = p.next
         assert_kind_of NilClass, f
@@ -138,7 +138,7 @@ class CSSParserTests < Test::Unit::TestCase
         f = p.next
         assert_kind_of Token, f
         assert_equal :attribute, f.type
-        assert_equal ["movie",:begins_with_dash,"batman-begins"], f.value
+        assert_equal [:any,"movie",:begins_with_dash,"batman-begins"], f.value
 
         f = p.next
         assert_kind_of NilClass, f
@@ -202,12 +202,12 @@ class CSSParserTests < Test::Unit::TestCase
         f = p.next
         assert_kind_of Token, f
         assert_equal :attribute, f.type
-        assert_equal ["class",:in_list,"awesome"], f.value
+        assert_equal [:any,"class",:in_list,"awesome"], f.value
 
         f = p.next
         assert_kind_of Token, f
         assert_equal :attribute, f.type
-        assert_equal ["id",:equal,"girl"], f.value
+        assert_equal [:any,"id",:equal,"girl"], f.value
 
         f = p.next
         assert_kind_of NilClass, f
@@ -274,7 +274,7 @@ class CSSParserTests < Test::Unit::TestCase
         f = p.next
         assert_kind_of Token, f
         assert_equal :attribute, f.type
-        assert_equal ["children",:equal,"gon\"e"], f.value
+        assert_equal [:any,"children",:equal,"gon\"e"], f.value
 
         f = p.next
         assert_kind_of NilClass, f
@@ -288,7 +288,7 @@ class CSSParserTests < Test::Unit::TestCase
         f = p.next
         assert_kind_of Token, f
         assert_equal :attribute, f.type
-        assert_equal ["children",:equal,"go\"[]ne"], f.value
+        assert_equal [:any,"children",:equal,"go\"[]ne"], f.value
 
         f = p.next
         assert_kind_of NilClass, f
