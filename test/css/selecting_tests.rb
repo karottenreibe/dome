@@ -23,7 +23,7 @@ class SelectingTests < Test::Unit::TestCase
 
     def setup
         @tree = Dome <<EOI
-<root>
+<pseudo:root>
     <level1 class=coldplay>
         <level2 value='home'>
             <data id=sleep><![CDATA[blubber]]>blubber</data>
@@ -318,6 +318,29 @@ EOI
 
         assert_kind_of Element, two
         assert_equal "level11", two.tag
+    end
+
+    def testNamespaceSelector
+        one = @tree/"pseudo|*"
+        two = @tree%"pseudo|*"
+
+        assert_equal [two], one
+        assert_kind_of Element, two
+        assert_equal "root", two.tag
+
+        one = @tree/"|level1"
+        two = @tree%"|level1"
+
+        assert_equal [two], one
+        assert_kind_of Element, two
+        assert_equal "level1", two.tag
+
+        one = @tree/"*|root"
+        two = @tree%"*|root"
+
+        assert_equal [two], one
+        assert_kind_of Element, two
+        assert_equal "root", two.tag
     end
 
 end

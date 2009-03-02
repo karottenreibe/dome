@@ -171,5 +171,14 @@ class SelectorTests < Test::Unit::TestCase
         assert_kind_of RootSelector, sli[0]
     end
 
+    def testNamespaces
+        sl = Selector.new("clone|wars").selectors
+        assert_equal 2, sl.length
+        assert_kind_of NamespaceSelector, sl[0]
+        assert_equal "clone", sl[0].instance_variable_get(:@ns)
+        assert_kind_of ElementSelector, sl[1]
+        assert_equal "wars", sl[1].instance_variable_get(:@tag)
+    end
+
 end
 
