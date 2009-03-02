@@ -36,22 +36,6 @@ class HTMLParserTests < Test::Unit::TestCase
         assert_kind_of NilClass, ret
     end
 
-    def testNamespacedElem
-        p = HTMLParser.new HTMLLexer.new("<ns:boo/>")
-        ret = p.next
-        assert_kind_of Token, ret
-        assert_equal :element_start, ret.type
-        assert_equal ["ns","boo"], ret.value
-
-        ret = p.next
-        assert_kind_of Token, ret
-        assert_equal :element_end, ret.type
-        assert_equal "boo", ret.value
-
-        ret = p.next
-        assert_kind_of NilClass, ret
-    end
-
     def testData
         p = HTMLParser.new HTMLLexer.new("<bar>data</bar>")
         ret = p.next
@@ -337,6 +321,27 @@ class HTMLParserTests < Test::Unit::TestCase
         assert_kind_of Token, ret
         assert_equal :comment, ret.type
         assert_equal "---", ret.value
+
+        ret = p.next
+        assert_kind_of NilClass, ret
+    end
+
+    def testNamespaces
+        p = HTMLParser.new HTMLLexer.new("<ns:boo tommy:gun='old'/>")
+        ret = p.next
+        assert_kind_of Token, ret
+        assert_equal :element_start, ret.type
+        assert_equal ["ns","boo"], ret.value
+
+        ret = p.next
+        assert_kind_of Token, ret
+        assert_equal :attribute, ret.type
+        assert_equal ["tommy","gun","old"], ret.value
+
+        ret = p.next
+        assert_kind_of Token, ret
+        assert_equal :element_end, ret.type
+        assert_equal "boo", ret.value
 
         ret = p.next
         assert_kind_of NilClass, ret
