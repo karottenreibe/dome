@@ -104,7 +104,7 @@ module Dome
             when :text
                 ns = @lexer.get.value
                 @lexer.next!
-            when :any
+            when :star
                 ns = :any
                 @lexer.next!
             end
@@ -125,7 +125,7 @@ module Dome
 
             case @lexer.get.type
             when :text then found :element, @lexer.get.value
-            when :any then found :element, :any
+            when :star then found :element, :any
             else return false
             end
 
@@ -197,7 +197,7 @@ module Dome
         # Returns the name on success and +nil+ otherwise.
         #
         def parse_attr_name
-            return nil if not @lexer.get or not [:text,:any].include? @lexer.get.type
+            return nil if not @lexer.get or not [:text,:star].include? @lexer.get.type
             ret = @lexer.get.type == :text ? @lexer.get.value : :any
             @lexer.next!
             ret

@@ -201,7 +201,7 @@ class CSSLexerTests < Test::Unit::TestCase
         lex = CSSLexer.new "*"
         t = lex.get
         assert_kind_of Token, t
-        assert_equal :any, t.type
+        assert_equal :star, t.type
         assert_equal "*", t.value
 
         lex.next!

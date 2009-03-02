@@ -38,7 +38,7 @@ module Dome
             when /\s/ then :whitespace
             when ':' then :colon
             when '|' then :pipe
-            when '*' then :any
+            when '*' then :star
             when '.' then :class
             when '>' then :child
             when '+' then :neighbour
