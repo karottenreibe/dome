@@ -37,7 +37,7 @@ module Dome
             when '"', "'" then :quote
             when /\s/ then :whitespace
             when ':' then :colon
-            when '|' then :namespace
+            when '|' then :pipe
             when '*' then :any
             when '.' then :class
             when '>' then :child

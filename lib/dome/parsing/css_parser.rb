@@ -109,7 +109,7 @@ module Dome
                 @lexer.next!
             end
 
-            return terminate "namespace selector", trace if not @lexer.get or @lexer.get.type != :namespace
+            return terminate "namespace selector", trace if not @lexer.get or @lexer.get.type != :pipe
             found :namespace, ns
             @lexer.next!
 
@@ -156,7 +156,7 @@ module Dome
             ns = :any
             att = parse_attr_name
 
-            if @lexer.get.type == :namespace
+            if @lexer.get.type == :pipe
                 @lexer.next!
                 ns = att
                 att = parse_attr_name

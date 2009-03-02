@@ -150,7 +150,7 @@ class CSSLexerTests < Test::Unit::TestCase
         lex.next!
         t = lex.get
         assert_kind_of Token, t
-        assert_equal :namespace, t.type
+        assert_equal :pipe, t.type
         assert_equal "|", t.value
 
         lex.next!
