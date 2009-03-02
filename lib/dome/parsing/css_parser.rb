@@ -230,6 +230,7 @@ module Dome
         # Returns the argument as a String on success and +nil+ otherwise.
         #
         def parse_pseudo_arg pseudo
+            trace = @lexer.trace
             buf = ''
             leftys = 0
 
@@ -249,11 +250,15 @@ module Dome
             return nil unless done
             @lexer.next!
 
-            case pseudo
-            when "not" then parse_not_arg buf
-            when /^nth-/ then parse_nth_arg buf
-            else buf
-            end
+            ret =
+                case pseudo
+                when "not" then parse_not_arg buf
+                when /^nth-/ then parse_nth_arg buf
+                else nil
+                end
+
+            terminate "argument to :#{pseudo}", trace unless ret
+            ret
         end
 
         ##
@@ -280,6 +285,8 @@ module Dome
         #
         def parse_not_arg arg
             Selector.new arg
+        rescue CSSParserError => e
+            nil
         end
 
         ##
@@ -373,7 +380,7 @@ module Dome
         # parse and returns +false+.
         #
         def terminate what, trace
-            @last_failure = { :what => what, :where => @lexer.descriptive(trace) }
+            @last_failure = { :what => what, :where => trace, :descriptive => @lexer.descriptive(trace) }
             @lexer.undo trace
             false
         end
