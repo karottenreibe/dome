@@ -216,7 +216,7 @@ class CSSLexerTests < Test::Unit::TestCase
     end
 
     def testAttrOperaotrs
-        lex = CSSLexer.new "~=*==^=$=|="
+        lex = CSSLexer.new "~=*==^=$=|=/="
         t = lex.get
         assert_kind_of Token, t
         assert_equal :in_list, t.type
@@ -251,6 +251,12 @@ class CSSLexerTests < Test::Unit::TestCase
         assert_kind_of Token, t
         assert_equal :begins_with_dash, t.type
         assert_equal "|=", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :matches, t.type
+        assert_equal "/=", t.value
 
         lex.next!
         assert_kind_of NilClass, lex.get

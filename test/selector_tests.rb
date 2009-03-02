@@ -47,7 +47,7 @@ class SelectorTests < Test::Unit::TestCase
         assert_equal :equal, sl[1].instance_variable_get(:@op)
         assert_equal "TARDIS", sl[1].instance_variable_get(:@value)
 
-        %w{^= $= *= |= ~=}.zip(%w{begins_with ends_with contains begins_with_dash in_list}).each do |(arg,op)|
+        %w{^= $= *= |= ~=}.zip(%w{begins_with ends_with contains begins_with_dash in_list matches}).each do |(arg,op)|
             sl = Selector.new("doctor[TARDIS#{arg}'Time and Relative Dimensions in Space']").selectors
             assert_equal 2, sl.length
             assert_kind_of ElementSelector, sl[0]

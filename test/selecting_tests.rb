@@ -50,7 +50,7 @@ EOI
     end
 
     def testAttributeSelector
-        %w{= ~= *= ^= $= |=}.each do |sel|
+        %w{= ~= *= ^= $= |= /=}.each do |sel|
             one = @tree/"[value#{sel}home]"
             two = @tree%"[value#{sel}home]"
             assert_equal [two], one
@@ -58,6 +58,15 @@ EOI
             assert_kind_of Element, two
             assert_equal "level2", two.tag
         end
+    end
+
+    def testAttrMatches
+        one = @tree/"[class/='[^0-9]+\\s*ba.$']"
+        two = @tree%"[class/='[^0-9]+\\s*ba.$']"
+        assert_equal [two], one
+
+        assert_kind_of Element, two
+        assert_equal "nothing", two.tag
     end
 
     def testStarSelector

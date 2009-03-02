@@ -80,6 +80,22 @@ class CSSParserTests < Test::Unit::TestCase
         assert_kind_of NilClass, f
     end
 
+    def testAttrMatches
+        p = CSSParser.new CSSLexer.new("master[bruce/=hero]")
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :element, f.type
+        assert_equal "master", f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :attribute, f.type
+        assert_equal ["bruce",:matches,"hero"], f.value
+
+        f = p.next
+        assert_kind_of NilClass, f
+    end
+
     def testAttrBeginsWith
         p = CSSParser.new CSSLexer.new("the[story^=gordon]")
         f = p.next

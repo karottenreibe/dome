@@ -52,6 +52,7 @@ module Dome
                         when :begins_with then a.value.start_with? @value
                         when :begins_with_dash
                             a.value == @value or a.value.begin_with "#{@value}-"
+                        when :matches then Regexp.new(@value) =~ a.value
                         else true
                         end
                 }

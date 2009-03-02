@@ -182,7 +182,7 @@ module Dome
             return nil unless @lexer.get
 
             case type = @lexer.get.type
-            when :equal, :in_list, :ends_with, :begins_with, :begins_with_dash, :contains
+            when :equal, :in_list, :ends_with, :begins_with, :begins_with_dash, :contains, :matches
                 @lexer.next!
                 type
             else
