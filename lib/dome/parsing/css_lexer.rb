@@ -40,9 +40,9 @@ module Dome
             when '|' then :pipe
             when '*' then :star
             when '.' then :period
-            when '>' then :child
-            when '+' then :neighbour
-            when '~' then :follower
+            when '>' then :chevron
+            when '+' then :plus
+            when '~' then :tilde
             when '#' then :hash
             when '=' then :equal
             when '~=' then :in_list

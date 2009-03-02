@@ -178,19 +178,19 @@ class CSSLexerTests < Test::Unit::TestCase
         lex = CSSLexer.new "+~>"
         t = lex.get
         assert_kind_of Token, t
-        assert_equal :neighbour, t.type
+        assert_equal :plus, t.type
         assert_equal "+", t.value
 
         lex.next!
         t = lex.get
         assert_kind_of Token, t
-        assert_equal :follower, t.type
+        assert_equal :tilde, t.type
         assert_equal "~", t.value
 
         lex.next!
         t = lex.get
         assert_kind_of Token, t
-        assert_equal :child, t.type
+        assert_equal :chevron, t.type
         assert_equal ">", t.value
 
         lex.next!

@@ -380,9 +380,13 @@ module Dome
             ws = parse_whitespace
             return terminate "combinator", trace unless @lexer.get
 
+            ops = { :chevron => :child,
+                    :plus => :neighbour,
+                    :tilde => :follower }
+
             op = true
             case @lexer.get.type
-            when :child, :neighbour, :follower then found @lexer.get.type, nil
+            when :chevron, :plus, :tilde then found ops[@lexer.get.type], nil
             else op = false
             end
 
