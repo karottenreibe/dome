@@ -140,12 +140,18 @@ class CSSLexerTests < Test::Unit::TestCase
         assert_kind_of NilClass, lex.get
     end
 
-    def testPseudo
-        lex = CSSLexer.new ":"
+    def testPseudoNamespace
+        lex = CSSLexer.new ":|"
         t = lex.get
         assert_kind_of Token, t
         assert_equal :pseudo, t.type
         assert_equal ":", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :namespace, t.type
+        assert_equal "|", t.value
 
         lex.next!
         assert_kind_of NilClass, lex.get

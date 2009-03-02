@@ -99,16 +99,15 @@ module Dome
             return false if not @lexer.get
             trace = @lexer.trace
 
-            ns =
-                case @lexer.get.type
-                when :text
-                    @lexer.get.value
-                    @lexer.next!
-                when :any
-                    :any
-                    @lexer.next!
-                else nil
-                end
+            ns = nil
+            case @lexer.get.type
+            when :text
+                ns = @lexer.get.value
+                @lexer.next!
+            when :any
+                ns = :any
+                @lexer.next!
+            end
 
             return terminate "namespace selector", trace if not @lexer.get or @lexer.get.type != :namespace
             found :namespace, ns
