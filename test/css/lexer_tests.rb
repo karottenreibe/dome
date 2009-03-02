@@ -161,13 +161,13 @@ class CSSLexerTests < Test::Unit::TestCase
         lex = CSSLexer.new ".#"
         t = lex.get
         assert_kind_of Token, t
-        assert_equal :class, t.type
+        assert_equal :period, t.type
         assert_equal ".", t.value
 
         lex.next!
         t = lex.get
         assert_kind_of Token, t
-        assert_equal :id, t.type
+        assert_equal :hash, t.type
         assert_equal "#", t.value
 
         lex.next!

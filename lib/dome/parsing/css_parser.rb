@@ -346,7 +346,7 @@ module Dome
         # Returns +true+ on success and +false+ otherwise.
         #
         def parse_id_selector
-            return false if not @lexer.get or @lexer.get.type != :id
+            return false if not @lexer.get or @lexer.get.type != :hash
             trace = @lexer.trace
             @lexer.next!
 
@@ -361,7 +361,7 @@ module Dome
         # Returns +true+ on success and +false+ otherwise.
         #
         def parse_class_selector
-            return false if not @lexer.get or @lexer.get.type != :class
+            return false if not @lexer.get or @lexer.get.type != :period
             trace = @lexer.trace
             @lexer.next!
 

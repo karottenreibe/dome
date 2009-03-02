@@ -39,11 +39,11 @@ module Dome
             when ':' then :colon
             when '|' then :pipe
             when '*' then :star
-            when '.' then :class
+            when '.' then :period
             when '>' then :child
             when '+' then :neighbour
             when '~' then :follower
-            when '#' then :id
+            when '#' then :hash
             when '=' then :equal
             when '~=' then :in_list
             when '$=' then :ends_with
