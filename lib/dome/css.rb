@@ -40,9 +40,7 @@ module Dome
         # Extracts the first Element matching the given CSS3 +path+.
         #
         def % path
-            callcc { |cc|
-                Selector.new(path).each(self) { |node| cc.call node }
-            }
+            Selector.new(path).first self
         end
 
         ##
@@ -124,9 +122,8 @@ module Dome
         # is an Element or an Array of Elements - that matches this Selector -- or +nil+ if none is found.
         #
         def first obj
-            raise "Selector#each expects any of [Tree, Element, Array of Elements] as first argument" unless
+            raise "Selector#first expects any of [Tree, Element, Array of Elements] as first argument" unless
                 [Tree, Element].include? obj.class or ( obj.is_a? Array and obj.all? { |n| n.is_a? Element } )
-            raise "Selector#each expects a block" unless block_given?
             return if @selectors.empty?
 
             nodes = sels = nil
@@ -146,10 +143,13 @@ module Dome
             levels = [nodes]
           
             while not levels.empty?
+                # we're done if the last selector has been applied and something
+                # was found
                 return levels[-1][0] if levels.length == sels.length+1
 
                 # if the last level is empty, we're done there
-                levels.delete_at -1 if levels[-1].empty?
+                levels.delete_at -1 while levels[-1].empty?
+
                 # generate a new level from the first node in the last level
                 node = levels[-1].delete_at 0
                 lvl = []
