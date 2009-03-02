@@ -30,7 +30,7 @@ class SelectingTests < Test::Unit::TestCase
             <nothing class="fu baz">goo!</nothing>
         </level2>
         <empty />
-        <data id=1>foo</data>
+        <data real:id=1>foo</data>
         <data id=2>bar</data>
     </level1>
     <level11>
@@ -58,6 +58,14 @@ EOI
             assert_kind_of Element, two
             assert_equal "level2", two.tag
         end
+
+        one = @tree/"[real|id]"
+        two = @tree%"[real|id]"
+        assert_equal [two], one
+
+        assert_kind_of Element, two
+        assert_equal "data", two.tag
+        assert_equal "1", two[:id]
     end
 
     def testAttrMatches

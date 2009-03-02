@@ -135,12 +135,13 @@ module Dome
 
         ##
         # Parses attribute, pseudo selector, id and class selectors.
-        # Always returs +true+.
+        # Returns +true+ if at least one selector was parsed, otherwise +false+.
         #
         def parse_additional_selectors
-            nil while parse_pseudo_selector or parse_id_selector or
+            found = false
+            found = true while parse_pseudo_selector or parse_id_selector or
                 parse_class_selector or parse_attr_selector
-            true
+            found
         end
 
         ##
@@ -413,7 +414,10 @@ module Dome
         #
         def parse_tail
             buf = ''
-            buf << @lexer.get.value while @lexer.get
+            while @lexer.get
+                buf << @lexer.get.value
+                @lexer.next!
+            end
             found :tail, buf unless buf.empty?
         end
 
