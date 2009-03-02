@@ -75,13 +75,46 @@ module Dome
         #
         def parse_selector
             # looks strange, but has to be that way:
-            # first parse an element
-            # then parse any additional selectors, regardless of
-            # whether there actually was an element matched
-            # but do only return true if one of the two matched
+            # - first try to parse a namespace
+            # - then try to parse an element
+            # - if the first succeeded but the latter didn't: abort
+            # - then try any additional selectors, regardless of
+            #   whether there actually was an element or namespace matched
+            # but do only return true if
+            # - either an element was parsed
+            # - or none was parsed and neither was a namespace, and
+            #   an additional was parsed
+            ns = parse_namespace_selector
             elem = parse_elem_selector
+            return terminate "element after namespace selector", trace if ns and not elem
             add = parse_additional_selectors
-            elem or add
+            elem or ( not ns and add )
+        end
+
+        ##
+        # Parses a single namespace selector.
+        # Returns +true+ on success and +false+ otherwise.
+        #
+        def parse_namespace_selector
+            return false if not @lexer.get
+            trace = @lexer.trace
+
+            ns =
+                case @lexer.get.type
+                when :text
+                    @lexer.get.value
+                    @lexer.next!
+                when :any
+                    :any
+                    @lexer.next!
+                else nil
+                end
+
+            return terminate "namespace selector", trace if not @lexer.get or @lexer.get.type != :namespace
+            found :namespace, ns
+            @lexer.next!
+
+            true
         end
 
         ##

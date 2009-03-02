@@ -59,6 +59,16 @@ module Dome
             end
         end
 
+        class NamespaceSelector 
+            def initialize ns
+                @ns = ns
+            end
+
+            def walk node
+                yield node if node.is_a? Element and (@ns == :any or node.namespace == @ns)
+            end
+        end
+
         class ChildSelector
             def walk node
                 node.children.each { |child|

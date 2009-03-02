@@ -56,35 +56,35 @@ module Dome
     end
 
     ##
+    # The exception raised when parsing of a CSS selector fails.
+    #
+    class CSSParsingError < RuntimeError
+
+        ##
+        # Description of what failed to parse.
+        #
+        attr_accessor :what
+
+        ##
+        # Description of the location of the error within the input string.
+        #
+        attr_accessor :where
+
+        def initialize what, where
+            @what, @where = what, where
+        end
+
+        def to_s
+            "invalid CSS: failed to parse #{@what} at #{@where}"
+        end
+    end
+
+    ##
     # Stores a list of CSS3 Selectors over a Tree.
     # Can be used to iterate over all the Elements identified by the Selectors
     # and to execute code for each found node.
     #
     class Selector
-
-        ##
-        # The exception raised when parsing of a CSS selector fails.
-        #
-        class CSSParsingError < RuntimeError
-
-            ##
-            # Description of what failed to parse.
-            #
-            attr_accessor :what
-
-            ##
-            # Description of the location of the error within the input string.
-            #
-            attr_accessor :where
-
-            def initialize what, where
-                @what, @where = what, where
-            end
-
-            def to_s
-                "invalid CSS: failed to parse #{@what} at #{@where}"
-            end
-        end
 
         include Dome::Selectors
 
@@ -199,6 +199,8 @@ module Dome
                     last_elem = t.value
                 when :attribute
                     @selectors << AttributeSelector.new(*t.value)
+                when :namespace
+                    @selectors << NamespaceSelector.new(t.value)
                 when :pseudo
                     @selectors <<
                         case t.value[0]

@@ -24,7 +24,7 @@ module Dome
         protected
 
         def delimiters
-            /\[|\]|:|~=|\^=|\$=|\*=|\|=|\/=|\*|=|\(|\)|#|\.|>|\+|\s|~|\\|'|"/
+            /\[|\]|:|~=|\^=|\$=|\*=|\|=|\/=|\*|=|\(|\)|#|\.|>|\+|\s|~|\\|'|"|\|/
         end
 
         def meaning token
@@ -37,6 +37,7 @@ module Dome
             when '"', "'" then :quote
             when /\s/ then :whitespace
             when ':' then :pseudo
+            when '|' then :namespace
             when '*' then :any
             when '.' then :class
             when '>' then :child
