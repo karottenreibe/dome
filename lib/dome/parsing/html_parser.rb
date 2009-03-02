@@ -199,11 +199,19 @@ module Dome
         def parse_attribute
             trace = @lexer.trace
 
+            ns = nil
             name = parse_text
             return terminate trace if not name
 
+            if @lexer.get and @lexer.get.type == :namespace
+                @lexer.next!
+                ns = name
+                name = parse_text
+                return terminate trace if not name
+            end
+
             if not @lexer.get or not @lexer.get.type == :equal
-                found :attribute, [name,nil]
+                found :attribute, [ns,name,nil]
                 return true
             end
 
@@ -213,7 +221,7 @@ module Dome
 
             return terminate trace if not value
 
-            found :attribute, [name,value]
+            found :attribute, [ns,name,value]
             true
         end
 

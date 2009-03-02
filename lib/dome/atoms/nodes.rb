@@ -120,6 +120,9 @@ module Dome
         # The Element's attributes - Array of Attributes
         attr_accessor :attributes
 
+        ##
+        # Initializes the Element's +tag+, +parent+ and +namespace+.
+        #
         def initialize tag, parent = nil, namespace = nil
             super()
             @tag, @attributes, @parent, @namespace = tag, [], parent, namespace
@@ -287,6 +290,10 @@ module Dome
     class Attribute < Node
 
         ##
+        # The Attribute's namespace - String or +nil+
+        attr_accessor :namespace
+
+        ##
         # The name that identifies the Attribute.
         #
         attr_accessor :name
@@ -298,11 +305,11 @@ module Dome
         attr_accessor :value
 
         ##
-        # Initializes the Attribute's +name+ and +value+.
+        # Initializes the Attribute's +name+, +value+ and +namespace+.
         # +name+ must be convertible to a Symbol.
         #
-        def initialize name, value
-            @name, @value = name.to_sym, value
+        def initialize name, value = nil, namespace = nil
+            @name, @value, @namespace = name.to_sym, value, namespace
         end
 
         def inspect
