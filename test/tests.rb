@@ -14,13 +14,13 @@
 # Git repo::    http://rubyforge.org/scm/?group_id=7589
 #
 
-require 'htmllexer_tests.rb'
-require 'htmlparser_tests.rb'
-require 'fail_tests.rb'
-require 'dom_tests.rb'
-require 'csslexer_tests.rb'
-require 'cssparser_tests.rb'
-require 'selector_tests.rb'
-require 'selecting_tests.rb'
-require 'scraping_tests.rb'
+require 'html/lexer_tests.rb'
+require 'html/parser_tests.rb'
+require 'html/fail_tests.rb'
+require 'html/dom_tests.rb'
+require 'css/lexer_tests.rb'
+require 'css/parser_tests.rb'
+require 'css/selector_tests.rb'
+require 'css/selecting_tests.rb'
+require 'css/scraping_tests.rb'
 
