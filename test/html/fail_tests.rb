@@ -25,12 +25,12 @@ class FailTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal "coolness", ret.value
+        assert_equal [nil,"coolness"], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal "empty", ret.value
+        assert_equal [nil,"empty"], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -48,7 +48,7 @@ class FailTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal "coolness", ret.value
+        assert_equal [nil,"coolness"], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -66,7 +66,7 @@ class FailTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal "captain", ret.value
+        assert_equal [nil,"captain"], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -93,7 +93,7 @@ class FailTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal "morgan", ret.value
+        assert_equal [nil,"morgan"], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -109,7 +109,7 @@ class FailTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal "anna", ret.value
+        assert_equal [nil,"anna"], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -125,7 +125,7 @@ class FailTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal "john", ret.value
+        assert_equal [nil,"john"], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -141,7 +141,7 @@ class FailTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal "the", ret.value
+        assert_equal [nil,"the"], ret.value
 
         ret = p.next
         assert_kind_of Token, ret

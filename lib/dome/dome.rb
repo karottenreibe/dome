@@ -60,8 +60,8 @@ module Dome
             while token = @parser.next
                 case token.type
                 when :element_start
-                    @open << token.value
-                    elem = Element.new token.value, @cur
+                    @open << token.value[1]
+                    elem = Element.new token.value[1], @cur, token.value[0]
                     @cur.children << elem
                     @cur = elem
                 when :element_end, :missing_end

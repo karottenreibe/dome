@@ -24,7 +24,7 @@ module Dome
         protected
 
         def delimiters
-            /<!\[CDATA\[|<!--|-->|<\/|=|\\|\s|\/>|>|<|\]\]>|'|"/
+            /<!\[CDATA\[|<!--|-->|<\/|=|\\|\s|\/>|>|<|\]\]>|'|"|:/
         end
 
         def meaning token
@@ -41,6 +41,7 @@ module Dome
             when '-->' then :comment_end
             when '<![CDATA[' then :cdata_start
             when ']]>' then :cdata_end
+            when ':' then :namespace
             else :text
             end
         end

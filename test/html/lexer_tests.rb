@@ -65,8 +65,8 @@ class HTMLLexerTests < Test::Unit::TestCase
         assert_equal ">", t.value
     end
 
-    def testEqual
-        lex = HTMLLexer.new "<foo=>"
+    def testEqualNamespace
+        lex = HTMLLexer.new "<foo=:"
         t = lex.get
         assert_kind_of Token, t
         assert_equal :left_bracket, t.type
@@ -87,8 +87,8 @@ class HTMLLexerTests < Test::Unit::TestCase
         lex.next!
         t = lex.get
         assert_kind_of Token, t
-        assert_equal :right_bracket, t.type
-        assert_equal ">", t.value
+        assert_equal :namespace, t.type
+        assert_equal ":", t.value
     end
 
     def testQuote

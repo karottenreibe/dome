@@ -80,10 +80,18 @@ module Dome
             trace = @lexer.trace
             @lexer.next!
 
+            ns = nil
             tag = parse_text
             return terminate trace unless tag
 
-            found :element_start, tag
+            if @lexer.get and @lexer.get.type == :namespace
+                @lexer.next!
+                ns = tag
+                tag = parse_text
+                return terminate trace unless tag
+            end
+
+            found :element_start, [ns,tag]
 
             parse_attributes
             parse_whitespace

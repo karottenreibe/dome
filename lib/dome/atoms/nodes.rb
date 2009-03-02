@@ -109,6 +109,10 @@ module Dome
     class Element < Node
 
         ##
+        # The Element's namespace - String or +nil+
+        attr_accessor :namespace
+
+        ##
         # The Element's tag - String
         attr_accessor :tag
 
@@ -116,9 +120,9 @@ module Dome
         # The Element's attributes - Array of Attributes
         attr_accessor :attributes
 
-        def initialize tag = "", parent = nil
+        def initialize tag, parent = nil, namespace = nil
             super()
-            @tag, @attributes, @parent = tag, [], parent
+            @tag, @attributes, @parent, @namespace = tag, [], parent, namespace
         end
 
         ##
