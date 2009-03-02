@@ -394,5 +394,36 @@ class CSSParserTests < Test::Unit::TestCase
         assert_kind_of NilClass, f
     end
 
+    def testAttrNamespaces
+        p = CSSParser.new CSSLexer.new("[*|max]")
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :attribute, f.type
+        assert_equal [:any,"max",nil,nil], f.value
+
+        f = p.next
+        assert_kind_of NilClass, f
+
+
+        p = CSSParser.new CSSLexer.new("[|max]")
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :attribute, f.type
+        assert_equal [nil,"max",nil,nil], f.value
+
+        f = p.next
+        assert_kind_of NilClass, f
+
+
+        p = CSSParser.new CSSLexer.new("[sam|max]")
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :attribute, f.type
+        assert_equal ["sam","max",nil,nil], f.value
+
+        f = p.next
+        assert_kind_of NilClass, f
+    end
+
 end
 

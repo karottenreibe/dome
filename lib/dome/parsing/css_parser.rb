@@ -152,20 +152,16 @@ module Dome
             trace = @lexer.trace
             @lexer.next!
             
-            return terminate "attribute selector", trace if not @lexer.get or @lexer.get.type != :text
             ns = :any
-            att = @lexer.get.value
-            @lexer.next!
+            att = parse_attr_name
 
-            if @lexer.get and @lexer.get.type == :namespace
+            if @lexer.get.type == :namespace
                 @lexer.next!
-                return terminate "attribute selector", trace if not @lexer.get or
-                    @lexer.get.type != :text or @lexer.get.type != :any
                 ns = att
-                att = @lexer.get.type == :text ?
-                    @lexer.get.value :
-                    :any
-                @lexer.next!
+                att = parse_attr_name
+                return terminate "attribute selector", trace if not att
+            elsif not att
+                return terminate "attribute selector", trace
             end
 
             op = parse_attr_op
@@ -193,6 +189,32 @@ module Dome
             found :attribute, [ns,att,op,val]
             @lexer.next!
             true
+        end
+
+        ##
+        # Parses the namespace or attribute name.
+        # Returns the name on success and +nil+ otherwise.
+        #
+        def parse_attr_name
+            return nil if not @lexer.get or not [:text,:any].include? @lexer.get.type
+            ret = @lexer.get.type == :text ? @lexer.get.value : :any
+            @lexer.next!
+            ret
+        end
+
+        ##
+        # Parses an attribute selecotr's operator.
+        #
+        def parse_attr_op
+            return nil unless @lexer.get
+
+            case type = @lexer.get.type
+            when :equal, :in_list, :ends_with, :begins_with, :begins_with_dash, :contains, :matches
+                @lexer.next!
+                type
+            else
+                nil
+            end
         end
 
         ##
@@ -224,21 +246,6 @@ module Dome
 
             buf.empty? ? nil : buf
        end
-
-        ##
-        # Parses an attribute selecotr's operator.
-        #
-        def parse_attr_op
-            return nil unless @lexer.get
-
-            case type = @lexer.get.type
-            when :equal, :in_list, :ends_with, :begins_with, :begins_with_dash, :contains, :matches
-                @lexer.next!
-                type
-            else
-                nil
-            end
-        end
 
         ##
         # Parses a pseudo selector.
