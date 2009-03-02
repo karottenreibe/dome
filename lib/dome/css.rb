@@ -62,6 +62,30 @@ module Dome
     #
     class Selector
 
+        ##
+        # The exception raised when parsing of a CSS selector fails.
+        #
+        class CSSParsingError < RuntimeError
+
+            ##
+            # Description of what failed to parse.
+            #
+            attr_accessor :what
+
+            ##
+            # Description of the location of the error within the input string.
+            #
+            attr_accessor :where
+
+            def initialize what, where
+                @what, @where = what, where
+            end
+
+            def to_s
+                "invalid CSS: failed to parse #{@what} at #{@where}"
+            end
+        end
+
         include Dome::Selectors
 
         ##
@@ -209,7 +233,7 @@ module Dome
                     @selectors << NeighbourSelector.new
                     last_elem = :any
                 when :tail
-                    @selectors = []
+                    raise CSSParsingError.new(@parser.last_failure[:what], @parser.last_failure[:where])
                 end
             end
         end
