@@ -75,7 +75,7 @@ module Dome
         end
 
         def to_s
-            "invalid CSS: failed to parse #{@what} at #{@where}"
+            "failed to parse #{@what} at #{@where}"
         end
     end
 
@@ -235,7 +235,7 @@ module Dome
                     @selectors << NeighbourSelector.new
                     last_elem = :any
                 when :tail
-                    raise CSSParsingError.new(@parser.last_failure[:what], @parser.last_failure[:where])
+                    raise CSSParsingError.new(@parser.last_failure[:what], @parser.last_failure[:descriptive])
                 end
             end
         end

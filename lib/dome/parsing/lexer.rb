@@ -71,10 +71,13 @@ module Dome
 
         ##
         # Returns a String that describes the area from the position within the input given in
-        # the +trace+ to the current position.
+        # the +trace+ to the current position and what unexpected +token+ was found.
         #
-        def descriptive trace
-            "char #{trace}-#{@pos}: '#{@string[trace..@pos]}'"
+        def descriptive trace, token
+            text =  ''
+            trace.upto(@pos) { |i| text << @tokens[i].value if @tokens[i]}
+            token = token ? token.type : "end of input"
+            "chars (#{trace}..#{trace+text.length}): '#{text}': unexpected #{token}"
         end
 
         protected

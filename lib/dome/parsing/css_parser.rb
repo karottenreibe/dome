@@ -435,7 +435,7 @@ module Dome
         # parse and returns +false+.
         #
         def terminate what, trace
-            @last_failure = { :what => what, :where => trace, :descriptive => @lexer.descriptive(trace) }
+            @last_failure = { :what => what, :where => trace, :descriptive => @lexer.descriptive(trace, @lexer.get) }
             @lexer.undo trace
             false
         end
