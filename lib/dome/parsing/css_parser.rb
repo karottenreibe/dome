@@ -29,6 +29,12 @@ module Dome
     class CSSParser
 
         ##
+        # A String describing the last parsing failure that occurred.
+        # Will be +nil+ if no failure happened
+        #
+        attr_accessor :last_failure
+
+        ##
         # Initializes the Parser with a given +lexer+.
         #
         def initialize lexer
@@ -114,7 +120,7 @@ module Dome
             trace = @lexer.trace
             @lexer.next!
             
-            return terminate trace if not @lexer.get or @lexer.get.type != :text
+            return terminate "attribute selector", trace if not @lexer.get or @lexer.get.type != :text
             att = @lexer.get.value
             @lexer.next!
 
@@ -122,7 +128,7 @@ module Dome
             val = nil
 
             if op
-                return terminate trace if not @lexer.get
+                return terminate "attribute selector", trace if not @lexer.get
 
                 quote = false
                 if @lexer.get.type == :quote
@@ -131,15 +137,15 @@ module Dome
                 end
                 
                 val = parse_value quote
-                return terminate trace unless val
+                return terminate "attribute selector", trace unless val
 
                 if quote
-                    return terminate trace if not @lexer.get or @lexer.get.type != :quote or @lexer.get.value != quote
+                    return terminate "attribute selector", trace if not @lexer.get or @lexer.get.type != :quote or @lexer.get.value != quote
                     @lexer.next!
                 end
             end
 
-            return terminate trace if not @lexer.get or @lexer.get.type != :right_bracket
+            return terminate "attribute selector", trace if not @lexer.get or @lexer.get.type != :right_bracket
             found :attribute, [att,op,val]
             @lexer.next!
             true
@@ -202,16 +208,16 @@ module Dome
             trace = @lexer.trace
             @lexer.next!
 
-            return terminate trace if not @lexer.get or @lexer.get.type != :text
+            return terminate "pseudo selector", trace if not @lexer.get or @lexer.get.type != :text
             pseudo = @lexer.get.value
-            return terminate trace unless allowed.include? pseudo
+            return terminate "pseudo selector", trace unless allowed.include? pseudo
             @lexer.next!
 
             arg = nil
             if @lexer.get and @lexer.get.type == :left_parenthesis
                 @lexer.next!
                 arg = parse_pseudo_arg pseudo
-                return terminate trace if not arg
+                return terminate "pseudo selector", trace if not arg
             end
 
             found :pseudo, [pseudo,arg]
@@ -285,7 +291,7 @@ module Dome
             trace = @lexer.trace
             @lexer.next!
 
-            return terminate trace if not @lexer.get or @lexer.get.type != :text
+            return terminate "id selector", trace if not @lexer.get or @lexer.get.type != :text
             found :attribute, ["id",:equal,@lexer.get.value]
             @lexer.next!
             true
@@ -300,7 +306,7 @@ module Dome
             trace = @lexer.trace
             @lexer.next!
 
-            return terminate trace if not @lexer.get or @lexer.get.type != :text
+            return terminate "class selector", trace if not @lexer.get or @lexer.get.type != :text
             found :attribute, ["class",:in_list,@lexer.get.value]
             @lexer.next!
             true
@@ -313,7 +319,7 @@ module Dome
         def parse_combinator
             trace = @lexer.trace
             ws = parse_whitespace
-            return terminate trace unless @lexer.get
+            return terminate "combinator", trace unless @lexer.get
 
             op = true
             case @lexer.get.type
@@ -363,9 +369,11 @@ module Dome
         end
 
         ##
-        # Returns the lexer to the given +trace+ and returns +false+.
+        # Returns the lexer to the given +trace+, stores an error message about +what+ failed to
+        # parse and returns +false+.
         #
-        def terminate trace
+        def terminate what, trace
+            @last_failure = "failed to parse #{what} at #{@lexer.descriptive(trace)}"
             @lexer.undo trace
             false
         end

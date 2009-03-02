@@ -69,6 +69,14 @@ module Dome
             @pos = trace
         end
 
+        ##
+        # Returns a String that describes the area from the position within the input given in
+        # the +trace+ to the current position.
+        #
+        def descriptive trace
+            "char #{trace}-#{@pos}: '#{@string[trace..@pos]}'"
+        end
+
         protected
 
         ##
