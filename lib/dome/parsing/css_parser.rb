@@ -256,7 +256,7 @@ module Dome
             allowed = %w{root nth-child nth-last-child nth-of-type nth-last-of-type
                          first-child last-child first-of-type last-of-type
                          only-child only-of-type empty only-text not}
-            return false if not @lexer.get or @lexer.get.type != :pseudo
+            return false if not @lexer.get or @lexer.get.type != :colon
             trace = @lexer.trace
             @lexer.next!
 
