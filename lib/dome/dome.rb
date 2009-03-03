@@ -82,7 +82,7 @@ module Dome
                     val = @options[:expand_entities] ?
                         CGI::unescapeHTML(token.value[2]) :
                         token.value[2]
-                    Attribute.new(token.value[1].to_sym, val, token.value[0]).parent = @cur
+                    Attribute.new(token.value[1], val, token.value[0]).parent = @cur
                 when :cdata
                     val = @options[:ignore_whitespace] ?
                         token.value.strip :

@@ -211,7 +211,7 @@ module Dome
             end
 
             if not @lexer.get or not @lexer.get.type == :equal
-                found :attribute, [ns,name,nil]
+                found :attribute, [ns,name.to_sym,nil]
                 return true
             end
 
@@ -221,7 +221,7 @@ module Dome
 
             return terminate trace if not value
 
-            found :attribute, [ns,name,value]
+            found :attribute, [ns,name.to_sym,value]
             true
         end
 
