@@ -31,6 +31,10 @@ module Dome
         # The root pseudo Node.
         attr_accessor :root
 
+        ##
+        # Whether or not the Tree uses implicit namespace lookup.
+        attr_accessor :implicit_namespaces
+
         def initialize
             @root = Root.new
         end
@@ -63,6 +67,20 @@ module Dome
         ##
         # The Node's parent - Node
         attr_accessor :parent
+
+        ##
+        # The Tree this Node belongs to - Tree
+        attr_accessor :tree
+
+        ##
+        # Attaches this Node to the +p+ Element's children.
+        #
+        def parent= p
+            raise "Nodes can only be attached to Elements or the Root" unless [Element,Root].include? p.class
+            @parent = p
+            @tree = p.tree
+            p.children << self
+        end
 
         def initialize
             @children = []
@@ -121,11 +139,11 @@ module Dome
         attr_accessor :attributes
 
         ##
-        # Initializes the Element's +tag+, +parent+ and +namespace+.
+        # Initializes the Element's +tag+and +namespace+.
         #
-        def initialize tag, parent = nil, namespace = nil
+        def initialize tag, namespace = nil
             super()
-            @tag, @attributes, @parent, @namespace = tag, [], parent, namespace
+            @tag, @attributes, @namespace = tag, [], namespace
         end
 
         ##
@@ -260,6 +278,7 @@ module Dome
         end
         
         def initialize value = '', cdata = false
+            super()
             @value, @cdata = value, cdata
         end
 
@@ -305,10 +324,21 @@ module Dome
         attr_accessor :value
 
         ##
+        # Attaches this attribute to the +p+ Element.
+        #
+        def parent= p
+            raise "Attributes can only be attached to Elements" unless p.is_a? Element
+            @parent = p
+            @tree = p.tree
+            p.attributes << self
+        end
+
+        ##
         # Initializes the Attribute's +name+, +value+ and +namespace+.
         # +name+ must be convertible to a Symbol.
         #
         def initialize name, value = nil, namespace = nil
+            super()
             @name, @value, @namespace = name.to_sym, value, namespace
         end
 

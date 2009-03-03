@@ -47,12 +47,16 @@ module Dome
         # following entries:
         # - :ignore_whitespace => true -- Ignore whitespace between Nodes
         # - :expand_entities => true -- Autoconvert stuff like '&amp;' --> '&'
+        # - :implicit_namespaces => true -- Actively search for xmlns tags when querying for
+        #   element namespaces. This is set as an option on the Tree and can be reverted any
+        #   time by setting +Tree#implicit_namespaces+ to +false+.
         # Any parameter that is not given will be assumed to be +false+.
         #
         def initialize input, options = {}
             @parser = HTMLParser.new HTMLLexer.new(input)
             @open, @tree, @options = [], Tree.new, options
             @cur = @tree.root
+            @tree.implicit_namespaces = @options[:implicit_namespaces]
 
             require 'cgi' if @options[:expand_entities]
 
@@ -69,8 +73,8 @@ module Dome
                 case token.type
                 when :element_start
                     @open << token.value[1]
-                    elem = Element.new token.value[1], @cur, token.value[0]
-                    @cur.children << elem
+                    elem = Element.new token.value[1], token.value[0]
+                    elem.parent = @cur
                     @cur = elem
                 when :element_end, :missing_end
                     close
@@ -78,21 +82,21 @@ module Dome
                     val = @options[:expand_entities] ?
                         CGI::unescapeHTML(token.value[2]) :
                         token.value[2]
-                    @cur.attributes << Attribute.new(token.value[1].to_sym, val, token.value[0])
+                    Attribute.new(token.value[1].to_sym, val, token.value[0]).parent = @cur
                 when :cdata
                     val = @options[:ignore_whitespace] ?
                         token.value.strip :
                         token.value
                     val = CGI::unescapeHTML val if @options[:expand_entities]
-                    @cur.children << Data.new(val, true) unless val.empty?
+                    Data.new(val, true).parent = @cur unless val.empty?
                 when :data, :tail
                     val = @options[:ignore_whitespace] ?
                         token.value.strip :
                         token.value
                     val = CGI::unescapeHTML val if @options[:expand_entities]
-                    @cur.children << Data.new(val) unless val.empty?
+                    Data.new(val).parent = @cur unless val.empty?
                 when :comment
-                    @cur.children << Comment.new(token.value)
+                    Comment.new(token.value).parent = @cur
                 end
             end
 
