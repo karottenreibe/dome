@@ -32,7 +32,8 @@ module Dome
         #
         def / path
             ret = []
-            Selector.new(path).each(self) { |node| ret << node }
+            sel = path.is_a?(Selector) ? path : Selector.new(path)
+            sel.each(self) { |node| ret << node }
             ret
         end
 
@@ -40,7 +41,8 @@ module Dome
         # Extracts the first Element matching the given CSS3 +path+.
         #
         def % path
-            Selector.new(path).first self
+            sel = path.is_a?(Selector) ? path : Selector.new(path)
+            sel.first self
         end
 
         ##
@@ -49,7 +51,8 @@ module Dome
         def each path
             raise "Tree#each expects a block" unless block_given?
             ret = []
-            Selector.new(path).each(self) { |node| yield node }
+            sel = path.is_a?(Selector) ? path : Selector.new(path)
+            sel.each(self) { |node| yield node }
             ret
         end
 
