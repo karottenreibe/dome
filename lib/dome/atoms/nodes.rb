@@ -31,10 +31,6 @@ module Dome
         # The root pseudo Node.
         attr_accessor :root
 
-        ##
-        # Whether or not the Tree uses implicit namespace lookup.
-        attr_accessor :implicit_namespaces
-
         def initialize
             @root = Root.new
             @root.tree = self
@@ -138,13 +134,6 @@ module Dome
         ##
         # The Element's attributes - Array of Attributes
         attr_accessor :attributes
-
-        def namespace
-            if @tree.implicit_namespaces
-                self["xmlns:#{@namespace}"] || self[:xmlns] || (@parent ? @parent.namespace : nil)
-            else @namespace
-            end
-        end
 
         ##
         # Initializes the Element's +tag+and +namespace+.

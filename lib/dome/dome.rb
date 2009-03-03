@@ -47,16 +47,12 @@ module Dome
         # following entries:
         # - :ignore_whitespace => true -- Ignore whitespace between Nodes
         # - :expand_entities => true -- Autoconvert stuff like '&amp;' --> '&'
-        # - :implicit_namespaces => true -- Actively search for xmlns tags when querying for
-        #   element namespaces. This is set as an option on the Tree and can be reverted any
-        #   time by setting +Tree#implicit_namespaces+ to +false+.
         # Any parameter that is not given will be assumed to be +false+.
         #
         def initialize input, options = {}
             @parser = HTMLParser.new HTMLLexer.new(input)
             @open, @tree, @options = [], Tree.new, options
             @cur = @tree.root
-            @tree.implicit_namespaces = @options[:implicit_namespaces]
 
             require 'cgi' if @options[:expand_entities]
 
