@@ -232,6 +232,18 @@ class ParserTests < Test::Unit::TestCase
         assert_equal "-", tree.root.children[0].text
     end
 
+    def testEntityExpansion
+        tree = Dome "<a b='&amp;'>&lt;</a>", :expand_entities => true
+        assert_kind_of Tree, tree
+        assert_equal 1, tree.root.children.length
+        assert_kind_of Element, tree.root.children[0]
+        assert_equal "a", tree.root.children[0].tag
+        assert_equal "&", tree.root.children[0][:b]
+        assert_equal 1, tree.root.children[0].children.length
+        assert_kind_of Data, tree.root.children[0].children[0]
+        assert_equal "<", tree.root.children[0].children[0].value
+    end
+
     def testWhitespaceIgnoring
         tree = Dome "  <foo> data  </foo>  ", :ignore_whitespace => true
         assert_kind_of Tree, tree

@@ -46,7 +46,7 @@ module Dome
         # The optional +options+ parameter is a Hash that may have any combination of the
         # following entries:
         # - :ignore_whitespace => true -- Ignore whitespace between Nodes
-        # - :convert_entities => true -- Autoconvert stuff like '&amp;' --> '&'
+        # - :expand_entities => true -- Autoconvert stuff like '&amp;' --> '&'
         # Any parameter that is not given will be assumed to be +false+.
         #
         def initialize input, options = {}
@@ -54,7 +54,7 @@ module Dome
             @open, @tree, @options = [], Tree.new, options
             @cur = @tree.root
 
-            require 'cgi' if @options[:convert_entities]
+            require 'cgi' if @options[:expand_entities]
 
             parse!
         end
@@ -75,7 +75,7 @@ module Dome
                 when :element_end, :missing_end
                     close
                 when :attribute
-                    val = @options[:convert_entities] ?
+                    val = @options[:expand_entities] ?
                         CGI::unescapeHTML(token.value[2]) :
                         token.value[2]
                     @cur.attributes << Attribute.new(token.value[1].to_sym, val, token.value[0])
@@ -83,13 +83,13 @@ module Dome
                     val = @options[:ignore_whitespace] ?
                         token.value.strip :
                         token.value
-                    val = CGI::unescapeHTML val if @options[:convert_entities]
+                    val = CGI::unescapeHTML val if @options[:expand_entities]
                     @cur.children << Data.new(val, true) unless val.empty?
                 when :data, :tail
                     val = @options[:ignore_whitespace] ?
                         token.value.strip :
                         token.value
-                    val = CGI::unescapeHTML val if @options[:convert_entities]
+                    val = CGI::unescapeHTML val if @options[:expand_entities]
                     @cur.children << Data.new(val) unless val.empty?
                 when :comment
                     @cur.children << Comment.new(token.value)
