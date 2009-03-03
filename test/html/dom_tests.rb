@@ -25,7 +25,7 @@ class ParserTests < Test::Unit::TestCase
         assert_kind_of Tree, tree
         assert_equal 1, tree.root.children.length
         assert_kind_of Element, tree.root.children[0]
-        assert_equal "doctor", tree.root.children[0].tag
+        assert_equal :doctor, tree.root.children[0].tag
     end
 
     def testData
@@ -35,7 +35,7 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, tree.root.children.empty?
         donna = tree.root.children[0]
         assert_kind_of Element, donna
-        assert_equal "donna", donna.tag
+        assert_equal :donna, donna.tag
 
         assert_equal false, donna.children.empty?
         noble = donna.children[0]
@@ -51,7 +51,7 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, tree.root.children.empty?
         the = tree.root.children[0]
         assert_kind_of Element, the
-        assert_equal "the", the.tag
+        assert_equal :the, the.tag
 
         assert_equal false, the.attributes.empty?
         doctor = the.attributes[0]
@@ -67,7 +67,7 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, tree.root.children.empty?
         martha = tree.root.children[0]
         assert_kind_of Element, martha
-        assert_equal "martha", martha.tag
+        assert_equal :martha, martha.tag
 
         assert_equal false, martha.attributes.empty?
         jones = martha.attributes[0]
@@ -83,7 +83,7 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, tree.root.children.empty?
         rose = tree.root.children[0]
         assert_kind_of Element, rose
-        assert_equal "rose", rose.tag
+        assert_equal :rose, rose.tag
 
         assert_equal false, rose.attributes.empty?
         tyler = rose.attributes[0]
@@ -99,7 +99,7 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, tree.root.children.empty?
         rose = tree.root.children[0]
         assert_kind_of Element, rose
-        assert_equal "rose", rose.tag
+        assert_equal :rose, rose.tag
 
         assert_equal false, rose.attributes.empty?
         tyler = rose.attributes[0]
@@ -115,7 +115,7 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, tree.root.children.empty?
         rose = tree.root.children[0]
         assert_kind_of Element, rose
-        assert_equal "rose", rose.tag
+        assert_equal :rose, rose.tag
 
         assert_equal 2, rose.attributes.length
         tyler = rose.attributes[0]
@@ -136,7 +136,7 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, tree.root.children.empty?
         captain = tree.root.children[0]
         assert_kind_of Element, captain
-        assert_equal "captain", captain.tag
+        assert_equal :captain, captain.tag
 
         assert_equal 1, captain.attributes.length
         jack = captain.attributes[0]
@@ -152,7 +152,7 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, tree.root.children.empty?
         daleks = tree.root.children[0]
         assert_kind_of Element, daleks
-        assert_equal "daleks", daleks.tag
+        assert_equal :daleks, daleks.tag
 
         assert_equal false, daleks.children.empty?
         cdata = daleks.children[0]
@@ -168,12 +168,12 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, tree.root.children.empty?
         torchwood = tree.root.children[0]
         assert_kind_of Element, torchwood
-        assert_equal "torchwood", torchwood.tag
+        assert_equal :torchwood, torchwood.tag
 
         assert_equal false, torchwood.children.empty?
         staff = torchwood.children[0]
         assert_kind_of Element, staff
-        assert_equal "staff", staff.tag
+        assert_equal :staff, staff.tag
 
         assert_equal false, staff.children.empty?
         gwen = staff.children[0]
@@ -189,7 +189,7 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, tree.root.children.empty?
         sarah = tree.root.children[0]
         assert_kind_of Element, sarah
-        assert_equal "sarah", sarah.tag
+        assert_equal :sarah, sarah.tag
 
         assert_equal 3, sarah.children.length
         jane = sarah.children[0]
@@ -200,7 +200,7 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, sarah.children.empty?
         adventures = sarah.children[1]
         assert_kind_of Element, adventures
-        assert_equal "adventures", adventures.tag
+        assert_equal :adventures, adventures.tag
 
         assert_equal false, sarah.children.empty?
         cdata = sarah.children[2]
@@ -216,7 +216,7 @@ class ParserTests < Test::Unit::TestCase
         assert_equal 2, tree.root.children.length
         shadow = tree.root.children[0]
         assert_kind_of Element, shadow
-        assert_equal "shadow", shadow.tag
+        assert_equal :shadow, shadow.tag
 
         proclamation = tree.root.children[1]
         assert_kind_of Data, proclamation
@@ -237,7 +237,7 @@ class ParserTests < Test::Unit::TestCase
         assert_kind_of Tree, tree
         assert_equal 1, tree.root.children.length
         assert_kind_of Element, tree.root.children[0]
-        assert_equal "a", tree.root.children[0].tag
+        assert_equal :a, tree.root.children[0].tag
         assert_equal "&", tree.root.children[0][:b]
         assert_equal 1, tree.root.children[0].children.length
         assert_kind_of Data, tree.root.children[0].children[0]
@@ -249,7 +249,7 @@ class ParserTests < Test::Unit::TestCase
         assert_kind_of Tree, tree
         assert_equal 1, tree.root.children.length
         assert_kind_of Element, tree.root.children[0]
-        assert_equal "foo", tree.root.children[0].tag
+        assert_equal :foo, tree.root.children[0].tag
         assert_equal 1, tree.root.children[0].children.length
         assert_kind_of Data, tree.root.children[0].children[0]
         assert_equal "data", tree.root.children[0].children[0].value
