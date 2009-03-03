@@ -81,7 +81,7 @@ EOI
         assert_kind_of Array, res[:elems]
         res[:elems].each { |elem|
             assert_kind_of Element, elem
-            assert_equal "data", elem.tag
+            assert_equal :data, elem.tag
         }
         res = res[:elems].collect { |e| e.children[0].value.to_i }
         assert_equal [1,64,2,65], res
