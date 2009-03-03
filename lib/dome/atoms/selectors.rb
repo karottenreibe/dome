@@ -44,7 +44,7 @@ module Dome
             def walk node
                 yield node if node.is_a? Element and node.attributes.find { |a|
                     a.name == @name and
-                        (@ns == :any or (a.namespace.nil? and @ns.nil?) or a.namespace == @ns.to_sym) and
+                        (@ns == :any or a.namespace == @ns or (not @ns.nil? and a.namespace == @ns.to_sym)) and
                         case @op
                         when :equal then a.value == @value
                         when :in_list then a.value.split(/\s/).include? @value
@@ -67,7 +67,7 @@ module Dome
 
             def walk node
                 yield node if node.is_a? Element and (@ns == :any or
-                      (node.namespace.nil? and @ns.nil?) or node.namespace == @ns)
+                      node.namespace == @ns or (not @ns.nil? and node.namespace == @ns.to_sym))
             end
         end
 
