@@ -152,5 +152,45 @@ class FailTests < Test::Unit::TestCase
         assert_kind_of NilClass, ret
     end
 
+    def testNotMatchingNamespaces
+        p = HTMLParser.new HTMLLexer.new("<best:buddies></any:buddies>")
+        ret = p.next
+        assert_kind_of Token, ret
+        assert_equal :element_start, ret.type
+        assert_equal [:best,:buddies], ret.value
+
+        ret = p.next
+        assert_kind_of Token, ret
+        assert_equal :missing_end, ret.type
+        assert_equal :buddies, ret.value
+
+        ret = p.next
+        assert_kind_of Token, ret
+        assert_equal :tail, ret.type
+        assert_equal "</any:buddies>", ret.value
+
+        ret = p.next
+        assert_kind_of NilClass, ret
+
+        p = HTMLParser.new HTMLLexer.new("<best:buddies></buddies>")
+        ret = p.next
+        assert_kind_of Token, ret
+        assert_equal :element_start, ret.type
+        assert_equal [:best,:buddies], ret.value
+
+        ret = p.next
+        assert_kind_of Token, ret
+        assert_equal :missing_end, ret.type
+        assert_equal :buddies, ret.value
+
+        ret = p.next
+        assert_kind_of Token, ret
+        assert_equal :tail, ret.type
+        assert_equal "</buddies>", ret.value
+
+        ret = p.next
+        assert_kind_of NilClass, ret
+    end
+
 end
 
