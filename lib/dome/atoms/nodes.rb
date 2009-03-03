@@ -155,14 +155,26 @@ module Dome
         end
 
         ##
-        # Retrieves the first attribute, whose name is +key+, from the attributes hash, or +nil+ if
-        # no such attribute was specified.
+        # Retrieves the first attribute identified by the given +key+ from the attributes hash,
+        # or +nil+ if no such attribute was specified.
+        # +key+ can be any of:
+        # - 'name' -- attribute name from default or any namespace
+        # - 'ns:name' -- attribute name from ns namespace
+        # - ':name' -- attribute name form default namespace
         #
         def [] key
             key = key.to_s.split ':'
-            ns,key = key.length == 1 ? [nil,key[0].to_sym] : [key[0],key[1].to_sym]
-            att = @attributes.find { |a| a.name == key and a.namespace == ns }
-            att ||= @attributes.find { |a| a.name == key } if ns.nil?
+            ns,key = key.length == 1 ? [:default,key[0].to_sym] : [key[0],key[1].to_sym]
+            ns = nil if ns == ''
+
+            att = nil
+            if ns == :default
+                att = @attributes.find { |a| a.name == key and a.namespace == nil }
+                att ||= @attributes.find { |a| a.name == key }
+            else
+                att = @attributes.find { |a| a.name == key and a.namespace == ns }
+            end
+
             att ? att.value : nil
         end
 
@@ -172,8 +184,16 @@ module Dome
         #
         def []= key, value
             key = key.to_s.split ":"
-            ns,key = key.length == 1 ? [nil,key[0].to_sym] : [key[0],key[1].to_sym]
-            idx = @attributes.index { |a| a.name == key and a.namespace == ns }
+            ns,key = key.length == 1 ? [:default,key[0].to_sym] : [key[0],key[1].to_sym]
+            ns = nil if ns.empty?
+
+            idx = nil
+            if ns == :default
+                att = @attributes.index { |a| a.name == key and a.namespace == nil } or
+                att ||= @attributes.index { |a| a.name == key }
+            else
+                att = @attributes.index { |a| a.name == key and a.namespace == ns }
+            end
 
             if idx then @attributes[idx].value = value
             else @attributes << Attribute.new(key, value, ns)
