@@ -25,12 +25,12 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal [nil,"foo"], ret.value
+        assert_equal [nil,:foo], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal "foo", ret.value
+        assert_equal :foo, ret.value
 
         ret = p.next
         assert_kind_of NilClass, ret
@@ -41,7 +41,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal [nil,"bar"], ret.value
+        assert_equal [nil,:bar], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -51,7 +51,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal "bar", ret.value
+        assert_equal :bar, ret.value
 
         ret = p.next
         assert_kind_of NilClass, ret
@@ -62,7 +62,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal [nil,"bacon"], ret.value
+        assert_equal [nil,:bacon], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -72,7 +72,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal "bacon", ret.value
+        assert_equal :bacon, ret.value
 
         ret = p.next
         assert_kind_of NilClass, ret
@@ -83,7 +83,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal [nil,"bacon"], ret.value
+        assert_equal [nil,:bacon], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -93,7 +93,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal "bacon", ret.value
+        assert_equal :bacon, ret.value
 
         ret = p.next
         assert_kind_of NilClass, ret
@@ -104,7 +104,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal [nil,"bacon"], ret.value
+        assert_equal [nil,:bacon], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -114,7 +114,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal "bacon", ret.value
+        assert_equal :bacon, ret.value
 
         ret = p.next
         assert_kind_of NilClass, ret
@@ -125,7 +125,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal [nil,"bacon"], ret.value
+        assert_equal [nil,:bacon], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -135,7 +135,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal "bacon", ret.value
+        assert_equal :bacon, ret.value
 
         ret = p.next
         assert_kind_of NilClass, ret
@@ -146,7 +146,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal [nil,"lester"], ret.value
+        assert_equal [nil,:lester], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -161,7 +161,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal "lester", ret.value
+        assert_equal :lester, ret.value
 
         ret = p.next
         assert_kind_of NilClass, ret
@@ -172,7 +172,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal [nil,"ellie"], ret.value
+        assert_equal [nil,:ellie], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -182,7 +182,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal "ellie", ret.value
+        assert_equal :ellie, ret.value
 
         ret = p.next
         assert_kind_of NilClass, ret
@@ -193,7 +193,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal [nil,"random"], ret.value
+        assert_equal [nil,:random], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -208,7 +208,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal "random", ret.value
+        assert_equal :random, ret.value
     end
 
     def testSubElements
@@ -216,12 +216,12 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal [nil,"extreme"], ret.value
+        assert_equal [nil,:extreme], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal [nil,"being"], ret.value
+        assert_equal [nil,:being], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -231,12 +231,12 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal "being", ret.value
+        assert_equal :being, ret.value
 
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal "extreme", ret.value
+        assert_equal :extreme, ret.value
     end
 
     def testMix
@@ -244,7 +244,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal [nil,"holographic"], ret.value
+        assert_equal [nil,:holographic], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -254,7 +254,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal [nil,"bees"], ret.value
+        assert_equal [nil,:bees], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -264,7 +264,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal "bees", ret.value
+        assert_equal :bees, ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -274,17 +274,17 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal [nil,"like"], ret.value
+        assert_equal [nil,:like], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal "like", ret.value
+        assert_equal :like, ret.value
 
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal "holographic", ret.value
+        assert_equal :holographic, ret.value
     end
 
     def testTail
@@ -292,12 +292,12 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal [nil,"chuck"], ret.value
+        assert_equal [nil,:chuck], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal "chuck", ret.value
+        assert_equal :chuck, ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -331,7 +331,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal ["ns","boo"], ret.value
+        assert_equal ["ns",:boo], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -341,7 +341,7 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal "boo", ret.value
+        assert_equal :boo, ret.value
 
         ret = p.next
         assert_kind_of NilClass, ret

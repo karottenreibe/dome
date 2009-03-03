@@ -91,6 +91,7 @@ module Dome
                 return terminate trace unless tag
             end
 
+            tag = tag.to_sym
             found :element_start, [ns,tag]
 
             parse_attributes
@@ -112,10 +113,10 @@ module Dome
             @lexer.next!
 
             end_tag = parse_text
-            return missing_end tag, end_trace if not end_tag or end_tag != tag or not @lexer.get or @lexer.get.type != :right_bracket
+            return missing_end tag, end_trace if not end_tag or end_tag.to_sym != tag or not @lexer.get or @lexer.get.type != :right_bracket
             @lexer.next!
 
-            found :element_end, end_tag
+            found :element_end, end_tag.to_sym
             true
         end
 
