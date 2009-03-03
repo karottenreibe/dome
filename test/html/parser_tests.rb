@@ -327,7 +327,7 @@ class HTMLParserTests < Test::Unit::TestCase
     end
 
     def testNamespaces
-        p = HTMLParser.new HTMLLexer.new("<ns:boo tommy:gun='old'/>")
+        p = HTMLParser.new HTMLLexer.new("<ns:boo tommy:gun='old'></ns:boo>")
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type

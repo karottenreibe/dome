@@ -114,7 +114,18 @@ module Dome
             @lexer.next!
 
             end_tag = parse_text
-            return missing_end tag, end_trace if not end_tag or end_tag.to_sym != tag or not @lexer.get or @lexer.get.type != :right_bracket
+
+            if not ns.nil?
+                end_ns = end_tag
+                return missing_end tag, end_trace if not end_ns or end_ns.to_sym != ns or
+                    not @lexer.get or @lexer.get.type != :colon
+                @lexer.next!
+
+                end_tag = parse_text
+            end
+
+            return missing_end tag, end_trace if not end_tag or end_tag.to_sym != tag or
+                not @lexer.get or @lexer.get.type != :right_bracket
             @lexer.next!
 
             found :element_end, end_tag.to_sym

@@ -36,7 +36,7 @@ class SelectingTests < Test::Unit::TestCase
     <level11>
         <only id=foo>child</only>
     </level11>
-</root>
+</pseudo:root>
 EOI
     end
 
