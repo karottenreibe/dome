@@ -37,6 +37,7 @@ module Dome
 
         def initialize
             @root = Root.new
+            @root.tree = self
         end
 
         ##
@@ -138,6 +139,13 @@ module Dome
         # The Element's attributes - Array of Attributes
         attr_accessor :attributes
 
+        def namespace
+            if @tree.implicit_namespaces
+                self["xmlns:#{@namespace}"] || self[:xmlns] || (@parent ? @parent.namespace : nil)
+            else @namespace
+            end
+        end
+
         ##
         # Initializes the Element's +tag+and +namespace+.
         #
@@ -149,25 +157,26 @@ module Dome
         ##
         # Retrieves the first attribute, whose name is +key+, from the attributes hash, or +nil+ if
         # no such attribute was specified.
-        # The +key+ must be convertible to a Symbol.
         #
         def [] key
-            key = key.to_sym
-            att = @attributes.find { |a| a.name == key }
+            key = key.to_s.split ':'
+            ns,key = key.length == 1 ? [nil,key[0].to_sym] : [key[0],key[1].to_sym]
+            att = @attributes.find { |a| a.name == key and a.namespace == ns }
+            att ||= @attributes.find { |a| a.name == key } if ns.nil?
             att ? att.value : nil
         end
 
         ##
         # Sets the attribute specified by +key+ to the given +value+ and creates such an Attribute
         # if it does not yet exist.
-        # The +key+ must be convertible to a Symbol.
         #
         def []= key, value
-            key = key.to_sym
-            idx = @attributes.index { |a| a.name == key }
+            key = key.to_s.split ":"
+            ns,key = key.length == 1 ? [nil,key[0].to_sym] : [key[0],key[1].to_sym]
+            idx = @attributes.index { |a| a.name == key and a.namespace == ns }
 
             if idx then @attributes[idx].value = value
-            else @attributes << Attribute.new(key, value)
+            else @attributes << Attribute.new(key, value, ns)
             end
         end
 
