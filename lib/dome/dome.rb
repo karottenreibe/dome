@@ -47,10 +47,12 @@ module Dome
         # following entries:
         # - :ignore_whitespace => true -- Ignore whitespace between Nodes
         # - :expand_entities => true -- Autoconvert stuff like '&amp;' --> '&'
+        # - :case_sensitive => true -- Do not convert namespaces, Element tags and Attribute names
+        #   to lowercase
         # Any parameter that is not given will be assumed to be +false+.
         #
         def initialize input, options = {}
-            @parser = HTMLParser.new HTMLLexer.new(input)
+            @parser = HTMLParser.new HTMLLexer.new(input), !options[:case_sensitive]
             @open, @tree, @options = [], Tree.new, options
             @cur = @tree.root
 

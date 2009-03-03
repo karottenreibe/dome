@@ -29,9 +29,11 @@ module Dome
 
         ##
         # Initializes the Parser with a given +lexer+.
+        # +downcase+ tells the parser to convert namespaces, Element tags and Attribute names
+        # to lowercase.
         #
-        def initialize lexer
-            @lexer, @parse_started = lexer, false
+        def initialize lexer, downcase = true
+            @lexer, @parse_started, @downcase = lexer, false, downcase
         end
 
         ##
@@ -91,8 +93,14 @@ module Dome
                 return terminate trace unless tag
             end
 
+            tag = tag.downcase if @downcase
             tag = tag.to_sym
-            ns = ns.to_sym if ns
+
+            if ns
+                ns = ns.downcase if @downcase
+                ns = ns.to_sym
+            end
+
             found :element_start, [ns,tag]
 
             parse_attributes
@@ -116,7 +124,7 @@ module Dome
             end_tag = parse_text
 
             if not ns.nil?
-                end_ns = end_tag
+                end_ns = @downcase ? end_tag.downcase : end_tag
                 return missing_end end_trace if not end_ns or end_ns.to_sym != ns or
                     not @lexer.get or @lexer.get.type != :colon
                 @lexer.next!
@@ -124,6 +132,7 @@ module Dome
                 end_tag = parse_text
             end
 
+            end_tag = end_tag.downcase if @downcase
             return missing_end end_trace if not end_tag or end_tag.to_sym != tag or
                 not @lexer.get or @lexer.get.type != :right_bracket
             @lexer.next!
@@ -223,9 +232,16 @@ module Dome
                 return terminate trace if not name
             end
 
-            ns = ns.to_sym if ns
+            name = name.downcase if @downcase
+            name = name.to_sym
+
+            if ns
+                ns = ns.downcase if @downcase
+                ns = ns.to_sym
+            end
+
             if not @lexer.get or not @lexer.get.type == :equal
-                found :attribute, [ns,name.to_sym,nil]
+                found :attribute, [ns,name,nil]
                 return true
             end
 
@@ -235,7 +251,7 @@ module Dome
 
             return terminate trace if not value
 
-            found :attribute, [ns,name.to_sym,value]
+            found :attribute, [ns,name,value]
             true
         end
 

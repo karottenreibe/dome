@@ -255,5 +255,25 @@ class ParserTests < Test::Unit::TestCase
         assert_equal "data", tree.root.children[0].children[0].value
     end
 
+    def testCaseSensitivity
+        tree = Dome "<BAAR:FoOoO loO:xxXxx />", :case_sensitive => true
+        assert_kind_of Tree, tree
+        assert_equal 1, tree.root.children.length
+        assert_kind_of Element, tree.root.children[0]
+        assert_equal :FoOoO, tree.root.children[0].tag
+        assert_equal :BAAR, tree.root.children[0].namespace
+        assert_equal :xxXxx, tree.root.children[0].attributes[0].name
+        assert_equal :loO, tree.root.children[0].attributes[0].namespace
+
+        tree = Dome "<BAAR:FoOoO loO:xxXxx />"
+        assert_kind_of Tree, tree
+        assert_equal 1, tree.root.children.length
+        assert_kind_of Element, tree.root.children[0]
+        assert_equal :foooo, tree.root.children[0].tag
+        assert_equal :baar, tree.root.children[0].namespace
+        assert_equal :xxxxx, tree.root.children[0].attributes[0].name
+        assert_equal :loo, tree.root.children[0].attributes[0].namespace
+    end
+
 end
 
