@@ -46,7 +46,7 @@ EOI
 
         assert_equal [two], one
         assert_kind_of Element, two
-        assert_equal "level2", two.tag
+        assert_equal :level2, two.tag
     end
 
     def testAttributeSelector
@@ -56,7 +56,7 @@ EOI
             assert_equal [two], one
 
             assert_kind_of Element, two
-            assert_equal "level2", two.tag
+            assert_equal :level2, two.tag
         end
 
         one = @tree/"[real|id]"
@@ -64,7 +64,7 @@ EOI
         assert_equal [two], one
 
         assert_kind_of Element, two
-        assert_equal "data", two.tag
+        assert_equal :data, two.tag
         assert_equal "1", two[:id]
     end
 
@@ -74,7 +74,7 @@ EOI
         assert_equal [two], one
 
         assert_kind_of Element, two
-        assert_equal "nothing", two.tag
+        assert_equal :nothing, two.tag
     end
 
     def testStarSelector
@@ -83,37 +83,37 @@ EOI
         assert_equal [two], one
 
         assert_kind_of Element, two
-        assert_equal "only", two.tag
+        assert_equal :only, two.tag
 
         one = @tree/"*"
         assert_equal 10, one.length
 
         assert_kind_of Element, one[0]
-        assert_equal "root", one[0].tag
+        assert_equal :root, one[0].tag
         assert_kind_of Element, one[1]
-        assert_equal "level1", one[1].tag
+        assert_equal :level1, one[1].tag
         assert_kind_of Element, one[2]
-        assert_equal "level2", one[2].tag
+        assert_equal :level2, one[2].tag
         assert_kind_of Element, one[3]
-        assert_equal "data", one[3].tag
+        assert_equal :data, one[3].tag
         assert_kind_of Element, one[4]
-        assert_equal "nothing", one[4].tag
+        assert_equal :nothing, one[4].tag
         assert_kind_of Element, one[5]
-        assert_equal "empty", one[5].tag
+        assert_equal :empty, one[5].tag
         assert_kind_of Element, one[6]
-        assert_equal "data", one[6].tag
+        assert_equal :data, one[6].tag
         assert_kind_of Element, one[7]
-        assert_equal "data", one[7].tag
+        assert_equal :data, one[7].tag
         assert_kind_of Element, one[8]
-        assert_equal "level11", one[8].tag
+        assert_equal :level11, one[8].tag
         assert_kind_of Element, one[9]
-        assert_equal "only", one[9].tag
+        assert_equal :only, one[9].tag
     end
 
     def testDescendant
         one = @tree/"root data"
         assert_equal 3, one.length
-        one.each { |x| assert_equal "data", x.tag }
+        one.each { |x| assert_equal :data, x.tag }
         assert_equal ["sleep","1","2"], one.collect { |x| x[:id] }
     end
 
@@ -124,28 +124,28 @@ EOI
             assert_equal [two], one
 
             assert_kind_of Element, two
-            assert_equal "empty", two.tag
+            assert_equal :empty, two.tag
         }
     end
 
     def testChild
         one = @tree/"level1 > data"
         assert_equal 2, one.length
-        one.each { |x| assert_equal "data", x.tag }
+        one.each { |x| assert_equal :data, x.tag }
         assert_equal ["1","2"], one.collect { |x| x[:id] }
     end
 
     def testNeighbour
         one = @tree/"empty + data"
         assert_equal 2, one.length
-        one.each { |x| assert_equal "data", x.tag }
+        one.each { |x| assert_equal :data, x.tag }
         assert_equal ["1","2"], one.collect { |x| x[:id] }
     end
 
     def testDescendant
         one = @tree/"empty ~ data"
         assert_equal 1, one.length
-        assert_equal "data", one[0].tag
+        assert_equal :data, one[0].tag
         assert_equal "1", one[0][:id]
     end
 
@@ -155,7 +155,7 @@ EOI
         assert_equal [two], one
 
         assert_kind_of Element, two
-        assert_equal "level1", two.tag
+        assert_equal :level1, two.tag
         assert_equal "coldplay", two[:class]
 
         one = @tree/"#foo"
@@ -163,7 +163,7 @@ EOI
         assert_equal [two], one
 
         assert_kind_of Element, two
-        assert_equal "only", two.tag
+        assert_equal :only, two.tag
         assert_equal "foo", two[:id]
     end
 
@@ -173,27 +173,27 @@ EOI
         assert_equal [two], one
 
         assert_kind_of Element, two
-        assert_equal "root", two.tag
+        assert_equal :root, two.tag
     end
 
     def testFirstLastChildSelectors
         one = @tree/":first-child"
         assert_equal 5, one.length
-        assert_equal "root", one[0].tag
-        assert_equal "level1", one[1].tag
-        assert_equal "level2", one[2].tag
-        assert_equal "data", one[3].tag
+        assert_equal :root, one[0].tag
+        assert_equal :level1, one[1].tag
+        assert_equal :level2, one[2].tag
+        assert_equal :data, one[3].tag
         assert_equal "sleep", one[3][:id]
-        assert_equal "only", one[4].tag
+        assert_equal :only, one[4].tag
         
         one = @tree/":last-child"
         assert_equal 5, one.length
-        assert_equal "root", one[0].tag
-        assert_equal "nothing", one[1].tag
-        assert_equal "data", one[2].tag
+        assert_equal :root, one[0].tag
+        assert_equal :nothing, one[1].tag
+        assert_equal :data, one[2].tag
         assert_equal "2", one[2][:id]
-        assert_equal "level11", one[3].tag
-        assert_equal "only", one[4].tag
+        assert_equal :level11, one[3].tag
+        assert_equal :only, one[4].tag
         
         %w{first-child last-child}.zip(
             %w{sleep 2}
@@ -203,7 +203,7 @@ EOI
             assert_equal [two], one
 
             assert_kind_of Element, two
-            assert_equal "data", two.tag
+            assert_equal :data, two.tag
             assert_equal id, two[:id]
         end
     end
@@ -211,31 +211,31 @@ EOI
     def testFirstLastOfTypeSelectors
         one = @tree/":first-of-type"
         assert_equal 9, one.length
-        assert_equal "root", one[0].tag
-        assert_equal "level1", one[1].tag
-        assert_equal "level2", one[2].tag
-        assert_equal "data", one[3].tag
+        assert_equal :root, one[0].tag
+        assert_equal :level1, one[1].tag
+        assert_equal :level2, one[2].tag
+        assert_equal :data, one[3].tag
         assert_equal "sleep", one[3][:id]
-        assert_equal "nothing", one[4].tag
-        assert_equal "empty", one[5].tag
-        assert_equal "data", one[6].tag
+        assert_equal :nothing, one[4].tag
+        assert_equal :empty, one[5].tag
+        assert_equal :data, one[6].tag
         assert_equal "1", one[6][:id]
-        assert_equal "level11", one[7].tag
-        assert_equal "only", one[8].tag
+        assert_equal :level11, one[7].tag
+        assert_equal :only, one[8].tag
         
         one = @tree/":last-of-type"
         assert_equal 9, one.length
-        assert_equal "root", one[0].tag
-        assert_equal "level1", one[1].tag
-        assert_equal "level2", one[2].tag
-        assert_equal "data", one[3].tag
+        assert_equal :root, one[0].tag
+        assert_equal :level1, one[1].tag
+        assert_equal :level2, one[2].tag
+        assert_equal :data, one[3].tag
         assert_equal "sleep", one[3][:id]
-        assert_equal "nothing", one[4].tag
-        assert_equal "empty", one[5].tag
-        assert_equal "data", one[6].tag
+        assert_equal :nothing, one[4].tag
+        assert_equal :empty, one[5].tag
+        assert_equal :data, one[6].tag
         assert_equal "2", one[6][:id]
-        assert_equal "level11", one[7].tag
-        assert_equal "only", one[8].tag
+        assert_equal :level11, one[7].tag
+        assert_equal :only, one[8].tag
         
         %w{first-of-type last-of-type}.zip(
             %w{1 2}
@@ -245,7 +245,7 @@ EOI
             assert_equal [two], one
 
             assert_kind_of Element, two
-            assert_equal "data", two.tag
+            assert_equal :data, two.tag
             assert_equal id, two[:id]
         end
     end
@@ -256,7 +256,7 @@ EOI
         assert_equal [two], one
 
         assert_kind_of Element, two
-        assert_equal "only", two.tag
+        assert_equal :only, two.tag
     end
 
     def OnlyOfTypeSelector
@@ -265,7 +265,7 @@ EOI
         assert_equal [two], one
 
         assert_kind_of Element, two
-        assert_equal "data", two.tag
+        assert_equal :data, two.tag
         assert_equal "sleep", two[:id]
     end
 
@@ -275,27 +275,27 @@ EOI
         assert_equal [two], one
 
         assert_kind_of Element, two
-        assert_equal "empty", two.tag
+        assert_equal :empty, two.tag
     end
 
     def testOnlyTextSelector
         one = @tree/":only-text"
         assert_equal 5, one.length
-        assert_equal "data", one[0].tag
+        assert_equal :data, one[0].tag
         assert_equal "sleep", one[0][:id]
-        assert_equal "nothing", one[1].tag
-        assert_equal "data", one[2].tag
+        assert_equal :nothing, one[1].tag
+        assert_equal :data, one[2].tag
         assert_equal "1", one[2][:id]
-        assert_equal "data", one[3].tag
+        assert_equal :data, one[3].tag
         assert_equal "2", one[3][:id]
-        assert_equal "only", one[4].tag
+        assert_equal :only, one[4].tag
 
         one = @tree/"level11 :only-text"
         two = @tree%"level11 :only-text"
         assert_equal [two], one
 
         assert_kind_of Element, two
-        assert_equal "only", two.tag
+        assert_equal :only, two.tag
     end
 
     def testNot
@@ -304,7 +304,7 @@ EOI
         assert_equal [two], one
 
         assert_kind_of Element, two
-        assert_equal "data", two.tag
+        assert_equal :data, two.tag
         assert_equal "sleep", two[:id]
 
         one = @tree/":not(:root) > * > data"
@@ -312,7 +312,7 @@ EOI
         assert_equal [two], one
 
         assert_kind_of Element, two
-        assert_equal "data", two.tag
+        assert_equal :data, two.tag
         assert_equal "sleep", two[:id]
 
         one = @tree/":not(* > *)"
@@ -325,7 +325,7 @@ EOI
         assert_equal [two], one
 
         assert_kind_of Element, two
-        assert_equal "level11", two.tag
+        assert_equal :level11, two.tag
     end
 
     def testNamespaceSelector
@@ -334,21 +334,21 @@ EOI
 
         assert_equal [two], one
         assert_kind_of Element, two
-        assert_equal "root", two.tag
+        assert_equal :root, two.tag
 
         one = @tree/"|level1"
         two = @tree%"|level1"
 
         assert_equal [two], one
         assert_kind_of Element, two
-        assert_equal "level1", two.tag
+        assert_equal :level1, two.tag
 
         one = @tree/"*|root"
         two = @tree%"*|root"
 
         assert_equal [two], one
         assert_kind_of Element, two
-        assert_equal "root", two.tag
+        assert_equal :root, two.tag
     end
 
 end

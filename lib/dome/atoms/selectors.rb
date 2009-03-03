@@ -32,7 +32,7 @@ module Dome
             end
 
             def walk node
-                yield node if node.is_a? Element and (@tag == :any or node.tag == @tag)
+                yield node if node.is_a? Element and (@tag == :any or node.tag == @tag.to_sym)
             end
         end
 
@@ -144,10 +144,10 @@ module Dome
             protected
 
             def nth_walk group, node, &block
-                return if @tag != :any and  @tag != node.tag
+                return if @tag != :any and  @tag.to_sym != node.tag
 
                 group = group.find_all { |item|
-                    item.tag == ( @tag == :any ? node.tag : @tag )
+                    item.tag == ( @tag == :any ? node.tag : @tag.to_sym )
                 }
 
                 super(group, node, &block)
@@ -167,7 +167,7 @@ module Dome
 
             def walk node
                 yield node if node.is_a? Element and node.parent.children.find_all { |c|
-                    c.is_a? Element and (@tag == :any or c.tag == @tag)
+                    c.is_a? Element and (@tag == :any or c.tag == @tag.to_sym)
                 }.length == 1
             end
         end
