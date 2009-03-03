@@ -43,11 +43,19 @@ module Dome
         ##
         # Parses the +input+. After the creation of the Dom object, the resulting
         # DOM tree will be located in +tree+.
+        # The optional +options+ parameter is a Hash that may have any combination of the
+        # following entries:
+        # - :ignore_whitespace => true -- Ignore whitespace between Nodes
+        # - :convert_entities => true -- Autoconvert stuff like '&amp;' --> '&'
+        # Any parameter that is not given will be assumed to be +false+.
         #
-        def initialize input
+        def initialize input, options = {}
             @parser = HTMLParser.new HTMLLexer.new(input)
-            @open, @tree = [], Tree.new
+            @open, @tree, @options = [], Tree.new, options
             @cur = @tree.root
+
+            require 'cgi' if @options[:convert_entities]
+
             parse!
         end
         
@@ -67,11 +75,22 @@ module Dome
                 when :element_end, :missing_end
                     close
                 when :attribute
-                    @cur.attributes << Attribute.new(token.value[1].to_sym, token.value[2], token.value[0])
+                    val = @options[:convert_entities] ?
+                        CGI::unescapeHTML(token.value[2]) :
+                        token.value[2]
+                    @cur.attributes << Attribute.new(token.value[1].to_sym, val, token.value[0])
                 when :cdata
-                    @cur.children << Data.new(token.value, true)
+                    val = @options[:ignore_whitespace] ?
+                        token.value.strip :
+                        token.value
+                    val = CGI::unescapeHTML val if @options[:convert_entities]
+                    @cur.children << Data.new(val, true) unless val.empty?
                 when :data, :tail
-                    @cur.children << Data.new(token.value)
+                    val = @options[:ignore_whitespace] ?
+                        token.value.strip :
+                        token.value
+                    val = CGI::unescapeHTML val if @options[:convert_entities]
+                    @cur.children << Data.new(val) unless val.empty?
                 when :comment
                     @cur.children << Comment.new(token.value)
                 end
