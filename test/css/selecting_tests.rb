@@ -350,5 +350,19 @@ EOI
         assert_kind_of Element, two
         assert_equal :root, two.tag
     end
+    
+    def testSelectNothing
+        one = @tree/"level2 > data#1"
+        two = @tree%"level2 > data#1"
+
+        assert_kind_of NilClass, two
+        assert_equal true, one.empty?
+
+        one = @tree/":not(*)"
+        two = @tree%"xirx"
+
+        assert_kind_of NilClass, two
+        assert_equal true, one.empty?
+    end
 
 end

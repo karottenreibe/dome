@@ -175,7 +175,11 @@ module Dome
                 return levels[-1][0] if levels.length == sels.length+1
 
                 # if the last level is empty, we're done there
-                levels.delete_at -1 while levels[-1].empty?
+                while levels[-1].empty?
+                    levels.delete_at -1
+                    # abort condition in case no element was found at all
+                    return nil if levels.empty?
+                end
 
                 # generate a new level from the first node in the last level
                 node = levels[-1].delete_at 0
