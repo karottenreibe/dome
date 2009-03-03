@@ -35,12 +35,10 @@ class FailTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :missing_end, ret.type
-        assert_equal :empty, ret.value
 
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_end, ret.type
-        assert_equal :coolness, ret.value
     end
 
     def testMissingCDATAEnd
@@ -58,7 +56,6 @@ class FailTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :missing_end, ret.type
-        assert_equal :coolness, ret.value
     end
 
     def testMissingAttributeQuote
@@ -162,7 +159,6 @@ class FailTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :missing_end, ret.type
-        assert_equal :buddies, ret.value
 
         ret = p.next
         assert_kind_of Token, ret
@@ -181,7 +177,6 @@ class FailTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :missing_end, ret.type
-        assert_equal :buddies, ret.value
 
         ret = p.next
         assert_kind_of Token, ret

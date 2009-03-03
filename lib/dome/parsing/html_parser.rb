@@ -100,7 +100,7 @@ module Dome
 
             if @lexer.get and @lexer.get.type == :empty_element_end
                 @lexer.next!
-                found :element_end, tag
+                found :element_end
                 return true
             end
 
@@ -110,25 +110,25 @@ module Dome
             parse_children
 
             end_trace = @lexer.trace
-            return missing_end tag, end_trace if not @lexer.get or @lexer.get.type != :end_element_start
+            return missing_end end_trace if not @lexer.get or @lexer.get.type != :end_element_start
             @lexer.next!
 
             end_tag = parse_text
 
             if not ns.nil?
                 end_ns = end_tag
-                return missing_end tag, end_trace if not end_ns or end_ns.to_sym != ns or
+                return missing_end end_trace if not end_ns or end_ns.to_sym != ns or
                     not @lexer.get or @lexer.get.type != :colon
                 @lexer.next!
 
                 end_tag = parse_text
             end
 
-            return missing_end tag, end_trace if not end_tag or end_tag.to_sym != tag or
+            return missing_end end_trace if not end_tag or end_tag.to_sym != tag or
                 not @lexer.get or @lexer.get.type != :right_bracket
             @lexer.next!
 
-            found :element_end, end_tag.to_sym
+            found :element_end
             true
         end
 
@@ -321,7 +321,7 @@ module Dome
         # given +value+. At the same time it sets up +@cc+ so +#next+ can jump
         # back into the parsing process.
         #
-        def found type, value
+        def found type, value = nil
             callcc { |@cc| @ret.call Token.new(type, value) }
         end
 
@@ -336,8 +336,8 @@ module Dome
         ##
         # Reports a missing end +tag+, returns the lexer to the +trace+.
         #
-        def missing_end tag, trace
-            found :missing_end, tag
+        def missing_end trace
+            found :missing_end
             @lexer.undo trace
         end
 
