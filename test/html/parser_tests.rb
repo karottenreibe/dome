@@ -331,12 +331,12 @@ class HTMLParserTests < Test::Unit::TestCase
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :element_start, ret.type
-        assert_equal ["ns",:boo], ret.value
+        assert_equal [:ns,:boo], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
         assert_equal :attribute, ret.type
-        assert_equal ["tommy",:gun,"old"], ret.value
+        assert_equal [:tommy,:gun,"old"], ret.value
 
         ret = p.next
         assert_kind_of Token, ret
