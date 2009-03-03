@@ -84,7 +84,7 @@ module Dome
             tag = parse_text
             return terminate trace unless tag
 
-            if @lexer.get and @lexer.get.type == :namespace
+            if @lexer.get and @lexer.get.type == :colon
                 @lexer.next!
                 ns = tag
                 tag = parse_text
@@ -203,7 +203,7 @@ module Dome
             name = parse_text
             return terminate trace if not name
 
-            if @lexer.get and @lexer.get.type == :namespace
+            if @lexer.get and @lexer.get.type == :colon
                 @lexer.next!
                 ns = name
                 name = parse_text

@@ -87,7 +87,7 @@ class HTMLLexerTests < Test::Unit::TestCase
         lex.next!
         t = lex.get
         assert_kind_of Token, t
-        assert_equal :namespace, t.type
+        assert_equal :colon, t.type
         assert_equal ":", t.value
     end
 

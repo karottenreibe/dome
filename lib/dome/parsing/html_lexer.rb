@@ -41,7 +41,7 @@ module Dome
             when '-->' then :comment_end
             when '<![CDATA[' then :cdata_start
             when ']]>' then :cdata_end
-            when ':' then :namespace
+            when ':' then :colon
             else :text
             end
         end
