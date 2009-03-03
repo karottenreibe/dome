@@ -425,5 +425,16 @@ class CSSParserTests < Test::Unit::TestCase
         assert_kind_of NilClass, f
     end
 
+    def testParentSelector
+        p = CSSParser.new CSSLexer.new("..")
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :parent, f.type
+        assert_equal nil, f.value
+
+        f = p.next
+        assert_kind_of NilClass, f
+    end
+
 end
 

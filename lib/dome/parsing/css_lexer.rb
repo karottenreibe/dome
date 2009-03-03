@@ -24,7 +24,7 @@ module Dome
         protected
 
         def delimiters
-            /\[|\]|:|~=|\^=|\$=|\*=|\|=|\/=|\*|=|\(|\)|#|\.|>|\+|\s|~|\\|'|"|\|/
+            /\[|\]|:|~=|\^=|\$=|\*=|\|=|\/=|\*|=|\(|\)|\.\.|#|\.|>|\+|\s|~|\\|'|"|\|/
         end
 
         def meaning token
@@ -40,6 +40,7 @@ module Dome
             when '|' then :pipe
             when '*' then :star
             when '.' then :period
+            when '..' then :double_period
             when '>' then :chevron
             when '+' then :plus
             when '~' then :tilde

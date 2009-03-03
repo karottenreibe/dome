@@ -218,5 +218,11 @@ class SelectorTests < Test::Unit::TestCase
         assert_equal nil, sl[0].instance_variable_get(:@value)
     end
 
+    def testParent
+        sl = Selector.new("..").selectors
+        assert_equal 1, sl.length
+        assert_kind_of ParentSelector, sl[0]
+    end
+
 end
 

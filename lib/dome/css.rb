@@ -208,6 +208,8 @@ module Dome
                     @selectors << AttributeSelector.new(*t.value)
                 when :namespace
                     @selectors << NamespaceSelector.new(t.value)
+                when :parent
+                    @selectors << ParentSelector.new
                 when :pseudo
                     @selectors <<
                         case t.value[0]

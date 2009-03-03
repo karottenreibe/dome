@@ -198,6 +198,12 @@ module Dome
             end
         end
 
+        class ParentSelector
+            def walk node
+                yield node.parent unless node.parent.root?
+            end
+        end
+
     end
 
 end

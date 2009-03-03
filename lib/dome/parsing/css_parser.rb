@@ -140,7 +140,7 @@ module Dome
         def parse_additional_selectors
             found = false
             found = true while parse_pseudo_selector or parse_id_selector or
-                parse_class_selector or parse_attr_selector
+                parse_class_selector or parse_attr_selector or parse_parent_selector
             found
         end
 
@@ -368,6 +368,17 @@ module Dome
             return terminate "class selector", trace if not @lexer.get or @lexer.get.type != :text
             found :attribute, [:any,"class",:in_list,@lexer.get.value]
             @lexer.next!
+            true
+        end
+
+        ##
+        # Parses the parent selector +..+.
+        # Returns +true+ on success and +false+ otherwise.
+        #
+        def parse_parent_selector
+            return false if not @lexer.get or @lexer.get.type != :double_period
+            @lexer.next!
+            found :parent, nil
             true
         end
 
