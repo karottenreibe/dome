@@ -22,10 +22,10 @@ require 'dome/parsing/html_parser'
 require 'dome/atoms/nodes'
 
 ##
-# Shortcut for calling +Dome::Dom.new(input).tree+.
+# Shortcut for calling +Dome::Dom.new(*args).tree+.
 #
-def Dome input
-    Dome::Dom.new(input).tree
+def Dome *args
+    Dome::Dom.new(*args).tree
 end
 
 module Dome

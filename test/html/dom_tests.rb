@@ -224,12 +224,23 @@ class ParserTests < Test::Unit::TestCase
         assert_equal false, proclamation.cdata?
     end
 
-    def testEmptyElem
+    def testComment
         tree = Dome "<!----->"
         assert_kind_of Tree, tree
         assert_equal 1, tree.root.children.length
         assert_kind_of Comment, tree.root.children[0]
         assert_equal "-", tree.root.children[0].text
+    end
+
+    def testWhitespaceIgnoring
+        tree = Dome "  <foo> data  </foo>  ", :ignore_whitespace => true
+        assert_kind_of Tree, tree
+        assert_equal 1, tree.root.children.length
+        assert_kind_of Element, tree.root.children[0]
+        assert_equal "foo", tree.root.children[0].tag
+        assert_equal 1, tree.root.children[0].children.length
+        assert_kind_of Data, tree.root.children[0].children[0]
+        assert_equal "data", tree.root.children[0].children[0].value
     end
 
 end

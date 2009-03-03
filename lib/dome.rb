@@ -13,7 +13,7 @@
 # Homepage::    http://dome.rubyforge.org/
 # Git repo::    http://rubyforge.org/scm/?group_id=7589
 #
-# Simple shortcut, only requires _dome/dome_.
+# Simple shortcut, only requires the full feature set, i.e. Dome, CSS and the Scraper.
 #
 
 require 'dome/dome'
