@@ -92,6 +92,7 @@ module Dome
             end
 
             tag = tag.to_sym
+            ns = ns.to_sym if ns
             found :element_start, [ns,tag]
 
             parse_attributes
@@ -211,6 +212,7 @@ module Dome
                 return terminate trace if not name
             end
 
+            ns = ns.to_sym if ns
             if not @lexer.get or not @lexer.get.type == :equal
                 found :attribute, [ns,name.to_sym,nil]
                 return true
