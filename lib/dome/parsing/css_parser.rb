@@ -337,7 +337,7 @@ module Dome
         #
         def parse_slist_arg arg
             Selector.new arg
-        rescue CSSParserError => e
+        rescue CSSParsingError => e
             nil
         end
 
