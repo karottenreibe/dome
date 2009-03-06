@@ -215,7 +215,7 @@ module Dome
                     @selectors <<
                         case t.value[0]
                         when :not then NotSelector.new(t.value[1])
-                        when :epsilon then EpsilonSelector.new(t.value[1])
+                        when :eps then EpsilonSelector.new(t.value[1])
                         when :root then RootSelector.new
 
                         when :"nth-child" then NthChildSelector.new(t.value[1], false)
