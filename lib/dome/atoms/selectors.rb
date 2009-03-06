@@ -192,9 +192,17 @@ module Dome
             end
 
             def walk node
-                yield node if node.is_a? Element and not callcc do |cc|
-                    @slist.each(node) { cc.call true }
-                end
+                yield node if node.is_a? Element and not @slist.first(node)
+            end
+        end
+
+        class EpsilonSelector
+            def initialize slist
+                @slist = slist
+            end
+
+            def walk node
+                yield node if node.is_a? Element and @slist.first(node)
             end
         end
 
