@@ -324,27 +324,29 @@ class CSSParserTests < Test::Unit::TestCase
         }
     end
 
-    def testNot
+    def testNotEps
         args = ["element[attr]","not valid[>stuff + you  ~  know",":root",":nth-child(2n+1)"]
         klasses = [[ElementSelector,AttributeSelector],nil,[RootSelector],[NthChildSelector]]
 
-        args.zip(klasses).each do |(arg,kls)|
-            p = CSSParser.new CSSLexer.new(":not(#{arg})")
-            f = p.next
-            assert_kind_of Token, f
+        [:not,:eps].each do |op|
+            args.zip(klasses).each do |(arg,kls)|
+                p = CSSParser.new CSSLexer.new(":#{op}(#{arg})")
+                f = p.next
+                assert_kind_of Token, f
 
-            if kls.nil?
-                assert_equal :tail, f.type
-            else
-                assert_equal :pseudo, f.type
-                assert_equal :not, f.value[0]
-                kls.each_with_index { |k,i|
-                    assert_kind_of k, f.value[1].selectors[i]
-                }
+                if kls.nil?
+                    assert_equal :tail, f.type
+                else
+                    assert_equal :pseudo, f.type
+                    assert_equal op, f.value[0]
+                    kls.each_with_index { |k,i|
+                        assert_kind_of k, f.value[1].selectors[i]
+                    }
+                end
+
+                f = p.next
+                assert_kind_of NilClass, f
             end
-
-            f = p.next
-            assert_kind_of NilClass, f
         end
     end
 
