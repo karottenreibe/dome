@@ -251,6 +251,10 @@ module Dome
             end
         end
 
+        def inspect
+            "#<Dome::Selector {#{@selectors.inject('') { |memo,s| memo + s.inspect }}}>"
+        end
+
     end
 
 end

@@ -34,6 +34,8 @@ module Dome
             def walk node
                 yield node if node.is_a? Element and (@tag == :any or node.tag == @tag.to_sym)
             end
+
+            def inspect; @tag; end
         end
 
         class AttributeSelector
@@ -58,6 +60,18 @@ module Dome
                         end
                 }
             end
+
+            def inspect
+                table = { :equal => '=',
+                          :in_list => '~=',
+                          :contains => '*=',
+                          :ends_with => '$=',
+                          :begins_with => '^=',
+                          :begins_with_dash => '|=',
+                          :matches => '/=' }
+
+                "[#{ @ns ? @ns + ':' : '' }#{@name}#{ @op ? table[@op] + @value.inspect : '' }]"
+            end
         end
 
         class NamespaceSelector 
@@ -69,6 +83,8 @@ module Dome
                 yield node if node.is_a? Element and (@ns == :any or
                       node.namespace == @ns or (not @ns.nil? and node.namespace == @ns.to_sym))
             end
+
+            def inspect; "#{@ns}|"; end
         end
 
         class ChildSelector
@@ -77,6 +93,8 @@ module Dome
                     yield child if child.is_a? Element
                 }
             end
+
+            def inspect; " > "; end
         end
 
         class DescendantSelector
@@ -86,6 +104,8 @@ module Dome
                     walk child, &block if child.is_a? Element
                 }
             end
+
+            def inspect; " "; end
         end
 
         class NeighbourSelector
@@ -97,6 +117,8 @@ module Dome
                     yield child if child.is_a? Element
                 end
             end
+
+            def inspect; " + "; end
         end
 
         class FollowerSelector
@@ -108,12 +130,16 @@ module Dome
                     return yield(child) if child.is_a? Element
                 end
             end
+
+            def inspect; " ~ "; end
         end
 
         class RootSelector
             def walk node
                 yield node if node.is_a? Element and node.parent.root?
             end
+
+            def inspect; ":root"; end
         end
 
         class NthChildSelector
@@ -134,6 +160,17 @@ module Dome
                 yield node if node.is_a? Element and
                     (a == 0 and b == idx) or (a != 0 and a * ((idx-b)/a) + b == idx)
             end
+
+            def inspect
+                a,b = @args
+                ":nth-child(#{
+                    case a
+                    when 0 then b.to_s
+                    when 1 then "n+#{b}"
+                    else b == 0 ? "#{a}n" : "#{a}n+#{b}"
+                    end
+                })"
+            end
         end
 
         class NthOfTypeSelector < NthChildSelector
@@ -153,12 +190,26 @@ module Dome
 
                 super(group, node, &block)
             end
+
+            def inspect
+                a,b = @args
+                ":nth-of-type(#{
+                    case a
+                    when 0 then b.to_s
+                    when 1 then "n+#{b}"
+                    else b == 0 ? "#{a}n" : "#{a}n+#{b}"
+                    end
+                })"
+            end
+
         end
 
         class OnlyChildSelector
             def walk node
                 yield node if node.is_a? Element and node.parent.children.length == 1
             end
+
+            def inspect; ":only-child"; end
         end
 
         class OnlyOfTypeSelector
@@ -171,12 +222,16 @@ module Dome
                     c.is_a? Element and (@tag == :any or c.tag == @tag.to_sym)
                 }.length == 1
             end
+
+            def inspect; ":only-of-type"; end
         end
 
         class EmptySelector
             def walk node
                 yield node if node.is_a? Element and node.children.empty?
             end
+
+            def inspect; ":empty"; end
         end
 
         class OnlyTextSelector
@@ -184,6 +239,8 @@ module Dome
                 yield node if node.is_a? Element and not node.empty? and
                     node.children.all? { |c| c.is_a? Data }
             end
+
+            def inspect; ":only-text"; end
         end
 
         class NotSelector
@@ -194,6 +251,8 @@ module Dome
             def walk node
                 yield node if node.is_a? Element and not @slist.first(node)
             end
+
+            def inspect; ":not(#{@slist.inspect})"; end
         end
 
         class EpsilonSelector
@@ -204,12 +263,16 @@ module Dome
             def walk node
                 yield node if node.is_a? Element and @slist.first(node)
             end
+
+            def inspect; ":eps(#{@slist.inspect})"; end
         end
 
         class ParentSelector
             def walk node
                 yield node.parent unless node.parent.root?
             end
+
+            def inspect; ".."; end
         end
 
     end
