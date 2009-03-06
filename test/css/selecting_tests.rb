@@ -298,6 +298,27 @@ EOI
         assert_equal :only, two.tag
     end
 
+    def testEps
+        one = @tree/":eps(* > data):eps(* > nothing)"
+        two = @tree%":eps(* > data):eps(* > nothing)"
+        assert_equal [two], one
+
+        assert_kind_of Element, two
+        assert_equal :level2, two.tag
+
+        one = @tree/":eps(* > *)"
+        two = [:root,:level1,:level2,:level11]
+        assert_equal one.length, two.length
+        one.each { |e| assert_equal true, two.include?(e.tag) }
+
+        one = @tree/":eps([class] > [value]):eps(* :empty)"
+        two = @tree%":eps([class] > [value]):eps(* :empty)"
+        assert_equal [two], one
+
+        assert_kind_of Element, two
+        assert_equal :level1, two.tag
+    end
+
     def testNot
         one = @tree/":not(level1) > data"
         two = @tree%":not(level1) > data"
