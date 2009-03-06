@@ -304,7 +304,7 @@ module Dome
 
             ret =
                 case pseudo
-                when "not" then parse_not_arg buf
+                when "not", "eps" then parse_slist_arg buf
                 when /^nth-/ then parse_nth_arg buf
                 else nil
                 end
@@ -331,11 +331,11 @@ module Dome
         end
 
         ##
-        # Parses the +arg+ument given to +:not()+ pseudo selector.
+        # Parses the +arg+ument given to the +:not()+ and +:eps()+ pseudo selectors.
         # On success returns a Selector which contains the specified selectors.
         # On failure returns +nil+.
         #
-        def parse_not_arg arg
+        def parse_slist_arg arg
             Selector.new arg
         rescue CSSParserError => e
             nil
