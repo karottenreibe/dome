@@ -252,7 +252,11 @@ module Dome
         end
 
         def inspect
-            "#<Dome::Selector {#{@selectors.inject('') { |memo,s| memo + s.inspect }}}>"
+            "#<Dome::Selector {#{internal_inspect}>"
+        end
+
+        def internal_inspect
+            @selectors.inject('') { |memo,s| memo + s.inspect }
         end
 
     end

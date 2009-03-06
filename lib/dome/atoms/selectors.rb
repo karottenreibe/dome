@@ -252,7 +252,7 @@ module Dome
                 yield node if node.is_a? Element and not @slist.first(node)
             end
 
-            def inspect; ":not(#{@slist.inspect})"; end
+            def inspect; ":not(#{@slist.internal_inspect})"; end
         end
 
         class EpsilonSelector
@@ -264,7 +264,7 @@ module Dome
                 yield node if node.is_a? Element and @slist.first(node)
             end
 
-            def inspect; ":eps(#{@slist.inspect})"; end
+            def inspect; ":eps(#{@slist.internal_inspect})"; end
         end
 
         class ParentSelector
