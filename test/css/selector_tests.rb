@@ -138,37 +138,39 @@ class SelectorTests < Test::Unit::TestCase
         assert_equal "guy", sl[1].instance_variable_get(:@value)
     end
 
-    def testNot
-        sl = Selector.new(":not(in > the[mood=for]:not(:root))").selectors
-        assert_equal 1, sl.length
-        assert_kind_of NotSelector, sl[0]
+    def testEpsNot
+        [:not,:eps].zip([NotSelector,EpsilonSelector]).each do |(op,kls)|
+            sl = Selector.new(":#{op}(in > the[mood=for]:#{op}(:root))").selectors
+            assert_equal 1, sl.length
+            assert_kind_of kls, sl[0]
 
-        inner = sl[0].instance_variable_get :@slist
-        assert_kind_of Selector, inner
+            inner = sl[0].instance_variable_get :@slist
+            assert_kind_of Selector, inner
 
-        sli = inner.selectors
-        assert_equal 5, sli.length
-        assert_kind_of ElementSelector, sli[0]
-        assert_equal "in", sli[0].instance_variable_get(:@tag)
+            sli = inner.selectors
+            assert_equal 5, sli.length
+            assert_kind_of ElementSelector, sli[0]
+            assert_equal "in", sli[0].instance_variable_get(:@tag)
 
-        assert_kind_of ChildSelector, sli[1]
+            assert_kind_of ChildSelector, sli[1]
 
-        assert_kind_of ElementSelector, sli[2]
-        assert_equal "the", sli[2].instance_variable_get(:@tag)
+            assert_kind_of ElementSelector, sli[2]
+            assert_equal "the", sli[2].instance_variable_get(:@tag)
 
-        assert_kind_of AttributeSelector, sli[3]
-        assert_equal :mood, sli[3].instance_variable_get(:@name)
-        assert_equal :equal, sli[3].instance_variable_get(:@op)
-        assert_equal "for", sli[3].instance_variable_get(:@value)
+            assert_kind_of AttributeSelector, sli[3]
+            assert_equal :mood, sli[3].instance_variable_get(:@name)
+            assert_equal :equal, sli[3].instance_variable_get(:@op)
+            assert_equal "for", sli[3].instance_variable_get(:@value)
 
-        assert_kind_of NotSelector, sli[4]
+            assert_kind_of kls, sli[4]
 
-        inner = sli[4].instance_variable_get :@slist
-        assert_kind_of Selector, inner
+            inner = sli[4].instance_variable_get :@slist
+            assert_kind_of Selector, inner
 
-        sli = inner.selectors
-        assert_equal 1, sli.length
-        assert_kind_of RootSelector, sli[0]
+            sli = inner.selectors
+            assert_equal 1, sli.length
+            assert_kind_of RootSelector, sli[0]
+        end
     end
 
     def testNamespaces
