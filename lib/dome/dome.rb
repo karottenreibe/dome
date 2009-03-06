@@ -59,6 +59,7 @@ module Dome
             require 'cgi' if @options[:expand_entities]
 
             parse!
+            @parser = @open = @cur = @options = nil
         end
         
         protected

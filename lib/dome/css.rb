@@ -102,6 +102,7 @@ module Dome
             @selectors = []
             @parser = CSSParser.new CSSLexer.new(string)
             parse
+            @parser = nil
         end
 
         ##
