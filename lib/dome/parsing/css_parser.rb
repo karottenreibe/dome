@@ -272,7 +272,7 @@ module Dome
                 return terminate "pseudo selector", trace if not arg
             end
 
-            found :pseudo, [pseudo,arg]
+            found :pseudo, [pseudo.to_sym,arg]
             true
         end
 
