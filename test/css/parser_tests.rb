@@ -458,5 +458,30 @@ class CSSParserTests < Test::Unit::TestCase
         assert_kind_of NilClass, f
     end
 
+    def testOr
+        ["foo,bar", "foo, bar"].each do |sel|
+            p = CSSParser.new CSSLexer.new(sel)
+            f = p.next
+            assert_kind_of Token, f
+            assert_equal :element, f.type
+            assert_equal "foo", f.value
+
+            f = p.next
+            assert_kind_of Token, f
+            assert_equal :or, f.type
+
+            o = f.value
+            assert_kind_of Selector, o
+
+            s = o.selectors
+            assert_equal 1, s.length
+            assert_kind_of ElementSelector, s[0]
+            assert_equal "bar", s[0].instance_variable_get(:@tag)
+
+            f = p.next
+            assert_kind_of NilClass, f
+        end
+    end
+
 end
 

@@ -101,11 +101,12 @@ module Dome
         attr_accessor :or
 
         ##
-        # Parses the given +string+ into a list of CSS3 Selectors.
+        # Parses the given +obj+ (String or Lexer) into a list of CSS3 Selectors.
         #
-        def initialize string
+        def initialize obj
+            obj = CSSLexer.new(obj) unless obj.is_a? Lexer
             @selectors, @or = [], nil
-            @parser = CSSParser.new CSSLexer.new(string)
+            @parser = CSSParser.new obj
             parse
             @parser = nil
         end

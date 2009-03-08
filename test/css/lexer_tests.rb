@@ -209,8 +209,8 @@ class CSSLexerTests < Test::Unit::TestCase
         assert_kind_of NilClass, lex.get
     end
 
-    def testAnyParent
-        lex = CSSLexer.new "*.."
+    def testAnyParentOr
+        lex = CSSLexer.new "*..,"
         t = lex.get
         assert_kind_of Token, t
         assert_equal :star, t.type
@@ -221,6 +221,12 @@ class CSSLexerTests < Test::Unit::TestCase
         assert_kind_of Token, t
         assert_equal :double_period, t.type
         assert_equal "..", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :comma, t.type
+        assert_equal ",", t.value
 
         lex.next!
         assert_kind_of NilClass, lex.get
