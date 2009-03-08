@@ -118,7 +118,7 @@ EOI
     end
 
     def testCombinators
-        %w{\  > + ~}.each { |op|
+        %w{\  > + ~ < %}.each { |op|
             one = @tree/"*#{op}empty"
             two = @tree%"*#{op}empty"
             assert_equal [two], one
@@ -147,6 +147,18 @@ EOI
         assert_equal 1, one.length
         assert_equal :data, one[0].tag
         assert_equal "1", one[0][:id]
+    end
+
+    def testPredecessor
+        one = @tree/"data % empty"
+        assert_equal 1, one.length
+        assert_equal :empty, one[0].tag
+    end
+
+    def testReverseNeighbour
+        one = @tree/"data < empty"
+        assert_equal 1, one.length
+        assert_equal :empty, one[0].tag
     end
 
     def testIDClassSelectors
