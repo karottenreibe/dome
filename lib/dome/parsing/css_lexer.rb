@@ -24,7 +24,7 @@ module Dome
         protected
 
         def delimiters
-            /\[|\]|:|~=|\^=|\$=|\*=|\|=|\/=|\*|=|\(|\)|\.\.|#|\.|>|<|%|\+|\s|~|\\|'|"|\|/
+            /\[|\]|:|~=|\^=|\$=|\*=|\|=|\/=|\*|=|\(|\)|\.\.|#|\.|>|<|%|\+|,|\s|~|\\|'|"|\|/
         end
 
         def meaning token
@@ -48,6 +48,7 @@ module Dome
             when '%' then :percent
             when '#' then :hash
             when '=' then :equal
+            when ',' then :comma
             when '~=' then :in_list
             when '$=' then :ends_with
             when '^=' then :begins_with

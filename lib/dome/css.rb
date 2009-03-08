@@ -96,10 +96,15 @@ module Dome
         attr_accessor :selectors
 
         ##
+        # May contain an additional Selector that will be or'ed together with this
+        # one - Selector or +nil+
+        attr_accessor :or
+
+        ##
         # Parses the given +string+ into a list of CSS3 Selectors.
         #
         def initialize string
-            @selectors = []
+            @selectors, @or = [], nil
             @parser = CSSParser.new CSSLexer.new(string)
             parse
             @parser = nil
@@ -142,6 +147,9 @@ module Dome
             end
 
             nodes.each { |node| block.call node }
+
+            @or.each obj, &block if @or
+
             nil
         end
 
@@ -251,6 +259,7 @@ module Dome
                 when :neighbour
                     @selectors << NeighbourSelector.new
                     last_elem = :any
+                when :or then @or = t.value
                 when :tail
                     raise CSSParsingError.new(@parser.last_failure[:what], @parser.last_failure[:descriptive])
                 end

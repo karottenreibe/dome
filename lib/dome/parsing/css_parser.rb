@@ -431,7 +431,22 @@ module Dome
         # Parses any tailing values so an error can be thrown.
         #
         def parse_tail
+            trace = @lexer.trace
+            parse_whitespace
+
+            if @lexer.get and @lexer.get.type == :comma
+                begin
+                    @lexer.next!
+                    parse_whitespace
+                    found :or, SelectorList.new(@lexer.rest)
+                    return
+                rescue CSSParsingError => e
+                end
+            end
+
+            @lexer.undo trace
             buf = ''
+
             while @lexer.get
                 buf << @lexer.get.value
                 @lexer.next!

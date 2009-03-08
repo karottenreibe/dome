@@ -47,6 +47,13 @@ module Dome
         end
 
         ##
+        # Retrieves all the input tokens that have not yet been consumed.
+        #
+        def rest
+            @tokens[@pos..-1]
+        end
+
+        ##
         # Advances by one token.
         #
         def next!
