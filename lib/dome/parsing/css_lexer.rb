@@ -43,7 +43,9 @@ module Dome
             when '..' then :double_period
             when '>' then :chevron
             when '+' then :plus
+            when '-' then :minus
             when '~' then :tilde
+            when '%' then :percent
             when '#' then :hash
             when '=' then :equal
             when '~=' then :in_list

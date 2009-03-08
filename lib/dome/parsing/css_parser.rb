@@ -393,11 +393,14 @@ module Dome
 
             ops = { :chevron => :child,
                     :plus => :neighbour,
+                    :minus => :reverse_neighbour,
+                    :percent => :predecessor,
                     :tilde => :follower }
 
             op = true
             case @lexer.get.type
-            when :chevron, :plus, :tilde then found ops[@lexer.get.type], nil
+            when :chevron, :plus, :tilde, :minus, :percent
+                found ops[@lexer.get.type], nil
             else op = false
             end
 

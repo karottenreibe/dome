@@ -108,6 +108,19 @@ module Dome
             def inspect; " "; end
         end
 
+        class ReverseNeighbourSelector
+            def walk node
+                idx = node.parent.children.index(node) - 1
+
+                idx.downto(0) do |i|
+                    child = node.parent.children[i]
+                    yield child if child.is_a? Element
+                end
+            end
+
+            def inspect; " - "; end
+        end
+
         class NeighbourSelector
             def walk node
                 idx = node.parent.children.index(node) + 1
@@ -119,6 +132,19 @@ module Dome
             end
 
             def inspect; " + "; end
+        end
+
+        class PredecessorSelector
+            def walk node
+                idx = node.parent.children.index(node) - 1
+
+                idx.downto(0) do |i|
+                    child = node.parent.children[i]
+                    return yield(child) if child.is_a? Element
+                end
+            end
+
+            def inspect; " % "; end
         end
 
         class FollowerSelector

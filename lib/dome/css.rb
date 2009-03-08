@@ -242,6 +242,12 @@ module Dome
                 when :follower
                     @selectors << FollowerSelector.new
                     last_elem = :any
+                when :predecessor
+                    @selectors << PredecessorSelector.new
+                    last_elem = :any
+                when :reverse_neighbour
+                    @selectors << ReverseNeighbourSelector.new
+                    last_elem = :any
                 when :neighbour
                     @selectors << NeighbourSelector.new
                     last_elem = :any
