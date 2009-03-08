@@ -399,7 +399,7 @@ module Dome
 
             op = true
             case @lexer.get.type
-            when :chevron, :plus, :tilde, :minus, :percent
+            when :chevron, :plus, :tilde, :rev_chevron, :percent
                 found ops[@lexer.get.type], nil
             else op = false
             end
