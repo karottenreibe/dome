@@ -60,8 +60,8 @@ class SelectorTests < Test::Unit::TestCase
     end
 
     def testCombinators
-        sl = Selector.new("one two > three  +  four~five").selectors
-        assert_equal 9, sl.length
+        sl = Selector.new("one two > three  +  four~five <six% seven").selectors
+        assert_equal 13, sl.length
         assert_kind_of ElementSelector, sl[0]
         assert_equal "one", sl[0].instance_variable_get(:@tag)
         assert_kind_of DescendantSelector, sl[1]
@@ -76,6 +76,12 @@ class SelectorTests < Test::Unit::TestCase
         assert_kind_of FollowerSelector, sl[7]
         assert_kind_of ElementSelector, sl[8]
         assert_equal "five", sl[8].instance_variable_get(:@tag)
+        assert_kind_of ReverseNeighbourSelector, sl[9]
+        assert_kind_of ElementSelector, sl[10]
+        assert_equal "six", sl[10].instance_variable_get(:@tag)
+        assert_kind_of PredecessorSelector, sl[11]
+        assert_kind_of ElementSelector, sl[12]
+        assert_equal "seven", sl[12].instance_variable_get(:@tag)
     end
 
     def testNoArgPseudos
