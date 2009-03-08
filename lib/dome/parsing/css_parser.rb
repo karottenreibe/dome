@@ -393,7 +393,7 @@ module Dome
 
             ops = { :chevron => :child,
                     :plus => :neighbour,
-                    :minus => :reverse_neighbour,
+                    :rev_chevron => :reverse_neighbour,
                     :percent => :predecessor,
                     :tilde => :follower }
 

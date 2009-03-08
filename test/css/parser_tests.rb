@@ -214,7 +214,7 @@ class CSSParserTests < Test::Unit::TestCase
     end
 
     def testCombinators
-        p = CSSParser.new CSSLexer.new("one two + three>four   ~   five")
+        p = CSSParser.new CSSLexer.new("one two + three>four   ~   five -six% seven")
         f = p.next
         assert_kind_of Token, f
         assert_equal :element, f.type
@@ -259,6 +259,26 @@ class CSSParserTests < Test::Unit::TestCase
         assert_kind_of Token, f
         assert_equal :element, f.type
         assert_equal "five", f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :reverse_neighbour, f.type
+        assert_equal nil, f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :element, f.type
+        assert_equal "six", f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :predecessor, f.type
+        assert_equal nil, f.value
+
+        f = p.next
+        assert_kind_of Token, f
+        assert_equal :element, f.type
+        assert_equal "seven", f.value
 
         f = p.next
         assert_kind_of NilClass, f

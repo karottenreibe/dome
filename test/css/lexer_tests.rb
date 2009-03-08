@@ -175,7 +175,7 @@ class CSSLexerTests < Test::Unit::TestCase
     end
 
     def testCombinators
-        lex = CSSLexer.new "+~>"
+        lex = CSSLexer.new "+~><%"
         t = lex.get
         assert_kind_of Token, t
         assert_equal :plus, t.type
@@ -192,6 +192,18 @@ class CSSLexerTests < Test::Unit::TestCase
         assert_kind_of Token, t
         assert_equal :chevron, t.type
         assert_equal ">", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :rev_chevron, t.type
+        assert_equal "<", t.value
+
+        lex.next!
+        t = lex.get
+        assert_kind_of Token, t
+        assert_equal :percent, t.type
+        assert_equal "%", t.value
 
         lex.next!
         assert_kind_of NilClass, lex.get
@@ -227,7 +239,7 @@ class CSSLexerTests < Test::Unit::TestCase
         }
     end
 
-    def testAttrOperaotrs
+    def testAttrOperators
         lex = CSSLexer.new "~=*==^=$=|=/="
         t = lex.get
         assert_kind_of Token, t
