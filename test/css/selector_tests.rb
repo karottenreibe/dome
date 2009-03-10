@@ -232,5 +232,24 @@ class SelectorTests < Test::Unit::TestCase
         assert_kind_of ParentSelector, sl[0]
     end
 
+    def testOr
+        s = Selector.new("wallace, and gromit")
+        sl = s.selectors
+        o = s.or
+
+        assert_equal 1, sl.length
+        assert_kind_of ElementSelector, sl[0]
+        assert_equal "wallace", sl[0].instance_variable_get(:@tag)
+
+        assert_kind_of Selector, o
+        sl = o.selectors
+        assert_equal 3, sl.length
+        assert_kind_of ElementSelector, sl[0]
+        assert_equal "and", sl[0].instance_variable_get(:@tag)
+        assert_kind_of DescendantSelector, sl[1]
+        assert_kind_of ElementSelector, sl[2]
+        assert_equal "gromit", sl[2].instance_variable_get(:@tag)
+    end
+
 end
 
