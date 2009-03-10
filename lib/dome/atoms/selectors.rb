@@ -70,7 +70,13 @@ module Dome
                           :begins_with_dash => '|=',
                           :matches => '/=' }
 
-                "[#{ @ns ? @ns + ':' : '' }#{@name}#{ @op ? table[@op] + @value.inspect : '' }]"
+                "[#{
+                    case @ns
+                    when nil then '|'
+                    when :any then ''
+                    else @ns + '|'
+                    end
+                }#{@name}#{ @op ? table[@op] + @value.inspect : '' }]"
             end
         end
 
@@ -84,7 +90,13 @@ module Dome
                       node.namespace == @ns or (not @ns.nil? and node.namespace == @ns.to_sym))
             end
 
-            def inspect; "#{@ns}|"; end
+            def inspect
+                case @ns
+                when nil then '|'
+                when :any then '*|'
+                else "#{@ns}|"
+                end
+            end
         end
 
         class ChildSelector
@@ -118,7 +130,7 @@ module Dome
                 end
             end
 
-            def inspect; " - "; end
+            def inspect; " < "; end
         end
 
         class NeighbourSelector
