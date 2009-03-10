@@ -50,5 +50,17 @@ class SelectorsTests < Test::Unit::TestCase
         end
     end
 
+    def testPseudos
+        [RootSelector, OnlyChildSelector, EmptySelector, OnlyTextSelector, ParentSelector].zip(
+            %w{:root :only-child :empty :only-text ..}
+        ).each do |(klass,exp)|
+            p = klass.new
+            assert_equal exp, p.inspect
+        end
+
+        p = OnlyOfTypeSelector.new "type"
+        assert_equal ":only-of-type", p.inspect
+    end
+
 end
 
