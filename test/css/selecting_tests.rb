@@ -383,7 +383,7 @@ EOI
         assert_kind_of Element, two
         assert_equal :root, two.tag
     end
-     
+      
     def testParentSelector
         one = @tree/"level2.."
         two = @tree%"level2.."
@@ -396,6 +396,13 @@ EOI
         two = @tree/"level2.."
 
         assert_not_equal one, two
+    end
+    
+    def testOr
+        one = @tree/"level1, level11"
+        two = @tree/"root > *"
+
+        assert_equal two, one
     end
 
     def testSelectNothing
