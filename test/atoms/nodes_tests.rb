@@ -112,5 +112,14 @@ class NodesTests < Test::Unit::TestCase
         assert_equal [s,s,s].inspect, r.inspect
     end
 
+    def testTreeInspect
+        t = Tree.new
+        s = Element.new(:sub)
+        t.root.children << s
+        t.root.children << s
+        t.root.children << s
+        assert_equal "#<Dome::Tree " + [s,s,s].inspect + ">", t.inspect
+    end
+
 end
 

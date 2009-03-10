@@ -47,7 +47,7 @@ module Dome
         end
 
         def inspect
-            "#<Dome::Tree #{@root.inspect}"
+            "#<Dome::Tree #{@root.inspect}>"
         end
 
     end
