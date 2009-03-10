@@ -103,5 +103,14 @@ class NodesTests < Test::Unit::TestCase
         assert_equal '<pseudo empty="false">0<child>123456</child><child>789</child><child empty/></pseudo>', e.outer_html
     end
 
+    def testRootInspect
+        r = Root.new
+        s = Element.new(:sub)
+        r.children << s
+        r.children << s
+        r.children << s
+        assert_equal [s,s,s].inspect, r.inspect
+    end
+
 end
 
