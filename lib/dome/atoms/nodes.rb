@@ -203,7 +203,7 @@ module Dome
         # Actually just an alias for +#inspect+.
         #
         def outer_html
-            empty? ? inspect : start_tag + inner_html + end_tag
+            empty? ? inspect : start_tag + ">" + inner_html + end_tag
         end
 
         ##
@@ -228,26 +228,27 @@ module Dome
         end
 
         ##
-        # Returns a String representation of the start tag of the Element.
+        # Returns a String representation of the start tag of the Element without the closing ">".
         #
         def start_tag
-            ret = "<#{@tag}"
-            ret += @attributes.inject(' ') { |memo,a| "#{memo} #{a.inspect}" } unless @attributes.empty?
-            ret + ">"
+            tag = @namespace ? "#{@namespace}:#{@tag}" : @tag
+            ret = "<#{tag}"
+            ret += @attributes.inject('') { |memo,a| "#{memo} #{a.inspect}" } unless @attributes.empty?
+            ret
         end
 
         ##
         # Returns a String representation of the end tag of the Element.
         #
         def end_tag
-            "</#{@tag}>"
+            "</#{@namespace ? "#{@namespace}:#{@tag}" : @tag}>"
         end
 
         def inspect
             start_tag + (
                 empty? ?
                 '/>' :
-                "#{ @children.inject('') { |memo,c| "#{memo} #{c.inspect}" } } #{end_tag}"
+                ">#{ @children.inject('') { |memo,c| "#{memo} #{c.inspect}" } } #{end_tag}"
             )
         end
 
@@ -268,14 +269,14 @@ module Dome
         end
 
         def inner_html
-            "<!--#{@text}-->"
+            "<!-- #{@text} -->"
         end
 
         alias_method :outer_html, :inner_html
         alias_method :to_s, :inner_html
 
         def inspect
-            inner_html.inspect
+            inner_html
         end
     end
 
@@ -285,7 +286,7 @@ module Dome
     class Data < Node
 
         ##
-        # The data enclosed in this object - String
+        # The data enclosed in this Node - String
         attr_accessor :value
 
         ##
@@ -361,7 +362,8 @@ module Dome
         end
 
         def inspect
-            @value ? "#{@name}='#{ @value.gsub("'", "\\\\'") }'" : @name.to_s
+            name = @namespace ? "#{@namespace}:#{@name}" : @name.to_s
+            @value ? "#{name}=\"#{ @value.gsub('"', '\"') }\"" : name
         end
 
         alias_method :to_s, :inspect
