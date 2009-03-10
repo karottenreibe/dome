@@ -67,5 +67,41 @@ class NodesTests < Test::Unit::TestCase
             ' </child> </alternative:muse>', e.inspect
     end
 
+    def testInnerText
+        e = Element.new :pseudo
+        e.children << Data.new("0")
+        e.children << Element.new(:child)
+        e.children[1].children << Data.new("123456")
+        e.children << Element.new(:child)
+        e.children[2].children << Data.new("789")
+        e.children << Element.new(:child)
+        assert_equal '0123456789', e.inner_text
+    end
+
+    def testInnerHTML
+        e = Element.new :pseudo
+        e.children << Data.new("0")
+        e.children << Element.new(:child)
+        e.children[1].children << Data.new("123456")
+        e.children << Element.new(:child)
+        e.children[2].children << Data.new("789")
+        e.children << Element.new(:child)
+        e.children[3].attributes << Attribute.new(:empty)
+        assert_equal '0<child>123456</child><child>789</child><child empty/>', e.inner_html
+    end
+
+    def testOuterHTML
+        e = Element.new :pseudo
+        e.attributes << Attribute.new(:empty, "false")
+        e.children << Data.new("0")
+        e.children << Element.new(:child)
+        e.children[1].children << Data.new("123456")
+        e.children << Element.new(:child)
+        e.children[2].children << Data.new("789")
+        e.children << Element.new(:child)
+        e.children[3].attributes << Attribute.new(:empty)
+        assert_equal '<pseudo empty="false">0<child>123456</child><child>789</child><child empty/></pseudo>', e.outer_html
+    end
+
 end
 

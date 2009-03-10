@@ -23,4 +23,5 @@ require 'css/parser_tests.rb'
 require 'css/selector_tests.rb'
 require 'css/selecting_tests.rb'
 require 'css/scraping_tests.rb'
+require 'atoms/nodes_tests.rb'
 
