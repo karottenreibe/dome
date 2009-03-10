@@ -91,6 +91,10 @@ module Dome
         # All the +storage+ places are guaranteed to be initialized with an Array, even if nothing
         # was selected.
         #
+        # If an additional block is given, it is passed all results of the scraping operation and
+        # expected to return a substitution for each result, i.e. it may apply additional transformation
+        # in-place on the results.
+        #
         def scrape hash
             raise "nothing selected so far" unless @selected
 
@@ -98,7 +102,7 @@ module Dome
                 @result[storage] ||= []
 
                 @selected.each do |elem|
-                    @result[storage] <<
+                    result =
                         case selector
                         when :element then elem
                         when :inner_text, :inner_html, :outer_html then elem.send selector
@@ -113,6 +117,8 @@ module Dome
                             scrape_data elem, first..last
                         else raise "invalid selector #{selector.inspect} given to Scraper#scrape"
                         end
+                    result = yield result if block_given?
+                    @result[storage] << result
                 end
             end
         end

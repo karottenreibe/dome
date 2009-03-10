@@ -151,5 +151,19 @@ EOI
         }
     end
 
+    def testTransformation
+        res = @tree.scrape do
+            all "root > storage:first-child data:not(:last-child)"
+            scrape :inner_text => :val do |text|
+                text.to_i
+            end
+        end
+
+        assert_kind_of Hash, res
+        assert_equal [:val], res.keys
+        assert_kind_of Array, res[:val]
+        assert_equal [1,2,3,4], res[:val]
+    end
+
 end
 
