@@ -85,5 +85,10 @@ class SelectorsTests < Test::Unit::TestCase
         end
     end
 
+    def testSelectorInspect
+        s = Selector.new "dim[versus] zim"
+        assert_equal "#<Dome::Selector {dim[versus] zim}>", s.inspect
+    end
+
 end
 
