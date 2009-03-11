@@ -15,7 +15,7 @@
 #
 
 require 'test/unit'
-require 'dome/atoms/selectors'
+require 'dome/css'
 
 class SelectorsTests < Test::Unit::TestCase
     include Dome
@@ -73,6 +73,15 @@ class SelectorsTests < Test::Unit::TestCase
                 n = klass.new *([args, false] + base)
                 assert_equal ":#{type}(#{exp})", n.inspect
             end
+        end
+    end
+
+    def testEpsNotInspect
+        [EpsilonSelector,NotSelector].zip(
+            %w{eps not}
+        ).each do |(klass,exp)|
+            s = klass.new Selector.new("invader > zim")
+            assert_equal ":#{exp}(invader > zim)", s.inspect
         end
     end
 

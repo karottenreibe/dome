@@ -201,6 +201,14 @@ module Dome
             nil
         end
 
+        def inspect
+            "#<Dome::Selector {#{internal_inspect}}>"
+        end
+
+        def internal_inspect
+            @selectors.inject('') { |memo,s| memo + s.inspect }
+        end
+
         protected
 
         ##
@@ -265,14 +273,6 @@ module Dome
                     raise CSSParsingError.new(@parser.last_failure[:what], @parser.last_failure[:descriptive])
                 end
             end
-        end
-
-        def inspect
-            "#<Dome::Selector {#{internal_inspect}>"
-        end
-
-        def internal_inspect
-            @selectors.inject('') { |memo,s| memo + s.inspect }
         end
 
     end
