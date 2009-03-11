@@ -62,5 +62,19 @@ class SelectorsTests < Test::Unit::TestCase
         assert_equal ":only-of-type", p.inspect
     end
 
+    def testNthInspect
+        [NthChildSelector,NthOfTypeSelector].zip(
+            %w{nth-child nth-of-type},
+            [[],["foo"]]
+        ).each do |(klass,type,base)|
+            [[2,0],[2,1],[3,5],[0,0],[4,0],[0,1],[1,1],[1,0]].zip(
+                %w{even odd 3n+5 0 4n 1 n+1 n}
+            ).each do |(args,exp)|
+                n = klass.new *([args, false] + base)
+                assert_equal ":#{type}(#{exp})", n.inspect
+            end
+        end
+    end
+
 end
 

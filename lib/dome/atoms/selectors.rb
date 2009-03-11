@@ -190,6 +190,21 @@ module Dome
                 nth_walk( @reverse ? group.reverse : group, node, &block )
             end
 
+            def inspect
+                a,b = @args
+                ":nth-child(#{
+                    if a == 2 and b == 0 then "even"
+                    elsif a == 2 and b == 1 then "odd"
+                    else
+                        case a
+                        when 0 then b.to_s
+                        when 1 then b == 0 ? "n" : "n+#{b}"
+                        else b == 0 ? "#{a}n" : "#{a}n+#{b}"
+                        end
+                    end
+                })"
+            end
+
             protected
 
             def nth_walk group, node
@@ -199,22 +214,27 @@ module Dome
                     (a == 0 and b == idx) or (a != 0 and a * ((idx-b)/a) + b == idx)
             end
 
-            def inspect
-                a,b = @args
-                ":nth-child(#{
-                    case a
-                    when 0 then b.to_s
-                    when 1 then "n+#{b}"
-                    else b == 0 ? "#{a}n" : "#{a}n+#{b}"
-                    end
-                })"
-            end
         end
 
         class NthOfTypeSelector < NthChildSelector
             def initialize args, reverse, tag
                 @tag = tag
                 super(args, reverse)
+            end
+
+            def inspect
+                a,b = @args
+                ":nth-of-type(#{
+                    if a == 2 and b == 0 then "even"
+                    elsif a == 2 and b == 1 then "odd"
+                    else
+                        case a
+                        when 0 then b.to_s
+                        when 1 then b == 0 ? "n" : "n+#{b}"
+                        else b == 0 ? "#{a}n" : "#{a}n+#{b}"
+                        end
+                    end
+                })"
             end
 
             protected
@@ -227,17 +247,6 @@ module Dome
                 }
 
                 super(group, node, &block)
-            end
-
-            def inspect
-                a,b = @args
-                ":nth-of-type(#{
-                    case a
-                    when 0 then b.to_s
-                    when 1 then "n+#{b}"
-                    else b == 0 ? "#{a}n" : "#{a}n+#{b}"
-                    end
-                })"
             end
 
         end
