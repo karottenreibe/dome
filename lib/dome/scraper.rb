@@ -2,6 +2,8 @@
 # This file contains the CSS Scraper related classes and functions.
 #
 
+require 'rubygems'
+require 'ohash'
 require 'dome/css'
 
 module Dome
@@ -39,7 +41,7 @@ module Dome
         #
         def initialize( tree )
             @tree   = tree
-            @result = Hash.new
+            @result = OpenHash.new
         end
 
         ##

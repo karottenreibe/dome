@@ -35,7 +35,7 @@ module Dome
             return callcc { |@ret| parse_selectors } unless @parse_started
             # set up a return continuation which will be called when something
             # was parsed successfully
-            return callcc { |@ret| @cc.call } if @cc
+            return callcc { |@ret| @cc.call }        if @cc
             nil
         end
 
@@ -47,12 +47,12 @@ module Dome
         #
         def parse_selectors
             @parse_started = true
-            goon = true
+            goon           = true
             goon = parse_selector and parse_combinator while @lexer.get and goon
             # in case there was an error and there is still data stuff
             parse_tail
             @cc = nil
-            @ret.call nil
+            @ret.call(nil)
         end
 
         ##
@@ -70,9 +70,9 @@ module Dome
             # - either an element was parsed
             # - or none was parsed and neither was a namespace, and
             #   an additional was parsed
-            ns = parse_namespace_selector
+            ns   = parse_namespace_selector
             elem = parse_elem_selector
-            return terminate "element after namespace selector", trace if ns and not elem
+            return terminate("element after namespace selector", trace) if ns and not elem
             add = parse_additional_selectors
             elem or ( not ns and add )
         end
@@ -85,7 +85,6 @@ module Dome
             return false if not @lexer.get
             trace = @lexer.trace
 
-            ns = nil
             case @lexer.get.type
             when :text
                 ns = @lexer.get.value
@@ -93,10 +92,12 @@ module Dome
             when :star
                 ns = :any
                 @lexer.next!
+            else
+                ns = nil
             end
 
-            return terminate "namespace selector", trace if not @lexer.get or @lexer.get.type != :pipe
-            found :namespace, ns
+            return terminate("namespace selector", trace) if not @lexer.get or @lexer.get.type != :pipe
+            found(:namespace, ns)
             @lexer.next!
 
             true
@@ -110,9 +111,9 @@ module Dome
             return false if not @lexer.get
 
             case @lexer.get.type
-            when :text then found :element, @lexer.get.value
-            when :star then found :element, :any
-            else return false
+            when :text then found(:element, @lexer.get.value)
+            when :star then found(:element, :any)
+            else            return false
             end
 
             @lexer.next!
@@ -125,8 +126,9 @@ module Dome
         #
         def parse_additional_selectors
             found = false
-            found = true while parse_pseudo_selector or parse_id_selector or
-                parse_class_selector or parse_attr_selector or parse_parent_selector
+            found = true while parse_pseudo_selector or parse_id_selector \
+                            or parse_class_selector  or parse_attr_selector \
+                            or parse_parent_selector
             found
         end
 
@@ -144,18 +146,18 @@ module Dome
 
             if @lexer.get.type == :pipe
                 @lexer.next!
-                ns = att
+                ns  = att
                 att = parse_attr_name
-                return terminate "attribute selector", trace if not att
+                return terminate("attribute selector", trace) unless att
             elsif not att
                 return terminate "attribute selector", trace
             end
 
-            op = parse_attr_op
+            op  = parse_attr_op
             val = nil
 
             if op
-                return terminate "attribute selector", trace if not @lexer.get
+                return terminate("attribute selector", trace) unless @lexer.get
 
                 quote = false
                 if @lexer.get.type == :quote
@@ -164,16 +166,17 @@ module Dome
                 end
                 
                 val = parse_value quote
-                return terminate "attribute selector", trace unless val
+                return terminate("attribute selector", trace) unless val
 
                 if quote
-                    return terminate "attribute selector", trace if not @lexer.get or @lexer.get.type != :quote or @lexer.get.value != quote
+                    return terminate("attribute selector", trace) if not @lexer.get or @lexer.get.type != :quote \
+                                                                  or @lexer.get.value != quote
                     @lexer.next!
                 end
             end
 
-            return terminate "attribute selector", trace if not @lexer.get or @lexer.get.type != :right_bracket
-            found :attribute, [ns,att,op,val]
+            return terminate("attribute selector", trace) if not @lexer.get or @lexer.get.type != :right_bracket
+            found(:attribute, [ns,att,op,val])
             @lexer.next!
             true
         end
@@ -183,8 +186,9 @@ module Dome
         # Returns the name on success and +nil+ otherwise.
         #
         def parse_attr_name
-            return nil if not @lexer.get or not [:text,:star].include? @lexer.get.type
-            ret = @lexer.get.type == :text ? @lexer.get.value : :any
+            return nil if not @lexer.get or not [:text,:star].include?(@lexer.get.type)
+            ret = @lexer.get.type == :text ?
+                @lexer.get.value : :any
             @lexer.next!
             ret
         end
@@ -196,7 +200,8 @@ module Dome
             return nil unless @lexer.get
 
             case type = @lexer.get.type
-            when :equal, :in_list, :ends_with, :begins_with, :begins_with_dash, :contains, :matches
+            when :equal, :in_list, :ends_with, :begins_with,
+                 :begins_with_dash, :contains, :matches
                 @lexer.next!
                 type
             else

@@ -61,14 +61,14 @@ EOI
             scrape :element => :elems
         end
 
-        assert_kind_of Hash, res
-        assert_equal [:elems], res.keys
-        assert_kind_of Array, res[:elems]
-        res[:elems].each { |elem|
+        assert_kind_of OpenHash, res
+        assert_equal [:elems], res._keys
+        assert_kind_of Array, res.elems
+        res.elems.each { |elem|
             assert_kind_of Element, elem
             assert_equal :data, elem.tag
         }
-        res = res[:elems].collect { |e| e.children[0].value.to_i }
+        res = res.elems.collect { |e| e.children[0].value.to_i }
         assert_equal [1,64,2,65], res
     end
 
@@ -78,10 +78,10 @@ EOI
             scrape "@value" => :values
         end
 
-        assert_kind_of Hash, res
-        assert_equal [:values], res.keys
-        assert_kind_of Array, res[:values]
-        assert_equal ["CIA", "FBI"], res[:values]
+        assert_kind_of OpenHash, res
+        assert_equal [:values], res._keys
+        assert_kind_of Array, res.values
+        assert_equal ["CIA", "FBI"], res.values
     end
 
     def testDataScraping
@@ -90,27 +90,27 @@ EOI
             scrape "$2" => :val
         end
 
-        assert_kind_of Hash, res
-        assert_equal [:val], res.keys
-        assert_kind_of Array, res[:val]
-        assert_equal ["6"], res[:val]
+        assert_kind_of OpenHash, res
+        assert_equal [:val], res._keys
+        assert_kind_of Array, res.val
+        assert_equal ["6"], res.val
 
         res = @tree.scrape do
             all "root > storage:first-child data:last-of-type"
             scrape "$2..4" => :val
         end
 
-        assert_kind_of Hash, res
-        assert_equal [:val], res.keys
-        assert_kind_of Array, res[:val]
-        assert_equal ["678"], res[:val]
+        assert_kind_of OpenHash, res
+        assert_equal [:val], res._keys
+        assert_kind_of Array, res.val
+        assert_equal ["678"], res.val
 
         res2 = @tree.scrape do
             all "root > storage:first-child data:last-of-type"
             scrape "$2...5" => :val
         end
 
-        assert_equal res, res2
+        assert_equal res.to_h, res2.to_h
     end
 
     def testInnerOuterScraping
@@ -128,11 +128,11 @@ EOI
                 scrape sel.to_sym => :elems
             end
 
-            assert_kind_of Hash, res
-            assert_equal [:elems], res.keys
-            assert_kind_of Array, res[:elems]
-            res[:elems].each { |elem| assert_kind_of String, elem }
-            assert_equal data, res[:elems]
+            assert_kind_of OpenHash, res
+            assert_equal [:elems], res._keys
+            assert_kind_of Array, res.elems
+            res.elems.each { |elem| assert_kind_of String, elem }
+            assert_equal data, res.elems
         }
     end
 
@@ -144,10 +144,10 @@ EOI
             end
         end
 
-        assert_kind_of Hash, res
-        assert_equal [:val], res.keys
-        assert_kind_of Array, res[:val]
-        assert_equal [1,2,3,4], res[:val]
+        assert_kind_of OpenHash, res
+        assert_equal [:val], res._keys
+        assert_kind_of Array, res.val
+        assert_equal [1,2,3,4], res.val
     end
 
 end
