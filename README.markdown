@@ -4,16 +4,29 @@ This is [Dome], a pure Ruby HTML DOM parser with CSS3 support.
 
 ## Features ##
 
-Dome features a HTML DOM parser (i.e. it generate a tree structure
+Dome features a **HTML DOM parser** (i.e. it generate a tree structure
 from the HTML document) that supports common HTML/XML including
 namespaces and HTML comments. It is designed to never abort parsing
 due to errors and will instead try to fix the errors.
 
-It also features an implementation of CSS3 selectors to traverse a
+It also features an implementation of **CSS3 selectors** to traverse a
 DOM tree and grab elements from it, although it [diverges a bit] [cssdiv]
 from the standard in some points.
 
+Furthermore it has a **Scraper** class that allows for easy extraction of
+arbitrary data from HTML documents with very little code overhead.
+
 ## Usage ##
+
+    require 'rubygems'
+    require 'openuri'
+    require 'dome'
+
+    document = open('http://www.google.de') { |file| file.read }
+    tree = Dome(document)
+    puts tree.root.children[0].tag
+
+    divs = tree / 'div'
 
 ## License ##
 

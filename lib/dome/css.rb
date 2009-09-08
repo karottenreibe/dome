@@ -17,9 +17,10 @@ module Dome
         ##
         # Extracts all Elements matching the given CSS3 +path+.
         #
-        def / path
+        def /( path )
             ret = []
-            sel = path.is_a?(Selector) ? path : Selector.new(path)
+            sel = path.is_a?(Selector) ?
+                path : Selector.new(path)
             sel.each(self) { |node| ret << node }
             ret
         end
@@ -27,15 +28,16 @@ module Dome
         ##
         # Extracts the first Element matching the given CSS3 +path+.
         #
-        def % path
-            sel = path.is_a?(Selector) ? path : Selector.new(path)
-            sel.first self
+        def %( path )
+            sel = path.is_a?(Selector) ?
+                path : Selector.new(path)
+            sel.first(self)
         end
 
         ##
         # Executes the given block for each Element matching the given CSS3 +path+.
         #
-        def each path
+        def each( path )
             raise "Tree#each expects a block" unless block_given?
             ret = []
             sel = path.is_a?(Selector) ? path : Selector.new(path)
@@ -60,7 +62,7 @@ module Dome
         #
         attr_accessor :where
 
-        def initialize what, where
+        def initialize( what, where )
             @what, @where = what, where
         end
 
@@ -90,12 +92,12 @@ module Dome
         ##
         # Parses the given +obj+ (String or Lexer) into a list of CSS3 Selectors.
         #
-        def initialize obj
-            obj = CSSLexer.new(obj) unless obj.is_a? Lexer
+        def initialize( obj )
+            obj             = CSSLexer.new(obj)    unless obj.is_a?(Lexer)
             @selectors, @or = [], nil
-            @parser = CSSParser.new obj
-            parse
-            @parser = nil
+            @parser         = CSSParser.new(obj)
+            self.parse
+            @parser         = nil
         end
 
         ##
@@ -103,41 +105,41 @@ module Dome
         # from +obj+ in case +obj+ is an Element or an Array of Elements - that matches this
         # Selector.
         #
-        def each obj, &block
-            raise "Selector#each expects any of [Tree, Element, Array of Elements] as first argument" unless
-                [Tree, Element].include? obj.class or ( obj.is_a? Array and obj.all? { |n| n.is_a? Element } )
-            raise "Selector#each expects a block" unless block_given?
+        def each( obj, &block )
+            raise "Selector#each expects any of [Tree, Element, Array of Elements] as first argument" \
+                unless [Tree, Element].include?(obj.class)                                            \
+                or ( obj.is_a?(Array) and obj.all? { |n| n.is_a?(Element) } )
+            raise "Selector#each expects a block" \
+                unless block_given?
             return if @selectors.empty?
 
             nodes = sels = nil
-            if obj.is_a? Tree
+            if obj.is_a?(Tree)
                 if @selectors[0].is_a? RootSelector
-                    nodes = obj.root.children.find_all { |r| r.is_a? Element }
-                    sels = @selectors[1..-1]
+                    nodes = obj.root.children.find_all { |r| r.is_a?(Element) }
+                    sels  = @selectors[1..-1]
                 else
                     nodes = obj.flatten
-                    sels = @selectors
+                    sels  = @selectors
                 end
             else
                 nodes = [obj].flatten
-                sels = @selectors
+                sels  = @selectors
             end
 
             sels.each do |sel|
                 new_nodes = []
 
                 nodes.each { |node|
-                    sel.walk(node) { |ret| new_nodes << ret unless new_nodes.include? ret }
+                    sel.walk(node) { |ret| new_nodes << ret unless new_nodes.include?(ret) }
                 }
 
                 return if new_nodes.empty?
                 nodes = new_nodes
             end
 
-            nodes.each { |node| block.call node }
-
-            @or.each obj, &block if @or
-
+            nodes.each { |node| block.call(node) }
+            @or.each(obj, &block) if @or
             nil
         end
 
@@ -145,23 +147,24 @@ module Dome
         # Returns the first Node in the Tree given in +obj+ - or constructed from +obj+ in case +obj+
         # is an Element or an Array of Elements - that matches this Selector -- or +nil+ if none is found.
         #
-        def first obj
-            raise "Selector#first expects any of [Tree, Element, Array of Elements] as first argument" unless
-                [Tree, Element].include? obj.class or ( obj.is_a? Array and obj.all? { |n| n.is_a? Element } )
+        def first( obj )
+            raise "Selector#first expects any of [Tree, Element, Array of Elements] as first argument" \
+                unless [Tree, Element].include?(obj.class)                                             \
+                or ( obj.is_a?(Array) and obj.all? { |n| n.is_a?(Element) } )
             return if @selectors.empty?
 
             nodes = sels = nil
-            if obj.is_a? Tree
-                if @selectors[0].is_a? RootSelector
-                    nodes = obj.root.children.find_all { |r| r.is_a? Element }
-                    sels = @selectors[1..-1]
+            if obj.is_a?(Tree)
+                if @selectors[0].is_a?(RootSelector)
+                    nodes = obj.root.children.find_all { |r| r.is_a?(Element) }
+                    sels  = @selectors[1..-1]
                 else
                     nodes = obj.flatten
-                    sels = @selectors
+                    sels  = @selectors
                 end
             else
                 nodes = [obj].flatten
-                sels = @selectors
+                sels  = @selectors
             end
  
             levels = [nodes]
@@ -169,18 +172,18 @@ module Dome
             while not levels.empty?
                 # we're done if the last selector has been applied and something
                 # was found
-                return levels[-1][0] if levels.length == sels.length+1
+                return levels[-1][0] if levels.length == sels.length + 1
 
                 # if the last level is empty, we're done there
                 while levels[-1].empty?
-                    levels.delete_at -1
+                    levels.delete_at(-1)
                     # abort condition in case no element was found at all
                     return nil if levels.empty?
                 end
 
                 # generate a new level from the first node in the last level
-                node = levels[-1].delete_at 0
-                lvl = []
+                node = levels[-1].delete_at(0)
+                lvl  = []
                 sels[levels.length-1].walk(node) { |ret| lvl << ret }
                 levels << lvl unless lvl.empty?
             end
@@ -218,44 +221,45 @@ module Dome
                 when :pseudo
                     @selectors <<
                         case t.value[0]
-                        when :not then NotSelector.new(t.value[1])
-                        when :eps then EpsilonSelector.new(t.value[1])
-                        when :root then RootSelector.new
+                        when :not                then NotSelector.new(t.value[1])
+                        when :eps                then EpsilonSelector.new(t.value[1])
+                        when :root               then RootSelector.new
 
-                        when :"nth-child" then NthChildSelector.new(t.value[1], false)
-                        when :"nth-last-child" then NthChildSelector.new(t.value[1], true)
-                        when :"first-child" then NthChildSelector.new([0,1], false)
-                        when :"last-child" then NthChildSelector.new([0,1], true)
+                        when :"nth-child"        then NthChildSelector.new(t.value[1], false)
+                        when :"nth-last-child"   then NthChildSelector.new(t.value[1], true)
+                        when :"first-child"      then NthChildSelector.new([0,1],      false)
+                        when :"last-child"       then NthChildSelector.new([0,1],      true)
 
-                        when :"nth-of-type" then NthOfTypeSelector.new(t.value[1], false, last_elem)
-                        when :"nth-last-of-type" then NthOfTypeSelector.new(t.value[1], true, last_elem)
-                        when :"first-of-type" then NthOfTypeSelector.new([0,1], false, last_elem)
-                        when :"last-of-type" then NthOfTypeSelector.new([0,1], true, last_elem)
+                        when :"nth-of-type"      then NthOfTypeSelector.new(t.value[1], false, last_elem)
+                        when :"nth-last-of-type" then NthOfTypeSelector.new(t.value[1], true,  last_elem)
+                        when :"first-of-type"    then NthOfTypeSelector.new([0,1],      false, last_elem)
+                        when :"last-of-type"     then NthOfTypeSelector.new([0,1],      true,  last_elem)
 
-                        when :"only-child" then OnlyChildSelector.new
-                        when :"only-of-type" then OnlyOfTypeSelector.new(last_elem)
-                        when :empty then EmptySelector.new
-                        when :"only-text" then OnlyTextSelector.new
+                        when :"only-child"       then OnlyChildSelector.new
+                        when :"only-of-type"     then OnlyOfTypeSelector.new(last_elem)
+                        when :empty              then EmptySelector.new
+                        when :"only-text"        then OnlyTextSelector.new
                         end
                 when :child
                     @selectors << ChildSelector.new
-                    last_elem = :any
+                    last_elem   = :any
                 when :descendant
                     @selectors << DescendantSelector.new
-                    last_elem = :any
+                    last_elem   = :any
                 when :follower
                     @selectors << FollowerSelector.new
-                    last_elem = :any
+                    last_elem   = :any
                 when :predecessor
                     @selectors << PredecessorSelector.new
-                    last_elem = :any
+                    last_elem   = :any
                 when :reverse_neighbour
                     @selectors << ReverseNeighbourSelector.new
-                    last_elem = :any
+                    last_elem   = :any
                 when :neighbour
                     @selectors << NeighbourSelector.new
-                    last_elem = :any
-                when :or then @or = t.value
+                    last_elem   = :any
+                when :or
+                    @or = t.value
                 when :tail
                     raise CSSParsingError.new(@parser.last_failure[:what], @parser.last_failure[:descriptive])
                 end

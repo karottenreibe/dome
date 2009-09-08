@@ -15,10 +15,10 @@ module Dome
         # Scrapes data from the Tree by evaluating the given +block+ on an
         # Scraper object.
         #
-        def scrape &block
+        def scrape( &block )
             raise "Tree#extract expects a block" unless block_given?
-            ex = Scraper.new self
-            ex.instance_exec ex, &block
+            ex = Scraper.new(self)
+            ex.instance_exec(ex, &block)
             ex.result
         end
     end
@@ -37,8 +37,8 @@ module Dome
         ##
         # +tree+ must be the Tree on which the Scraper should operate.
         #
-        def initialize tree
-            @tree = tree
+        def initialize( tree )
+            @tree   = tree
             @result = Hash.new
         end
 
@@ -46,7 +46,7 @@ module Dome
         # Selects all Elements matching +path+.
         # Alias: +all+
         #
-        def / path
+        def /( path )
             @selected = @tree/path
         end
 
@@ -54,7 +54,7 @@ module Dome
         # Selects the first Element matching +path+.
         # Alias: +first+
         #
-        def % path
+        def %( path )
             @selected = @tree%path
         end
 
@@ -82,7 +82,7 @@ module Dome
         # expected to return a substitution for each result, i.e. it may apply additional transformation
         # in-place on the results.
         #
-        def scrape hash
+        def scrape( hash )
             raise "nothing selected so far" unless @selected
 
             hash.each do |selector,storage|
@@ -91,20 +91,20 @@ module Dome
                 @selected.each do |elem|
                     result =
                         case selector
-                        when :element then elem
-                        when :inner_text, :inner_html, :outer_html then elem.send selector
-                        when /^@./ then elem[selector[1..-1]]
+                        when :element                              then elem
+                        when :inner_text, :inner_html, :outer_html then elem.send(selector)
+                        when /^@./                                 then elem[selector[1..-1]]
                         when /^\$[0-9]+$/
                             i = selector[1..-1].to_i
-                            scrape_data elem, i..i
+                            scrape_data(elem, i..i)
                         when /^\$[0-9]+(\.\.\.?[0-9]+)?$/
-                            m = /\.\.\.?/.match selector
-                            first,last = m.pre_match[1..-1].to_i, m.post_match.to_i
+                            m = /\.\.\.?/.match(selector)
+                            first, last = m.pre_match[1..-1].to_i, m.post_match.to_i
                             last -= 1 if m[0] == "..."
-                            scrape_data elem, first..last
+                            scrape_data(elem, first..last)
                         else raise "invalid selector #{selector.inspect} given to Scraper#scrape"
                         end
-                    result = yield result if block_given?
+                    result = yield(result) if block_given?
                     @result[storage] << result
                 end
             end
@@ -116,12 +116,12 @@ module Dome
         # Scrapes the +idx+'th Data Node under the given +element+.
         # Returns the found Data Nodes' values joined together into a single String.
         #
-        def scrape_data element, range
+        def scrape_data( element, range )
             idx = 1
             ret = []
             element.children.each { |child|
-                if child.is_a? Data
-                    ret << child.value if range.include? idx
+                if child.is_a?(Data)
+                    ret << child.value if range.include?(idx)
                     idx += 1
                 end
             }

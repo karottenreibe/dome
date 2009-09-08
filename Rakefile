@@ -26,8 +26,7 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = 'Dome'
   rdoc.rdoc_files.include('lib/*.rb')
-  rdoc.rdoc_files.include('lib/*/*.rb')
-  rdoc.rdoc_files.include('lib/*/*/*.rb')
+  rdoc.rdoc_files.include('lib/*/**/*.rb')
   rdoc.rdoc_files.include(%w{README.markdown LICENSE.txt HISTORY.markdown})
 end
 
