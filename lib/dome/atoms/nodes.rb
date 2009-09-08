@@ -16,7 +16,7 @@ module Dome
         attr_accessor :root
 
         def initialize
-            @root = Root.new
+            @root      = Root.new
             @root.tree = self
         end
 
@@ -56,10 +56,11 @@ module Dome
         ##
         # Attaches this Node to the +p+ Element's children.
         #
-        def parent= p
-            raise "Nodes can only be attached to Elements or the Root" unless [Element,Root].include? p.class
+        def parent=( p )
+            raise "Nodes can only be attached to Elements or the Root" \
+                unless [Element,Root].include?(p.class)
             @parent = p
-            @tree = p.tree
+            @tree   = p.tree
             p.children << self
         end
 
@@ -78,7 +79,7 @@ module Dome
         # Whether or not the Node is the root pseudo Node.
         #
         def root?
-            is_a? Root
+            self.is_a?(Root)
         end
 
         def to_s
@@ -122,7 +123,7 @@ module Dome
         ##
         # Initializes the Element's +tag+and +namespace+.
         #
-        def initialize tag, namespace = nil
+        def initialize( tag, namespace = nil )
             super()
             @tag, @attributes, @namespace = tag, [], namespace
         end
@@ -131,45 +132,26 @@ module Dome
         # Retrieves the first attribute identified by the given +key+ from the attributes hash,
         # or +nil+ if no such attribute was specified.
         # +key+ can be any of:
-        # - 'name' -- attribute name from default or any namespace
+        # - 'name'    -- attribute name from default or any namespace
         # - 'ns:name' -- attribute name from ns namespace
-        # - ':name' -- attribute name form default namespace
+        # - ':name'   -- attribute name form default namespace
         #
-        def [] key
-            key = key.to_s.split ':'
-            ns,key = key.length == 1 ? [:default,key[0].to_sym] : [key[0],key[1].to_sym]
-            ns = nil if ns == ''
-
-            att = nil
-            if ns == :default
-                att = @attributes.find { |a| a.name == key and a.namespace == nil }
-                att ||= @attributes.find { |a| a.name == key }
-            else
-                att = @attributes.find { |a| a.name == key and a.namespace == ns }
+        def []( key )
+            resolve_key(key) do |_,_,idx|
+                att = @attributes[idx]
+                return(att ? att.value : nil)
             end
-
-            att ? att.value : nil
         end
 
         ##
         # Sets the attribute specified by +key+ to the given +value+ and creates such an Attribute
         # if it does not yet exist.
         #
-        def []= key, value
-            key = key.to_s.split ":"
-            ns,key = key.length == 1 ? [:default,key[0].to_sym] : [key[0],key[1].to_sym]
-            ns = nil if ns.empty?
-
-            idx = nil
-            if ns == :default
-                att = @attributes.index { |a| a.name == key and a.namespace == nil } or
-                att ||= @attributes.index { |a| a.name == key }
-            else
-                att = @attributes.index { |a| a.name == key and a.namespace == ns }
-            end
-
-            if idx then @attributes[idx].value = value
-            else @attributes << Attribute.new(key, value, ns)
+        def []=( key, value )
+            resolve_key(key) do |key,ns,idx|
+                if idx then @attributes[idx].value = value
+                else @attributes << Attribute.new(key, value, ns)
+                end
             end
         end
 
@@ -236,6 +218,28 @@ module Dome
             )
         end
 
+        protected
+
+        ##
+        # Yieldss the key, namespace and attribute to the given key.
+        # If no such attribute exists, yields nil insted.
+        #
+        def resolve_key( key )
+            if key.to_s.include?(':')
+                ns, key = key.to_s.split(':')
+                key     = key.to_sym
+                ns      = nil                 if ns == ''
+                idx     = @attributes.index { |a| a.name == key and a.namespace == ns }
+                yield(key, ns, idx)
+            else
+                ns  = :default
+                key = key.to_sym
+                idx = @attributes.index { |a| a.name == key and a.namespace == nil } ||
+                      @attributes.index { |a| a.name == key }
+                yield(key, ns, idx)
+            end
+        end
+
     end
 
     ##
@@ -248,7 +252,7 @@ module Dome
         #
         attr_accessor :text
 
-        def initialize text
+        def initialize( text )
             @text = text
         end
 
@@ -280,7 +284,7 @@ module Dome
             @cdata
         end
         
-        def initialize value = '', cdata = false
+        def initialize( value = '', cdata = false )
             super()
             @value, @cdata = value, cdata
         end
@@ -329,10 +333,10 @@ module Dome
         ##
         # Attaches this attribute to the +p+ Element.
         #
-        def parent= p
+        def parent=( p )
             raise "Attributes can only be attached to Elements" unless p.is_a? Element
             @parent = p
-            @tree = p.tree
+            @tree   = p.tree
             p.attributes << self
         end
 
@@ -340,7 +344,7 @@ module Dome
         # Initializes the Attribute's +name+, +value+ and +namespace+.
         # +name+ must be convertible to a Symbol.
         #
-        def initialize name, value = nil, namespace = nil
+        def initialize( name, value = nil, namespace = nil )
             super()
             @name, @value, @namespace = name.to_sym, value, namespace
         end
