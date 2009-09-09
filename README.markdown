@@ -29,16 +29,15 @@ arbitrary data from HTML documents with very little code overhead.
     header  = tree % 'div#header'
 
     results = tree / '#res ol > li > h3'
-    results.each do |h3|
-        puts h3.inner_text
-    end
+    results.map! { |h3| h3.inner_text }
 
     scraped = tree.scrape do
-        all '#res ol > li > h3'
-        scrape :inner_text => :results
+        first '#header', :results
+        all '#res ol > li > h3', :inner_text => :results
     end
 
     assert_kind_of  OpenHash, scraped
+    assert_equal    header,   scraped.header
     assert_equal    results,  scraped.results
 
 ## License ##

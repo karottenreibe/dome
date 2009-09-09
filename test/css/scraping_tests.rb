@@ -54,11 +54,8 @@ EOI
 
     def testElementScraping
         res = @tree.scrape do
-            all "special ~ data"
-            scrape :element => :elems
-
-            all "special ~ * ~ data"
-            scrape :element => :elems
+            all "special ~ data", :element => :elems
+            all "special ~ * ~ data", :element => :elems
         end
 
         assert_kind_of OpenHash, res
@@ -74,8 +71,7 @@ EOI
 
     def testAttributeScraping
         res = @tree.scrape do
-            all "special"
-            scrape "@value" => :values
+            all "special", "@value" => :values
         end
 
         assert_kind_of OpenHash, res
@@ -86,8 +82,7 @@ EOI
 
     def testDataScraping
         res = @tree.scrape do
-            all "root > storage:first-child data:last-of-type"
-            scrape "$2" => :val
+            all "root > storage:first-child data:last-of-type", "$2" => :val
         end
 
         assert_kind_of OpenHash, res
@@ -96,8 +91,7 @@ EOI
         assert_equal ["6"], res.val
 
         res = @tree.scrape do
-            all "root > storage:first-child data:last-of-type"
-            scrape "$2..4" => :val
+            all "root > storage:first-child data:last-of-type", "$2..4" => :val
         end
 
         assert_kind_of OpenHash, res
@@ -106,8 +100,7 @@ EOI
         assert_equal ["678"], res.val
 
         res2 = @tree.scrape do
-            all "root > storage:first-child data:last-of-type"
-            scrape "$2...5" => :val
+            all "root > storage:first-child data:last-of-type", "$2...5" => :val
         end
 
         assert_equal res.to_h, res2.to_h
@@ -121,11 +114,8 @@ EOI
             ]
         ).each { |(sel,data)|
             res = @tree.scrape do
-                all "special ~ data"
-                scrape sel.to_sym => :elems
-
-                all "special ~ * ~ data"
-                scrape sel.to_sym => :elems
+                all "special ~ data", sel.to_sym => :elems
+                all "special ~ * ~ data", sel.to_sym => :elems
             end
 
             assert_kind_of OpenHash, res
@@ -138,10 +128,32 @@ EOI
 
     def testTransformation
         res = @tree.scrape do
-            all "root > storage:first-child data:not(:last-child)"
-            scrape :inner_text => :val do |text|
-                text.to_i
-            end
+            all "root > storage:first-child data:not(:last-child)", :inner_text => :val
+            result.val.map!(&:to_i)
+        end
+
+        assert_kind_of OpenHash, res
+        assert_equal [:val], res._keys
+        assert_kind_of Array, res.val
+        assert_equal [1,2,3,4], res.val
+    end
+
+    def testFirst
+        res = @tree.scrape do
+            first "root > storage:first-child data:not(:last-child)", :inner_text => :val
+            result.val = result.val.to_i
+        end
+
+        assert_kind_of OpenHash, res
+        assert_equal [:val], res._keys
+        assert_kind_of Integer, res.val
+        assert_equal 1, res.val
+    end
+
+    def testNoSelector
+        res = @tree.scrape do
+            all "root > storage:first-child data:not(:last-child)", :val
+            result.val.map!(&:inner_text).map!(&:to_i)
         end
 
         assert_kind_of OpenHash, res
