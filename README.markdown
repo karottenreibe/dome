@@ -2,6 +2,7 @@
 
 This is [Dome], a pure Ruby HTML DOM parser with CSS3 support.
 
+
 ## Features ##
 
 Dome features a **HTML DOM parser** (i.e. it generate a tree structure
@@ -15,6 +16,13 @@ from the standard in some points.
 
 Furthermore it has a **Scraper** class that allows for easy extraction of
 arbitrary data from HTML documents with very little code overhead.
+
+
+## Installation ##
+
+    gem install karottenreibe-dome --source http://gems.github.com
+    gem install dome
+
 
 ## Usage ##
 
@@ -39,6 +47,7 @@ arbitrary data from HTML documents with very little code overhead.
     assert_kind_of  OpenHash, scraped
     assert_equal    header,   scraped.header
     assert_equal    results,  scraped.results
+
 
 ## License ##
 
